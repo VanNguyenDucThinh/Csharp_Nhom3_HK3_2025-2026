@@ -1,0 +1,8 @@
+<Solution>
+  <Project Path="../DataAccess/DataAccess.csproj" />
+  <Project Path="../UserDB/UserDB.sqlproj" Id="5a99dcf3-c4b4-4472-a2ac-d35124e3c022">
+    <Build />
+    <Deploy />
+  </Project>
+  <Project Path="DapperDemo.csproj" />
+</Solution>
