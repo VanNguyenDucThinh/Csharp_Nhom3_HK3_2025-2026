@@ -1,11 +1,11 @@
 {
   "version": 2,
-  "dgSpecHash": "ZTLhTtTT9TU=",
+  "dgSpecHash": "Gd7BRmUHQAk=",
   "success": true,
-  "projectFilePath": "C:\\Users\\Van Nguyen Duc Thinh\\Csharp\\DapperDemo\\DapperDemo.csproj",
+  "projectFilePath": "C:\\Users\\ACER\\Downloads\\Csharp_Nhom3_HK3_2025-2026\\TimHieuDapper\\DapperDemo\\DapperDemo.csproj",
   "expectedPackageFiles": [
-    "C:\\Users\\Van Nguyen Duc Thinh\\.nuget\\packages\\microsoft.aspnetcore.openapi\\10.0.8\\microsoft.aspnetcore.openapi.10.0.8.nupkg.sha512",
-    "C:\\Users\\Van Nguyen Duc Thinh\\.nuget\\packages\\microsoft.openapi\\2.0.0\\microsoft.openapi.2.0.0.nupkg.sha512"
+    "C:\\Users\\ACER\\.nuget\\packages\\microsoft.aspnetcore.openapi\\10.0.8\\microsoft.aspnetcore.openapi.10.0.8.nupkg.sha512",
+    "C:\\Users\\ACER\\.nuget\\packages\\microsoft.openapi\\2.0.0\\microsoft.openapi.2.0.0.nupkg.sha512"
   ],
   "logs": []
 }
