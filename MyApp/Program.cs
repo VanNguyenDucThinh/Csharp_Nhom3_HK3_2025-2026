@@ -4,7 +4,7 @@ class Program
 {
     static void Main(string[] args)
     {
-        Console.WriteLine("Hello Docker! This is a simple .NET application running inside a Docker container.");
-        Console.WriteLine("This application is running on .NET 8.0.");
+        Console.WriteLine("Hello, Docker! Tôi đang chạy trong một container Docker.");
+        Console.WriteLine("Đây là một ứng dụng C# đơn giản được triển khai trong Docker.");
     }
 }
