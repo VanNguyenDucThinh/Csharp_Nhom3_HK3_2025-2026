@@ -10,3 +10,16 @@ C:\Users\Van Nguyen Duc Thinh\Csharp\DataAccess\obj\Debug\net10.0\DataAccess.dll
 C:\Users\Van Nguyen Duc Thinh\Csharp\DataAccess\obj\Debug\net10.0\refint\DataAccess.dll
 C:\Users\Van Nguyen Duc Thinh\Csharp\DataAccess\obj\Debug\net10.0\DataAccess.pdb
 C:\Users\Van Nguyen Duc Thinh\Csharp\DataAccess\obj\Debug\net10.0\ref\DataAccess.dll
+C:\Users\Van Nguyen Duc Thinh\Documents\GitHub\Csharp_Nhom3_HK3_2025-2026\TimHieuDapper\DataAccess\bin\Debug\net10.0\DataAccess.deps.json
+C:\Users\Van Nguyen Duc Thinh\Documents\GitHub\Csharp_Nhom3_HK3_2025-2026\TimHieuDapper\DataAccess\bin\Debug\net10.0\DataAccess.dll
+C:\Users\Van Nguyen Duc Thinh\Documents\GitHub\Csharp_Nhom3_HK3_2025-2026\TimHieuDapper\DataAccess\bin\Debug\net10.0\DataAccess.pdb
+C:\Users\Van Nguyen Duc Thinh\Documents\GitHub\Csharp_Nhom3_HK3_2025-2026\TimHieuDapper\DataAccess\obj\Debug\net10.0\DataAccess.csproj.AssemblyReference.cache
+C:\Users\Van Nguyen Duc Thinh\Documents\GitHub\Csharp_Nhom3_HK3_2025-2026\TimHieuDapper\DataAccess\obj\Debug\net10.0\DataAccess.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\Van Nguyen Duc Thinh\Documents\GitHub\Csharp_Nhom3_HK3_2025-2026\TimHieuDapper\DataAccess\obj\Debug\net10.0\DataAccess.AssemblyInfoInputs.cache
+C:\Users\Van Nguyen Duc Thinh\Documents\GitHub\Csharp_Nhom3_HK3_2025-2026\TimHieuDapper\DataAccess\obj\Debug\net10.0\DataAccess.AssemblyInfo.cs
+C:\Users\Van Nguyen Duc Thinh\Documents\GitHub\Csharp_Nhom3_HK3_2025-2026\TimHieuDapper\DataAccess\obj\Debug\net10.0\DataAccess.csproj.CoreCompileInputs.cache
+C:\Users\Van Nguyen Duc Thinh\Documents\GitHub\Csharp_Nhom3_HK3_2025-2026\TimHieuDapper\DataAccess\obj\Debug\net10.0\DataAccess.sourcelink.json
+C:\Users\Van Nguyen Duc Thinh\Documents\GitHub\Csharp_Nhom3_HK3_2025-2026\TimHieuDapper\DataAccess\obj\Debug\net10.0\DataAccess.dll
+C:\Users\Van Nguyen Duc Thinh\Documents\GitHub\Csharp_Nhom3_HK3_2025-2026\TimHieuDapper\DataAccess\obj\Debug\net10.0\refint\DataAccess.dll
+C:\Users\Van Nguyen Duc Thinh\Documents\GitHub\Csharp_Nhom3_HK3_2025-2026\TimHieuDapper\DataAccess\obj\Debug\net10.0\DataAccess.pdb
+C:\Users\Van Nguyen Duc Thinh\Documents\GitHub\Csharp_Nhom3_HK3_2025-2026\TimHieuDapper\DataAccess\obj\Debug\net10.0\ref\DataAccess.dll
