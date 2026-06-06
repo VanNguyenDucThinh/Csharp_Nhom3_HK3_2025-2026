@@ -1,11 +1,11 @@
 {
   "version": 2,
-  "dgSpecHash": "xHp5ly0xibg=",
+  "dgSpecHash": "jQlm72oZK9k=",
   "success": true,
-  "projectFilePath": "C:\\Users\\DUC KHAN\\TuneVault\\TuneVault.API\\TuneVault.API.csproj",
+  "projectFilePath": "c:\\Users\\Van Nguyen Duc Thinh\\Documents\\GitHub\\Csharp_Nhom3_HK3_2025-2026\\BACKEND\\TuneVault\\TuneVault.API\\TuneVault.API.csproj",
   "expectedPackageFiles": [
-    "C:\\Users\\DUC KHAN\\.nuget\\packages\\microsoft.aspnetcore.openapi\\10.0.7\\microsoft.aspnetcore.openapi.10.0.7.nupkg.sha512",
-    "C:\\Users\\DUC KHAN\\.nuget\\packages\\microsoft.openapi\\2.0.0\\microsoft.openapi.2.0.0.nupkg.sha512"
+    "C:\\Users\\Van Nguyen Duc Thinh\\.nuget\\packages\\microsoft.aspnetcore.openapi\\10.0.7\\microsoft.aspnetcore.openapi.10.0.7.nupkg.sha512",
+    "C:\\Users\\Van Nguyen Duc Thinh\\.nuget\\packages\\microsoft.openapi\\2.0.0\\microsoft.openapi.2.0.0.nupkg.sha512"
   ],
   "logs": []
 }
