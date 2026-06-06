@@ -1,6 +1,0 @@
-C:\Users\Van Nguyen Duc Thinh\Csharp\UserDB\bin\Debug\UserDB.dacpac
-C:\Users\Van Nguyen Duc Thinh\Csharp\UserDB\bin\Debug\UserDB.dll
-C:\Users\Van Nguyen Duc Thinh\Csharp\UserDB\bin\Debug\UserDB.pdb
-C:\Users\Van Nguyen Duc Thinh\Csharp\UserDB\obj\Debug\UserDB.sqlproj.AssemblyReference.cache
-C:\Users\Van Nguyen Duc Thinh\Csharp\UserDB\obj\Debug\UserDB.dll
-C:\Users\Van Nguyen Duc Thinh\Csharp\UserDB\obj\Debug\UserDB.pdb

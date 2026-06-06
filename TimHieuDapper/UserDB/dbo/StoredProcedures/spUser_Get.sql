@@ -1,6 +1,0 @@
-﻿CREATE PROCEDURE [dbo].[spUser_Get]
-	@Id INT
-AS
-begin
-	select Id, FirstName, LastName from [dbo].[User] where Id = @Id;
-end
