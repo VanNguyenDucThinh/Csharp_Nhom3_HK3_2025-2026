@@ -1,10 +1,9 @@
 using System;
 
-namespace Domain.Entity;
+namespace TuneVault.Domain.Entities;
 
 public class MediaShare
 {
-    public Guid IdMediaShare { get; set; }//khoa chính
     public Guid IdSender { get; set; }//khoa ngoại, người chia sẻ
     public Guid IdReceiver { get; set; }//khoa ngoại, người nhận 
     public Guid? IdMediaItem { get; set; }//khoa ngoại, bài hát được chia sẻ

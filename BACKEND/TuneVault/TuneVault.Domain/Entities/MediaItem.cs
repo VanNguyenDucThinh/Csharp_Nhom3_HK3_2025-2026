@@ -1,14 +1,16 @@
 using System;
 using TuneVault.Domain.Enums;
 
-namespace Domain.Entity;
+namespace TuneVault.Domain.Entities;
 
 public class MediaItem
 {
-    public Guid IdMediaItem { get; set; }//khóa chính 
-    public string? TitleMediaItem { get; set; }//Ten bai hat
-    public TimeSpan DurationMediaItem { get; set; }//Thoi luong bai hat
-    public MediaStyle MediaStyleMediaItem { get; set; }// Loai video hay nhac
+    public Guid Id { get; set; }//khóa chính 
+    public string? Title { get; set; }//Ten bai hat
+    public string? Description { get; set; }//Mo ta bai hat
+    public Category Category { get; set; }//The loai bai hat
+    public TimeSpan Duration { get; set; }//Thoi luong bai hat
+    public MediaStyle MediaStyle { get; set; }// Loai video hay nhac
     public string UrlMediaItem { get; set; }//Duong dan den file media
     public Guid OwnerMediaItem { get; set; }//Nguoi tai len
     public DateTime UploadDateMediaItem { get; set; }=DateTime.UtcNow;//Ngay tai len

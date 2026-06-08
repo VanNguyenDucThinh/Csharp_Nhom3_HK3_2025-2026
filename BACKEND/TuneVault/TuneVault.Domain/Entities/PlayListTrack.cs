@@ -1,6 +1,6 @@
 using System;
 
-namespace Domain.Entity;
+namespace TuneVault.Domain.Entities;
 
 public class PlayListTrack//Lớp này đại diện cho mối quan hệ giữa PlayList và MediaItem, cho phép một PlayList có nhiều MediaItem và một MediaItem có thể thuộc về nhiều PlayList
 {

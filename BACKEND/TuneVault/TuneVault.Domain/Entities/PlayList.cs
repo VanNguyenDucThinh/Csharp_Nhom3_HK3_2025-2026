@@ -1,13 +1,14 @@
 using System;
+using TuneVault.Domain.Enums;
 
-namespace Domain.Entity;
+namespace TuneVault.Domain.Entities;
 
 public class PlayList
 {
-    public Guid IdPlaylist { get; set; }//khoa chính
-    public string? NamePlaylist { get; set; }//Ten playlist
-    public bool IsPublicPlaylist { get; set; }=true;//Playlist công khai hay riêng tư
-    public DateTime CreatedDatePlaylist { get; set; }//Ngay tao playlist
-    public Guid OwnerPlaylist { get; set; }//Nguoi tao playlist
+    public Guid Id { get; set; }//khoa chính
+    public string? Name { get; set; }//Ten playlist
+    public bool IsPublic { get; set; }=true;//Playlist công khai(true) hay riêng tư(false)
+    public DateTime CreatedDate { get; set; }//Ngay tao playlist
+    public Guid Owner { get; set; }//Nguoi tao playlist
 
 }

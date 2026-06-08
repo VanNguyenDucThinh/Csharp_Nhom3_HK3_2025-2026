@@ -1,6 +1,6 @@
 using System;
 
-namespace Domain.Entity;
+namespace TuneVault.Domain.Entities;
 
 public class Album
 {
@@ -8,5 +8,6 @@ public class Album
     public string? Title { get; set; }//Ten album
     public DateTime ReleaseDate { get; set; }//Ngay phat hanh
     public string? CoverImageUrl { get; set; }//Duong dan den hinh anh bia album
+    public Guid ArtistId { get; set; }//khoa ngoại, nghệ sĩ chính của album
 
 }
