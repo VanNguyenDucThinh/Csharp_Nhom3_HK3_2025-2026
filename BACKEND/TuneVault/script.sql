@@ -13,7 +13,7 @@ create table UserProfile(
 	DateOfBirth DATETIME2 NOT NULL,
 	Bio NVARCHAR(max) NULL,
 	UserName varchar(50) NOT NULL UNIQUE, --loginName
-	[Password] varchar(255) not null, 
+	[Password] varchar(255) not null
 );
 Go
 
@@ -66,7 +66,7 @@ create table MediaShare(
 	IdReceiver UNIQUEIDENTIFIER not null,
 	IdMediaItem UNIQUEIDENTIFIER null,
 	IdPlayList UNIQUEIDENTIFIER null,
-	ShareAt DATETIME2 not null,
+	ShareAt DATETIME2 not null
 
 	Constraint MediaShare_IdMediaItem_Fkey foreign key(IdMediaItem)
 		references MediaItem(Id) on delete set null,
@@ -77,17 +77,17 @@ create table MediaShare(
 	constraint MediaShare_IdSender_Fkey foreign key(IdSender)
 		references UserProfile(UserId),
 	constraint MediaShare_IdReceiver_Fkey foreign key(IdReceiver)
-		references UserProfile(UserId),
+		references UserProfile(UserId)
 
 );
 Go
 
 --Table notification
-create table notification(
+create table Notification(
 	Id UNIQUEIDENTIFIER PRIMARY KEY DEFAULT NEWSEQUENTIALID(),
 	IdUser UNIQUEIDENTIFIER NOT NULL,
-	[Type] varchar(100) not null,
-	Payload NVARCHAR(MAX) NOT NULL,
+	[Type] int not null,
+	Payload NVARCHAR(MAX) NOT NULL
 
 	constraint notification_IdUser_Fkey foreign key(IdUser)
 		references UserProfile(UserId)
@@ -98,7 +98,7 @@ GO
 create table Favorite(
 	IdUser UNIQUEIDENTIFIER NOT NULL,
 	IdMediaItem UNIQUEIDENTIFIER not null,
-	FavoritedAt DATETIME2 NOT NULL,
+	FavoriteAt DATETIME2 NOT NULL,
 
 	PRIMARY KEY (IdUser, IdMediaItem),
 
@@ -114,7 +114,7 @@ Go
 create table PlayHistory(
 	IdUser UNIQUEIDENTIFIER NOT NULL,
 	IdMediaItem UNIQUEIDENTIFIER not null,
-	PlayAt datetime2 not null,
+	PlayAt datetime2 not null
 
 	constraint PlayHistory_IdUser_Fkey foreign key(IdUser)
 		references UserProfile(UserId) on delete cascade,
@@ -128,7 +128,7 @@ Go
 create table Follow(
 	IdFollower UNIQUEIDENTIFIER not null,
 	IdFollowing UNIQUEIDENTIFIER not null,
-	FollowAt datetime2 not null,
+	FollowAt datetime2 not null
 
 	constraint Follow_IdFollower_Fkey foreign key(IdFollower)
 		references UserProfile(UserId) on delete no action,
@@ -165,9 +165,9 @@ Go
 --table MediaItem_Artist
 create table MediaItem_Artist(
 	IdMediaItem UNIQUEIDENTIFIER not null,
-	IdArtist UNIQUEIDENTIFIER not null
+	IdArtist UNIQUEIDENTIFIER not null,
 
-	primary key(IdMediaItem , IdArtist)
+	primary key(IdMediaItem , IdArtist),
 
 	constraint MediaItemArtist_IdMediaItem_FKey foreign key (IdMediaItem) 
         references MediaItem(Id) on delete cascade,
