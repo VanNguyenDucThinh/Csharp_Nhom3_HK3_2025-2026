@@ -35,12 +35,11 @@ Go
 create table PlayList(
 	Id UNIQUEIDENTIFIER primary key,
 	[Name] varchar(255) not null,
-	UserId UNIQUEIDENTIFIER not null,
 	IsPublic bit not null default 1, --0:Private|1:not Private
-	CreateDate datetime2 not null,
+	CreateDate datetime2 not null ,
 	[Owner] UNIQUEIDENTIFIER not null
 
-	Constraint PlayList_Id_FKey foreign key(Id)
+	Constraint PlayList_Owner_FKey foreign key([Owner])
 		References UserProfile(UserId) on delete cascade
 );
 Go
