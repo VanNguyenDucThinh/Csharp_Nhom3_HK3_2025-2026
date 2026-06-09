@@ -27,7 +27,7 @@ create table MediaItem(
 	MediaStyleId INT NOT NULL,
 	UrlMediaItem VARCHAR(2048) NOT NULL,
 	OwnerMediaItem UNIQUEIDENTIFIER NOT NULL,
-	UploadDateMediaItem  datetime2 not null default getdate()
+	UploadDateMediaItem  datetime2 not null
 );
 Go
 
@@ -37,7 +37,7 @@ create table PlayList(
 	[Name] varchar(255) not null,
 	UserId UNIQUEIDENTIFIER not null,
 	IsPublic bit not null default 1, --0:Private|1:not Private
-	CreateDate datetime2 not null default getdate(),
+	CreateDate datetime2 not null,
 	[Owner] UNIQUEIDENTIFIER not null
 
 	Constraint PlayList_Id_FKey foreign key(Id)
@@ -49,7 +49,7 @@ Go
 create table PlayListTrack(
 	IdPlaylist UNIQUEIDENTIFIER not null,
 	IdMediaItem UNIQUEIDENTIFIER not null,
-	AddAt datetime2 not null default getdate(),
+	AddAt datetime2 not null,
 	Primary Key (IdPlaylist , IdMediaItem),
 
 	Constraint PlayListTrack_IdPlaylist_FKey foreign key(IdPlaylist)
@@ -66,7 +66,7 @@ create table MediaShare(
 	IdReceiver UNIQUEIDENTIFIER not null,
 	IdMediaItem UNIQUEIDENTIFIER null,
 	IdPlayList UNIQUEIDENTIFIER null,
-	ShareAt DATETIME2 DEFAULT GETDATE(),
+	ShareAt DATETIME2 not null,
 
 	Constraint MediaShare_IdMediaItem_Fkey foreign key(IdMediaItem)
 		references MediaItem(Id) on delete set null,
@@ -98,7 +98,7 @@ GO
 create table Favorite(
 	IdUser UNIQUEIDENTIFIER NOT NULL,
 	IdMediaItem UNIQUEIDENTIFIER not null,
-	FavoritedAt DATETIME2 NOT NULL DEFAULT GETDATE(),
+	FavoritedAt DATETIME2 NOT NULL,
 
 	PRIMARY KEY (IdUser, IdMediaItem),
 
@@ -114,7 +114,7 @@ Go
 create table PlayHistory(
 	IdUser UNIQUEIDENTIFIER NOT NULL,
 	IdMediaItem UNIQUEIDENTIFIER not null,
-	PlayAt datetime2 not null default getdate(),
+	PlayAt datetime2 not null,
 
 	constraint PlayHistory_IdUser_Fkey foreign key(IdUser)
 		references UserProfile(UserId) on delete cascade,
@@ -128,7 +128,7 @@ Go
 create table Follow(
 	IdFollower UNIQUEIDENTIFIER not null,
 	IdFollowing UNIQUEIDENTIFIER not null,
-	FollowAt datetime2 not null default getdate(),
+	FollowAt datetime2 not null,
 
 	constraint Follow_IdFollower_Fkey foreign key(IdFollower)
 		references UserProfile(UserId) on delete no action,
@@ -141,7 +141,7 @@ Go
 create table Album(
 	IdAlbum UNIQUEIDENTIFIER PRIMARY KEY DEFAULT NEWSEQUENTIALID(),
 	Title nvarchar(max) not null,
-	ReleaseDate datetime2 not null default getdate(),
+	ReleaseDate datetime2 not null,
 	CoverImageUrl varchar(max) not null,
 	ArtistId UNIQUEIDENTIFIER not null
 
