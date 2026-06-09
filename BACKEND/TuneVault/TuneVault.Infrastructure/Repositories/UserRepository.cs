@@ -94,5 +94,15 @@ namespace TuneVault.Infrastructure.Repositories
             return count == 1;
         }
 
+        //login
+        public async Task<UserProfile?> GetByUserNameOrEmailAsync(string LoginName)
+        {
+            string sql = @"select UserId, [Name], [Email], [AvatarUrl], [DateOfBirth], [Bio], [UserName], [Password]
+                           from UserProfile
+                           where UserName = @LoginName or [Email] = @LoginName";
+            using var connection = _connection.CreateConnection();
+            var command = new CommandDefinition(sql, new {LoginName = LoginName});
+            return await connection.QueryFirstOrDefaultAsync<UserProfile>(command);
+        }
     }
 }
