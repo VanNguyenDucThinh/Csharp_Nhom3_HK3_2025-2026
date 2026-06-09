@@ -14,11 +14,10 @@ namespace TuneVault.Infrastructure.Repositories
         {
             _connection = connection;
         }
-
+        
         //Create
-        public async Task<bool> CreateUserProfile(UserProfile userProfile) //register
+        public async Task<Guid> CreateUserProfile(UserProfile userProfile) //register
         {
-            ;
             string sql = @"Insert into UserProfile(UserName, [Password], [Email] , [Name])
                            output INSERTED.[UserId]
                            values (@UserName , @Password , @Email , @Name)";
@@ -49,9 +48,9 @@ namespace TuneVault.Infrastructure.Repositories
         public async Task<bool> UpdateUserProfile(UserProfile userProfile)
         {
             string sql = @"update UserProfile
-                           set [Name] = @Name
-                               AvatarUrl = @AvatarUrl
-                               DateOfBirth = @DateOfBirth
+                           set [Name] = @Name,
+                               AvatarUrl = @AvatarUrl,
+                               DateOfBirth = @DateOfBirth,
                                Bio = @Bio
                                where UserId = @UserId";
             using var connection = _connection.CreateConnection();
