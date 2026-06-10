@@ -29,7 +29,7 @@ namespace TuneVault.Infrastructure.Repositories
                 Email = userProfile.Email,
                 Name = userProfile.Name
             });
-            return await connection.QuerySingleAsync(command);
+            return await connection.QuerySingleAsync<Guid>(command); //Trả về 1 Guid user vừa register 
         }
 
         //Delete
