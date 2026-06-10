@@ -1,10 +1,8 @@
 // src/pages/Login.tsx
+// Đây là file lưu trữ. Khi Backend làm xong, copy toàn bộ file này vào file Login.tsx để sử dụng
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import authService from '../authService'
-
-// Chế độ mock — tắt đi khi backend sẵn sàng
-const USE_MOCK = true
 
 export default function Login() {
   const navigate = useNavigate()
@@ -19,15 +17,8 @@ export default function Login() {
     if (!username || !password) { setError('Vui lòng điền đầy đủ thông tin.'); return }
     setLoading(true); setError('')
     try {
-      if (USE_MOCK) {
-        // Giả lập login thành công để test giao diện
-        localStorage.setItem('token', 'mock-token-123')
-        localStorage.setItem('user', JSON.stringify({ id: '1', username, email: email || `${username}@test.com` }))
-        navigate('/')
-      } else {
-        await authService.login({ username, password })
-        navigate('/')
-      }
+      await authService.login({ username, password })
+      navigate('/')
     } catch {
       setError('Tên đăng nhập hoặc mật khẩu không đúng.')
     } finally {
@@ -39,15 +30,8 @@ export default function Login() {
     if (!username || !email || !password) { setError('Vui lòng điền đầy đủ thông tin.'); return }
     setLoading(true); setError('')
     try {
-      if (USE_MOCK) {
-        // Giả lập đăng ký thành công để test giao diện
-        localStorage.setItem('token', 'mock-token-123')
-        localStorage.setItem('user', JSON.stringify({ id: '1', username, email }))
-        navigate('/')
-      } else {
-        await authService.register({ username, email, password })
-        navigate('/')
-      }
+      await authService.register({ username, email, password })
+      navigate('/')
     } catch {
       setError('Đăng ký thất bại. Tên đăng nhập hoặc email đã tồn tại.')
     } finally {
@@ -58,61 +42,33 @@ export default function Login() {
   return (
     <div style={styles.page}>
       <div style={styles.card}>
+        {/* Logo */}
         <h1 style={styles.logo}>TuneVault</h1>
         <p style={styles.sub}>Nền tảng nghe nhạc & xem video của bạn</p>
 
-        {/* Tabs */}
+        {/* Tabs Login / Register */}
         <div style={styles.tabs}>
-          <button
-            style={{ ...styles.tab, ...(tab === 'login' ? styles.activeTab : {}) }}
-            onClick={() => { setTab('login'); setError('') }}
-          >
+          <button style={{ ...styles.tab, ...(tab === 'login' ? styles.activeTab : {}) }} onClick={() => { setTab('login'); setError('') }}>
             Đăng nhập
           </button>
-          <button
-            style={{ ...styles.tab, ...(tab === 'register' ? styles.activeTab : {}) }}
-            onClick={() => { setTab('register'); setError('') }}
-          >
+          <button style={{ ...styles.tab, ...(tab === 'register' ? styles.activeTab : {}) }} onClick={() => { setTab('register'); setError('') }}>
             Đăng ký
           </button>
         </div>
 
         {/* Form */}
         <div style={styles.form}>
-          <input
-            style={styles.input}
-            type="text"
-            placeholder="Tên đăng nhập"
-            value={username}
-            onChange={e => setUsername(e.target.value)}
-          />
+          <input style={styles.input} type="text" placeholder="Tên đăng nhập" value={username} onChange={e => setUsername(e.target.value)} />
 
           {tab === 'register' && (
-            <input
-              style={styles.input}
-              type="email"
-              placeholder="Email"
-              value={email}
-              onChange={e => setEmail(e.target.value)}
-            />
+            <input style={styles.input} type="email" placeholder="Email" value={email} onChange={e => setEmail(e.target.value)} />
           )}
 
-          <input
-            style={styles.input}
-            type="password"
-            placeholder="Mật khẩu"
-            value={password}
-            onChange={e => setPassword(e.target.value)}
+          <input style={styles.input} type="password" placeholder="Mật khẩu" value={password} onChange={e => setPassword(e.target.value)}
             onKeyDown={e => e.key === 'Enter' && (tab === 'login' ? handleLogin() : handleRegister())}
           />
 
           {error && <p style={styles.error}>{error}</p>}
-
-          {USE_MOCK && (
-            <p style={styles.mockNote}>
-              🔧 Chế độ thử nghiệm — Backend chưa kết nối
-            </p>
-          )}
 
           <button
             style={{ ...styles.btn, ...(loading ? styles.btnDisabled : {}) }}
@@ -138,7 +94,6 @@ const styles: Record<string, React.CSSProperties> = {
   form: { display: 'flex', flexDirection: 'column', gap: 12 },
   input: { backgroundColor: '#2a2a2a', border: '1px solid #3a3a3a', borderRadius: 6, padding: '13px 16px', color: '#fff', fontSize: 14, outline: 'none' },
   error: { color: '#f15e6c', fontSize: 13, textAlign: 'center', margin: '4px 0' },
-  mockNote: { color: '#f59e0b', fontSize: 12, textAlign: 'center', backgroundColor: '#2a2000', borderRadius: 6, padding: '8px', margin: '0' },
   btn: { backgroundColor: '#1DB954', color: '#000', border: 'none', borderRadius: 50, padding: 14, fontWeight: 700, fontSize: 15, cursor: 'pointer', marginTop: 4 },
   btnDisabled: { opacity: 0.6, cursor: 'not-allowed' },
 }

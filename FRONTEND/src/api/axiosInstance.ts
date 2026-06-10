@@ -1,26 +1,40 @@
 // src/api/axiosInstance.ts
-import axios from 'axios';
+import axios from 'axios'
+
+// Đọc URL từ file .env — không hardcode
+// Nếu .env chưa có thì fallback về localhost:5000
+const BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000/api'
 
 const axiosInstance = axios.create({
-  // Bạn có thể sửa cổng (Port) này lại cho đúng với cổng chạy Backend C# của bạn
-  baseURL: 'http://localhost:5000/api', 
+  baseURL: BASE_URL,
   headers: {
     'Content-Type': 'application/json',
   },
-});
+})
 
-// Bộ đánh chặn (Interceptor) tự động kiểm tra và gắn Token vào Header của mọi request
+// Interceptor: tự động gắn JWT token vào mọi request
 axiosInstance.interceptors.request.use(
   (config) => {
-    const token = localStorage.getItem('token');
+    const token = localStorage.getItem('token')
     if (token && config.headers) {
-      config.headers.Authorization = `Bearer ${token}`;
+      config.headers.Authorization = `Bearer ${token}`
     }
-    return config;
+    return config
   },
-  (error) => {
-    return Promise.reject(error);
-  }
-);
+  (error) => Promise.reject(error)
+)
 
-export default axiosInstance;
+// Interceptor: tự động logout nếu token hết hạn (lỗi 401)
+axiosInstance.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    if (error.response?.status === 401) {
+      localStorage.removeItem('token')
+      localStorage.removeItem('user')
+      window.location.href = '/login'
+    }
+    return Promise.reject(error)
+  }
+)
+
+export default axiosInstance

@@ -1,22 +1,20 @@
 // src/api/signalRService.ts
 import * as signalR from '@microsoft/signalr'
 
-// =============================================
-// SIGNALR SERVICE — nhận thông báo real-time
-// Cài package: npm install @microsoft/signalr
-// =============================================
+// Đọc URL từ .env
+const HUB_URL = import.meta.env.VITE_SIGNALR_HUB_URL || 'http://localhost:5000/hubs/notifications'
 
 let connection: signalR.HubConnection | null = null
 
 const signalRService = {
 
-  // Kết nối tới Hub thông báo của backend
+  // Kết nối tới Hub — gọi sau khi login thành công
   connect: async (onNotification: (message: string) => void) => {
     const token = localStorage.getItem('token')
     if (!token) return
 
     connection = new signalR.HubConnectionBuilder()
-      .withUrl('http://localhost:5000/hubs/notifications', {
+      .withUrl(HUB_URL, {
         accessTokenFactory: () => token,
       })
       .withAutomaticReconnect()
@@ -41,11 +39,9 @@ const signalRService = {
     if (connection) {
       await connection.stop()
       connection = null
-      console.log('SignalR disconnected')
     }
   },
 
-  // Trạng thái kết nối
   isConnected: (): boolean => {
     return connection?.state === signalR.HubConnectionState.Connected
   },
