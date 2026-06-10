@@ -1,34 +1,58 @@
 // src/pages/Profile.tsx
+import { useEffect, useState } from 'react'
+import apiClient, { type User } from '../api/apiClient'
+import authService from '../authService'
 import { useNavigate } from 'react-router-dom'
 
 export default function Profile() {
   const navigate = useNavigate()
-  
+  const [user, setUser] = useState<User | null>(null)
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    apiClient.profile.getMe()
+      .then(setUser)
+      .catch(() => setUser(authService.getCurrentUser()))
+      .finally(() => setLoading(false))
+  }, [])
+
   const handleLogout = () => {
-    localStorage.removeItem('token') // Xóa token giả
-    navigate('/login') // Đá người dùng về trang đăng nhập
+    authService.logout()
+    navigate('/login')
   }
 
+  if (loading) return <div style={{ padding: 40, color: '#b3b3b3' }}>Đang tải...</div>
+
   return (
-    <div style={{ padding: '32px', color: '#fff' }}>
-      <h1 style={{ marginBottom: 24 }}>Hồ sơ cá nhân</h1>
-      <div style={{ display: 'flex', alignItems: 'center', gap: 24, backgroundColor: '#181818', padding: 24, borderRadius: 12, maxWidth: 500 }}>
-        <img src="https://picsum.photos/150" alt="Avatar" style={{ borderRadius: '50%', border: '4px solid #1DB954' }} />
+    <div style={styles.page}>
+      <div style={styles.header}>
+        <div style={styles.avatar}>
+          {user?.avatarUrl
+            ? <img src={user.avatarUrl} alt="avatar" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+            : <span style={{ fontSize: 48 }}>👤</span>
+          }
+        </div>
         <div>
-          <h2 style={{ margin: 0 }}>Nguyễn Văn Đức Thịnh</h2>
-          <p style={{ color: '#b3b3b3', marginTop: 8, fontSize: 14 }}>Thành viên nhóm đồ án TuneVault</p>
-          <span style={{ display: 'inline-block', backgroundColor: '#1DB954', color: '#fff', padding: '4px 12px', borderRadius: 12, fontSize: 12, fontWeight: 'bold', marginTop: 12 }}>
-            Tài khoản PREMIUM
-          </span>
+          <p style={styles.label}>Hồ sơ</p>
+          <h1 style={styles.name}>{user?.username ?? 'Người dùng'}</h1>
+          <p style={styles.email}>{user?.email}</p>
         </div>
       </div>
 
-      <button 
-        onClick={handleLogout}
-        style={{ marginTop: 32, backgroundColor: '#e91429', color: '#fff', border: 'none', padding: '12px 24px', borderRadius: 24, fontWeight: 'bold', cursor: 'pointer' }}
-      >
-        Đăng xuất khỏi hệ thống
-      </button>
+      {user?.bio && <p style={styles.bio}>{user.bio}</p>}
+
+      <button style={styles.logoutBtn} onClick={handleLogout}>Đăng xuất</button>
     </div>
   )
+}
+
+const styles: Record<string, React.CSSProperties> = {
+  page: { padding: '24px 32px', color: '#fff' },
+  header: { display: 'flex', gap: 24, alignItems: 'flex-end', marginBottom: 32, padding: 24, background: 'linear-gradient(transparent 0, rgba(0,0,0,.5) 100%), #4a4a4a', borderRadius: 8 },
+  avatar: { width: 120, height: 120, borderRadius: '50%', backgroundColor: '#282828', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden', flexShrink: 0 },
+  label: { color: '#b3b3b3', fontSize: 12, textTransform: 'uppercase', letterSpacing: 1, marginBottom: 8 },
+  name: { fontSize: 36, fontWeight: 700, marginBottom: 4 },
+  email: { color: '#b3b3b3', fontSize: 14 },
+  bio: { color: '#b3b3b3', fontSize: 14, marginBottom: 32 },
+  logoutBtn: { backgroundColor: 'transparent', color: '#fff', border: '1px solid #535353', borderRadius: 20, padding: '10px 24px', cursor: 'pointer', fontWeight: 600 },
 }

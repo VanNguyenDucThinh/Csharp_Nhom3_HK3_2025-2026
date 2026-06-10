@@ -1,44 +1,104 @@
 // src/pages/Search.tsx
 import { useState } from 'react'
-
-const MOCK_ALL_SONGS = [
-  { id: 1, title: 'Chạy Ngay Đi', artist: 'Sơn Tùng M-TP' },
-  { id: 2, title: 'Waiting For You', artist: 'MONO' },
-  { id: 3, title: 'C# & .NET Song', artist: 'Lập Trình Viên Đẹp Trai' },
-  { id: 4, title: 'Database Connection Beats', artist: 'Dapper Master' },
-]
+import apiClient, { type MediaItem } from '../api/apiClient'
 
 export default function Search() {
-  const [keyword, setKeyword] = useState('')
+  const [query, setQuery] = useState('')
+  const [results, setResults] = useState<MediaItem[]>([])
+  const [loading, setLoading] = useState(false)
+  const [searched, setSearched] = useState(false)
 
-  const filteredSongs = MOCK_ALL_SONGS.filter(song => 
-    song.title.toLowerCase().includes(keyword.toLowerCase()) ||
-    song.artist.toLowerCase().includes(keyword.toLowerCase())
-  )
+  const handleSearch = async () => {
+    if (!query.trim()) return
+    setLoading(true)
+    setSearched(true)
+    try {
+      const data = await apiClient.media.search(query)
+      setResults(data)
+    } catch (err) {
+      console.error('Lỗi tìm kiếm:', err)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter') handleSearch()
+  }
 
   return (
-    <div style={{ padding: '32px', color: '#fff' }}>
-      <h1 style={{ marginBottom: 16 }}>Tìm kiếm</h1>
-      <input 
-        type="text" 
-        placeholder="Bạn muốn nghe gì?" 
-        value={keyword}
-        onChange={(e) => setKeyword(e.target.value)}
-        style={{ width: '100%', maxWidth: 400, padding: '12px 16px', borderRadius: 24, border: 'none', backgroundColor: '#242424', color: '#fff', fontSize: 16, outline: 'none', marginBottom: 24 }}
-      />
+    <div style={styles.page}>
+      <h1 style={styles.title}>Tìm kiếm</h1>
 
-      <h3>Kết quả hàng đầu</h3>
-      <div style={{ marginTop: 16 }}>
-        {filteredSongs.length > 0 ? filteredSongs.map(song => (
-          <div key={song.id} style={{ display: 'flex', justifyContent: 'space-between', padding: '12px 16px', backgroundColor: '#181818', borderRadius: 4, marginBottom: 8 }}>
-            <div>
-              <div style={{ fontWeight: 'bold' }}>{song.title}</div>
-              <div style={{ color: '#b3b3b3', fontSize: 14 }}>{song.artist}</div>
-            </div>
-            <button style={{ background: 'none', border: 'none', color: '#1DB954', cursor: 'pointer', fontSize: 18 }}>▶</button>
-          </div>
-        )) : <p style={{ color: '#b3b3b3' }}>Không tìm thấy bài hát nào khớp.</p>}
+      {/* Thanh tìm kiếm */}
+      <div style={styles.searchBar}>
+        <span style={styles.icon}>🔍</span>
+        <input
+          style={styles.input}
+          type="text"
+          placeholder="Bài hát, nghệ sĩ, playlist..."
+          value={query}
+          onChange={e => setQuery(e.target.value)}
+          onKeyDown={handleKeyDown}
+        />
+        <button style={styles.btn} onClick={handleSearch}>Tìm</button>
       </div>
+
+      {/* Kết quả */}
+      {loading && <p style={styles.info}>Đang tìm kiếm...</p>}
+
+      {!loading && searched && results.length === 0 && (
+        <p style={styles.info}>Không tìm thấy kết quả cho "{query}"</p>
+      )}
+
+      {!loading && results.length > 0 && (
+        <div>
+          <h2 style={styles.sectionTitle}>Kết quả ({results.length})</h2>
+          <table style={styles.table}>
+            <thead>
+              <tr style={styles.tableHead}>
+                <th style={styles.th}>#</th>
+                <th style={styles.th}>Tiêu đề</th>
+                <th style={styles.th}>Nghệ sĩ</th>
+                <th style={styles.th}>Loại</th>
+              </tr>
+            </thead>
+            <tbody>
+              {results.map((item, idx) => (
+                <tr key={item.id} style={styles.row}>
+                  <td style={styles.td}>{idx + 1}</td>
+                  <td style={styles.td}>
+                    <div style={styles.trackName}>
+                      <span style={styles.typeIcon}>{item.type === 'video' ? '🎬' : '🎵'}</span>
+                      {item.title}
+                    </div>
+                  </td>
+                  <td style={{ ...styles.td, color: '#b3b3b3' }}>{item.artist}</td>
+                  <td style={{ ...styles.td, color: '#b3b3b3', textTransform: 'capitalize' }}>{item.type}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
     </div>
   )
+}
+
+const styles: Record<string, React.CSSProperties> = {
+  page: { padding: '24px 32px', color: '#fff' },
+  title: { fontSize: 28, fontWeight: 700, marginBottom: 24 },
+  searchBar: { display: 'flex', alignItems: 'center', gap: 12, backgroundColor: '#242424', borderRadius: 8, padding: '8px 16px', marginBottom: 32, maxWidth: 600 },
+  icon: { fontSize: 18 },
+  input: { flex: 1, backgroundColor: 'transparent', border: 'none', outline: 'none', color: '#fff', fontSize: 15 },
+  btn: { backgroundColor: '#1DB954', color: '#000', border: 'none', borderRadius: 20, padding: '8px 20px', fontWeight: 700, cursor: 'pointer', fontSize: 13 },
+  info: { color: '#b3b3b3', marginTop: 16 },
+  sectionTitle: { fontSize: 18, fontWeight: 700, marginBottom: 16 },
+  table: { width: '100%', borderCollapse: 'collapse' },
+  tableHead: { borderBottom: '1px solid #282828' },
+  th: { padding: '8px 12px', textAlign: 'left', color: '#b3b3b3', fontSize: 12, fontWeight: 500, textTransform: 'uppercase', letterSpacing: 1 },
+  row: { borderBottom: '1px solid #1a1a1a', cursor: 'pointer' },
+  td: { padding: '12px', fontSize: 14 },
+  trackName: { display: 'flex', alignItems: 'center', gap: 10, fontWeight: 500 },
+  typeIcon: { fontSize: 18 },
 }

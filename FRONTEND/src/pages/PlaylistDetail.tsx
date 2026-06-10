@@ -1,55 +1,69 @@
 // src/pages/PlaylistDetail.tsx
+import { useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom'
-
-// Danh sách bài hát mẫu
-const MOCK_SONGS = [
-  { id: 1, title: 'Chạy Ngay Đi', artist: 'Sơn Tùng M-TP', duration: '4:05' },
-  { id: 2, title: 'Waiting For You', artist: 'MONO', duration: '4:25' },
-  { id: 3, title: 'C# & .NET Song', artist: 'Lập Trình Viên Đẹp Trai', duration: '3:50' },
-  { id: 4, title: 'Database Connection Beats', artist: 'Dapper Master', duration: '5:12' },
-]
+import apiClient, { type Playlist } from '../api/apiClient'
 
 export default function PlaylistDetail() {
   const { id } = useParams()
+  const [playlist, setPlaylist] = useState<Playlist | null>(null)
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    if (!id) return
+    apiClient.playlists.getById(Number(id))
+      .then(setPlaylist)
+      .catch(err => console.error('Lỗi tải playlist:', err))
+      .finally(() => setLoading(false))
+  }, [id])
+
+  if (loading) return <div style={{ padding: 40, color: '#b3b3b3' }}>Đang tải...</div>
+  if (!playlist) return <div style={{ padding: 40, color: '#b3b3b3' }}>Không tìm thấy playlist.</div>
 
   return (
-    <div style={{ padding: '32px', color: '#fff', overflowY: 'auto', height: '100%' }}>
-      {/* Header của Playlist */}
-      <div style={{ display: 'flex', gap: '24px', alignItems: 'flex-end', marginBottom: '32px' }}>
-        <img src={`https://picsum.photos/200?random=${id}`} alt="Cover" style={{ width: 192, height: 192, borderRadius: 8, boxShadow: '0 4px 60px rgba(0,0,0,.5)' }} />
+    <div style={styles.page}>
+      <div style={styles.header}>
+        <div style={styles.coverBox}>🎵</div>
         <div>
-          <p style={{ fontSize: '12px', fontWeight: 'bold', textTransform: 'uppercase' }}>Playlist</p>
-          <h1 style={{ fontSize: '48px', fontWeight: 'bold', margin: '8px 0' }}>Tuyển tập số {id}</h1>
-          <p style={{ color: '#b3b3b3', fontSize: '14px' }}>Tạo bởi nhóm của bạn • {MOCK_SONGS.length} bài hát</p>
+          <p style={styles.label}>Playlist</p>
+          <h1 style={styles.name}>{playlist.name}</h1>
+          <p style={styles.meta}>{playlist.tracks?.length ?? 0} bài hát · {playlist.isPublic ? 'Công khai' : 'Riêng tư'}</p>
         </div>
       </div>
 
-      {/* Nút Play hành động nhanh */}
-      <button style={{ backgroundColor: '#1DB954', color: '#fff', border: 'none', borderRadius: '50%', width: 56, height: 56, fontSize: 24, cursor: 'pointer', marginBottom: 24, fontWeight: 'bold' }}>
-        ▶
-      </button>
-
-      {/* Danh sách bài hát dạng bảng giống Spotify */}
-      <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
+      <table style={styles.table}>
         <thead>
-          <tr style={{ borderBottom: '1px solid #282828', color: '#b3b3b3', fontSize: '14px' }}>
-            <th style={{ padding: '12px', width: '50px' }}>#</th>
-            <th style={{ padding: '12px' }}>Tiêu đề</th>
-            <th style={{ padding: '12px' }}>Nghệ sĩ</th>
-            <th style={{ padding: '12px', width: '80px' }}>⏱</th>
+          <tr style={styles.thead}>
+            <th style={styles.th}>#</th>
+            <th style={styles.th}>Tiêu đề</th>
+            <th style={styles.th}>Nghệ sĩ</th>
+            <th style={styles.th}>Loại</th>
           </tr>
         </thead>
         <tbody>
-          {MOCK_SONGS.map((song, index) => (
-            <tr key={song.id} style={{ borderBottom: '1px solid transparent', cursor: 'pointer', color: '#e5e5e5' }} onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#282828'} onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}>
-              <td style={{ padding: '12px' }}>{index + 1}</td>
-              <td style={{ padding: '12px', fontWeight: '500' }}>{song.title}</td>
-              <td style={{ padding: '12px', color: '#b3b3b3' }}>{song.artist}</td>
-              <td style={{ padding: '12px', color: '#b3b3b3' }}>{song.duration}</td>
+          {(playlist.tracks ?? []).map((track, idx) => (
+            <tr key={track.id} style={styles.row}>
+              <td style={styles.td}>{idx + 1}</td>
+              <td style={{ ...styles.td, fontWeight: 600 }}>{track.title}</td>
+              <td style={{ ...styles.td, color: '#b3b3b3' }}>{track.artist}</td>
+              <td style={{ ...styles.td, color: '#b3b3b3' }}>{track.type}</td>
             </tr>
           ))}
         </tbody>
       </table>
     </div>
   )
+}
+
+const styles: Record<string, React.CSSProperties> = {
+  page: { padding: '24px 32px', color: '#fff' },
+  header: { display: 'flex', gap: 24, alignItems: 'flex-end', marginBottom: 32, padding: '24px', background: 'linear-gradient(transparent 0, rgba(0,0,0,.5) 100%), #3d3d3d', borderRadius: 8 },
+  coverBox: { width: 160, height: 160, backgroundColor: '#282828', borderRadius: 6, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 56, flexShrink: 0 },
+  label: { color: '#b3b3b3', fontSize: 12, textTransform: 'uppercase', letterSpacing: 1, marginBottom: 8 },
+  name: { fontSize: 36, fontWeight: 700, marginBottom: 8 },
+  meta: { color: '#b3b3b3', fontSize: 14 },
+  table: { width: '100%', borderCollapse: 'collapse' },
+  thead: { borderBottom: '1px solid #282828' },
+  th: { padding: '8px 12px', textAlign: 'left', color: '#b3b3b3', fontSize: 12, fontWeight: 500 },
+  row: { borderBottom: '1px solid #1a1a1a', cursor: 'pointer' },
+  td: { padding: '12px', fontSize: 14 },
 }
