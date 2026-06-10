@@ -13,15 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("MyApp")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-<<<<<<< Updated upstream
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+b8ab27174a53c49847d977f0f69c78d4217dc2cf")]
-=======
-<<<<<<< HEAD
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+966116bbdd97eabb81d0e91f3c5d424942709fc2")]
-=======
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+7c257064df9d688b7997f89986c004586df9caa0")]
->>>>>>> b8ab27174a53c49847d977f0f69c78d4217dc2cf
->>>>>>> Stashed changes
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+eff4912274421dc25f220eaa4c8c0b3e8cc555e6")]
 [assembly: System.Reflection.AssemblyProductAttribute("MyApp")]
 [assembly: System.Reflection.AssemblyTitleAttribute("MyApp")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
