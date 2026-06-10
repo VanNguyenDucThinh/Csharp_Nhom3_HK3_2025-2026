@@ -6,4 +6,23 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
+  <ItemGroup>
+    <Folder Include="DTOs\" />
+    <Folder Include="PipelineBehaviors\" />
+    <Folder Include="UseCases\" />
+    <Folder Include="UseCases\Command\" />
+    <Folder Include="UseCases\Handler\" />
+    <Folder Include="Validators\" />
+  </ItemGroup>
+  
+  <ItemGroup>
+    <ProjectReference Include="..\TuneVault.Domain\TuneVault.Domain.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="BCrypt.Net-Next" Version="4.2.0" />
+    <PackageReference Include="FluentValidation" Version="8.3.0" />
+    <PackageReference Include="MediatR" Version="14.1.0" />
+  </ItemGroup>
+
 </Project>

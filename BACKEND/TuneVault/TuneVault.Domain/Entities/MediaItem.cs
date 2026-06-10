@@ -12,7 +12,7 @@ public class MediaItem
     public TimeSpan Duration { get; set; }//Thoi luong bai hat
     public MediaStyle MediaStyle { get; set; }// Loai video hay nhac
     public string UrlMediaItem { get; set; }//Duong dan den file media
-    public Guid OwnerMediaItem { get; set; }//Nguoi tai len
+    public Guid Owner { get; set; }//Nguoi tai len
     public DateTime UploadDateMediaItem { get; set; }=DateTime.UtcNow;//Ngay tai len
 
 
