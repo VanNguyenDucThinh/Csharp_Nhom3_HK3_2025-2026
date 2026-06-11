@@ -2,37 +2,41 @@
 import { useState, useRef, useEffect } from 'react'
 
 const PlayIcon = () => (
-  <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-    <polygon points="5,3 19,12 5,21" />
-  </svg>
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><polygon points="5,3 19,12 5,21" /></svg>
 )
-
 const PauseIcon = () => (
   <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-    <rect x="5" y="3" width="4" height="18" rx="1" />
-    <rect x="15" y="3" width="4" height="18" rx="1" />
+    <rect x="5" y="3" width="4" height="18" rx="1" /><rect x="15" y="3" width="4" height="18" rx="1" />
   </svg>
 )
-
+const PrevIcon = () => (
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+    <rect x="5" y="4" width="2" height="16" rx="1" /><polygon points="19,4 9,12 19,20" />
+  </svg>
+)
+const NextIcon = () => (
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+    <rect x="17" y="4" width="2" height="16" rx="1" /><polygon points="5,4 15,12 5,20" />
+  </svg>
+)
 const VolumeIcon = () => (
   <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
     <path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02z"/>
   </svg>
 )
-
-// Prev: tam giác nhỏ bên trái + vạch đứng bên trái
-const PrevIcon = () => (
+const ShuffleIcon = () => (
   <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-    <rect x="5" y="4" width="2" height="16" rx="1" />
-    <polygon points="19,4 9,12 19,20" />
+    <path d="M10.59 9.17L5.41 4 4 5.41l5.17 5.17 1.42-1.41zM14.5 4l2.04 2.04L4 18.59 5.41 20 17.96 7.46 20 9.5V4h-5.5zm.33 9.41l-1.41 1.41 3.13 3.13L14.5 20H20v-5.5l-2.04 2.04-3.13-3.13z"/>
   </svg>
 )
-
-// Next: tam giác nhỏ bên phải + vạch đứng bên phải
-const NextIcon = () => (
+const RepeatIcon = () => (
   <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-    <rect x="17" y="4" width="2" height="16" rx="1" />
-    <polygon points="5,4 15,12 5,20" />
+    <path d="M7 7h10v3l4-4-4-4v3H5v6h2V7zm10 10H7v-3l-4 4 4 4v-3h12v-6h-2v4z"/>
+  </svg>
+)
+const HeartIcon = ({ filled }: { filled: boolean }) => (
+  <svg width="16" height="16" viewBox="0 0 24 24" fill={filled ? '#1DB954' : 'none'} stroke={filled ? '#1DB954' : 'currentColor'} strokeWidth="2">
+    <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
   </svg>
 )
 
@@ -41,6 +45,9 @@ export default function PlayerBar() {
   const [currentTime, setCurrentTime] = useState(0)
   const [duration, setDuration] = useState(0)
   const [volume, setVolume] = useState(0.7)
+  const [liked, setLiked] = useState(false)
+  const [shuffle, setShuffle] = useState(false)
+  const [repeat, setRepeat] = useState(false)
   const audioRef = useRef<HTMLAudioElement>(null)
 
   const sampleAudioUrl = 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3'
@@ -74,11 +81,8 @@ export default function PlayerBar() {
 
   const togglePlay = () => {
     if (!audioRef.current) return
-    if (isPlaying) {
-      audioRef.current.pause()
-    } else {
-      audioRef.current.play().catch(console.error)
-    }
+    if (isPlaying) audioRef.current.pause()
+    else audioRef.current.play().catch(console.error)
     setIsPlaying(!isPlaying)
   }
 
@@ -88,39 +92,70 @@ export default function PlayerBar() {
     <div style={styles.container}>
       <audio ref={audioRef} src={sampleAudioUrl} />
 
-      {/* 1. Thông tin bài hát */}
-      <div style={styles.trackInfo}>
+      {/* 1. Track info + like */}
+      <div style={styles.trackSection}>
         <img
           src="https://picsum.photos/seed/tune/48/48"
           alt="cover"
-          style={{ width: 48, height: 48, borderRadius: 4, display: 'block', flexShrink: 0 }}
+          style={styles.cover}
         />
-        <div>
+        <div style={styles.trackText}>
           <div style={styles.trackTitle}>SoundHelix Song 1</div>
           <div style={styles.trackArtist}>Bản Nhạc Thử Nghiệm</div>
         </div>
+        <button
+          className="btn-icon"
+          onClick={() => setLiked(!liked)}
+          title={liked ? 'Bỏ yêu thích' : 'Yêu thích'}
+          style={{ color: liked ? '#1DB954' : '#b3b3b3' }}
+        >
+          <HeartIcon filled={liked} />
+        </button>
       </div>
 
-      {/* 2. Controls + Thanh tiến trình */}
+      {/* 2. Controls + Progress */}
       <div style={styles.centerSection}>
-        <div style={styles.buttons}>
-          <button style={styles.sideBtn} title="Bài trước">
+        {/* Nút điều khiển */}
+        <div style={styles.controlRow}>
+          <button
+            className="btn-icon"
+            onClick={() => setShuffle(!shuffle)}
+            title="Phát ngẫu nhiên"
+            style={{ color: shuffle ? '#1DB954' : '#b3b3b3' }}
+          >
+            <ShuffleIcon />
+          </button>
+          <button className="btn-icon" title="Bài trước">
             <PrevIcon />
           </button>
-          <button style={styles.playBtn} onClick={togglePlay} title={isPlaying ? 'Dừng' : 'Phát'}>
+          <button className="btn-play" onClick={togglePlay} title={isPlaying ? 'Dừng' : 'Phát'}>
             {isPlaying ? <PauseIcon /> : <PlayIcon />}
           </button>
-          <button style={styles.sideBtn} title="Bài tiếp theo">
+          <button className="btn-icon" title="Bài tiếp theo">
             <NextIcon />
+          </button>
+          <button
+            className="btn-icon"
+            onClick={() => setRepeat(!repeat)}
+            title="Lặp lại"
+            style={{ color: repeat ? '#1DB954' : '#b3b3b3' }}
+          >
+            <RepeatIcon />
           </button>
         </div>
 
+        {/* Thanh tiến trình */}
         <div style={styles.progressRow}>
           <span style={styles.time}>{formatTime(currentTime)}</span>
-          <div style={styles.progressTrack}>
-            <div style={{ ...styles.progressFill, width: `${progressPercent}%` }} />
+          <div className="progress-wrapper">
+            <div className="progress-track">
+              <div className="progress-fill" style={{ width: `${progressPercent}%` }}>
+                <div className="progress-thumb" />
+              </div>
+            </div>
             <input
               type="range"
+              className="progress-input"
               min={0}
               max={duration || 100}
               value={currentTime}
@@ -129,25 +164,31 @@ export default function PlayerBar() {
                 if (audioRef.current) audioRef.current.currentTime = val
                 setCurrentTime(val)
               }}
-              style={styles.progressInput}
             />
           </div>
           <span style={styles.time}>{formatTime(duration)}</span>
         </div>
       </div>
 
-      {/* 3. Âm lượng */}
+      {/* 3. Volume */}
       <div style={styles.volumeSection}>
-        <VolumeIcon />
-        <input
-          type="range"
-          min={0}
-          max={1}
-          step={0.02}
-          value={volume}
-          onChange={e => setVolume(Number(e.target.value))}
-          style={styles.volumeSlider}
-        />
+        <button className="btn-icon" title="Âm lượng">
+          <VolumeIcon />
+        </button>
+        <div className="progress-wrapper" style={{ width: 90 }}>
+          <div className="progress-track">
+            <div className="progress-fill" style={{ width: `${volume * 100}%` }}>
+              <div className="progress-thumb" />
+            </div>
+          </div>
+          <input
+            type="range"
+            className="progress-input"
+            min={0} max={1} step={0.02}
+            value={volume}
+            onChange={e => setVolume(Number(e.target.value))}
+          />
+        </div>
       </div>
     </div>
   )
@@ -161,101 +202,27 @@ const styles: Record<string, React.CSSProperties> = {
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'space-between',
-    padding: '0 20px',
+    padding: '0 16px',
     gap: 16,
   },
-  trackInfo: {
-    display: 'flex',
-    alignItems: 'center',
-    gap: 12,
-    flex: '0 0 30%',
-    minWidth: 0,
+  trackSection: {
+    display: 'flex', alignItems: 'center',
+    gap: 12, flex: '0 0 30%', minWidth: 0,
   },
-  trackTitle: { fontSize: 14, fontWeight: 600, color: '#fff', marginBottom: 2 },
-  trackArtist: { fontSize: 12, color: '#b3b3b3' },
+  cover: { width: 48, height: 48, borderRadius: 4, flexShrink: 0 },
+  trackText: { minWidth: 0, flex: 1 },
+  trackTitle: { fontSize: 14, fontWeight: 600, color: '#fff', marginBottom: 2, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' },
+  trackArtist: { fontSize: 12, color: '#b3b3b3', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' },
   centerSection: {
-    display: 'flex',
-    flexDirection: 'column',
-    alignItems: 'center',
-    gap: 6,
+    display: 'flex', flexDirection: 'column',
+    alignItems: 'center', gap: 6,
     flex: '0 0 40%',
   },
-  buttons: {
-    display: 'flex',
-    alignItems: 'center',
-    gap: 20,
-  },
-  playBtn: {
-    backgroundColor: '#ffffff',
-    border: 'none',
-    borderRadius: '50%',
-    width: 36,
-    height: 36,
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    cursor: 'pointer',
-    color: '#000',
-    flexShrink: 0,
-  },
-  sideBtn: {
-    backgroundColor: 'transparent',
-    border: 'none',
-    color: '#b3b3b3',
-    cursor: 'pointer',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    padding: 4,
-    borderRadius: 4,
-  },
-  progressRow: {
-    display: 'flex',
-    alignItems: 'center',
-    gap: 10,
-    width: '100%',
-  },
-  progressTrack: {
-    flex: 1,
-    height: 4,
-    backgroundColor: '#404040',
-    borderRadius: 2,
-    position: 'relative',
-    cursor: 'pointer',
-  },
-  progressFill: {
-    height: '100%',
-    backgroundColor: '#1DB954',
-    borderRadius: 2,
-    pointerEvents: 'none',
-  },
-  progressInput: {
-    position: 'absolute',
-    inset: 0,
-    width: '100%',
-    height: '100%',
-    opacity: 0,
-    cursor: 'pointer',
-    margin: 0,
-  },
-  time: {
-    fontSize: 11,
-    color: '#b3b3b3',
-    fontFamily: 'monospace',
-    minWidth: 38,
-    textAlign: 'center',
-  },
+  controlRow: { display: 'flex', alignItems: 'center', gap: 8 },
+  progressRow: { display: 'flex', alignItems: 'center', gap: 10, width: '100%' },
+  time: { fontSize: 11, color: '#b3b3b3', fontFamily: 'monospace', minWidth: 38, textAlign: 'center' },
   volumeSection: {
-    display: 'flex',
-    alignItems: 'center',
-    gap: 8,
-    flex: '0 0 30%',
-    justifyContent: 'flex-end',
-    color: '#b3b3b3',
-  },
-  volumeSlider: {
-    width: 90,
-    accentColor: '#1DB954',
-    cursor: 'pointer',
+    display: 'flex', alignItems: 'center',
+    gap: 6, flex: '0 0 30%', justifyContent: 'flex-end',
   },
 }
