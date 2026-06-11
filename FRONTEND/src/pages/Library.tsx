@@ -3,6 +3,9 @@ import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import apiClient, { type Playlist, type MediaItem } from '../api/apiClient'
 
+// Mock data để test khi chưa có backend
+const USE_MOCK = true
+
 export default function Library() {
   const navigate = useNavigate()
   const [playlists, setPlaylists] = useState<Playlist[]>([])
@@ -10,9 +13,17 @@ export default function Library() {
   const [loading, setLoading] = useState(true)
   const [showCreate, setShowCreate] = useState(false)
   const [newName, setNewName] = useState('')
+  const [creating, setCreating] = useState(false)
 
   useEffect(() => {
     const load = async () => {
+      if (USE_MOCK) {
+        // Dữ liệu mẫu để test giao diện
+        setPlaylists([])
+        setUploads([])
+        setLoading(false)
+        return
+      }
       try {
         const [pls, media] = await Promise.all([
           apiClient.playlists.getAll(),
@@ -31,13 +42,29 @@ export default function Library() {
 
   const handleCreatePlaylist = async () => {
     if (!newName.trim()) return
+    setCreating(true)
     try {
-      const pl = await apiClient.playlists.create({ name: newName, isPublic: false })
-      setPlaylists(prev => [pl, ...prev])
+      if (USE_MOCK) {
+        // Tạo playlist giả để test
+        const mockPlaylist: Playlist = {
+          id: Date.now(),
+          name: newName.trim(),
+          isPublic: false,
+          ownerId: '1',
+          tracks: [],
+          createdAt: new Date().toISOString(),
+        }
+        setPlaylists(prev => [mockPlaylist, ...prev])
+      } else {
+        const pl = await apiClient.playlists.create({ name: newName.trim(), isPublic: false })
+        setPlaylists(prev => [pl, ...prev])
+      }
       setNewName('')
       setShowCreate(false)
     } catch (err) {
       console.error('Lỗi tạo playlist:', err)
+    } finally {
+      setCreating(false)
     }
   }
 
@@ -48,7 +75,9 @@ export default function Library() {
       {/* Header */}
       <div style={styles.header}>
         <h1 style={styles.title}>Thư viện</h1>
-        <button style={styles.addBtn} onClick={() => setShowCreate(!showCreate)}>+ Tạo playlist</button>
+        <button style={styles.addBtn} onClick={() => setShowCreate(!showCreate)}>
+          + Tạo playlist
+        </button>
       </div>
 
       {/* Form tạo playlist */}
@@ -56,13 +85,25 @@ export default function Library() {
         <div style={styles.createForm}>
           <input
             style={styles.input}
-            placeholder="Tên playlist..."
+            placeholder="Nhập tên playlist..."
             value={newName}
+            autoFocus
             onChange={e => setNewName(e.target.value)}
-            onKeyDown={e => e.key === 'Enter' && handleCreatePlaylist()}
+            onKeyDown={e => {
+              if (e.key === 'Enter') handleCreatePlaylist()
+              if (e.key === 'Escape') setShowCreate(false)
+            }}
           />
-          <button style={styles.confirmBtn} onClick={handleCreatePlaylist}>Tạo</button>
-          <button style={styles.cancelBtn} onClick={() => setShowCreate(false)}>Hủy</button>
+          <button
+            style={{ ...styles.confirmBtn, ...(creating ? { opacity: 0.6 } : {}) }}
+            onClick={handleCreatePlaylist}
+            disabled={creating}
+          >
+            {creating ? 'Đang tạo...' : 'Tạo'}
+          </button>
+          <button style={styles.cancelBtn} onClick={() => { setShowCreate(false); setNewName('') }}>
+            Hủy
+          </button>
         </div>
       )}
 
@@ -70,15 +111,30 @@ export default function Library() {
       <section style={styles.section}>
         <h2 style={styles.sectionTitle}>Playlist của tôi ({playlists.length})</h2>
         {playlists.length === 0
-          ? <p style={styles.empty}>Chưa có playlist nào.</p>
+          ? (
+            <div style={styles.emptyBox}>
+              <p style={styles.emptyText}>Chưa có playlist nào.</p>
+              <button style={styles.emptyBtn} onClick={() => setShowCreate(true)}>
+                Tạo playlist đầu tiên
+              </button>
+            </div>
+          )
           : (
             <div style={styles.list}>
               {playlists.map(pl => (
-                <div key={pl.id} style={styles.item} onClick={() => navigate(`/playlist/${pl.id}`)}>
+                <div
+                  key={pl.id}
+                  style={styles.item}
+                  onClick={() => navigate(`/playlist/${pl.id}`)}
+                  onMouseEnter={e => (e.currentTarget.style.backgroundColor = '#1a1a1a')}
+                  onMouseLeave={e => (e.currentTarget.style.backgroundColor = 'transparent')}
+                >
                   <div style={styles.itemIcon}>🎵</div>
                   <div>
                     <div style={styles.itemName}>{pl.name}</div>
-                    <div style={styles.itemSub}>{pl.tracks?.length ?? 0} bài · {pl.isPublic ? 'Công khai' : 'Riêng tư'}</div>
+                    <div style={styles.itemSub}>
+                      {pl.tracks?.length ?? 0} bài · {pl.isPublic ? 'Công khai' : 'Riêng tư'}
+                    </div>
                   </div>
                 </div>
               ))}
@@ -91,7 +147,7 @@ export default function Library() {
       <section style={styles.section}>
         <h2 style={styles.sectionTitle}>Bài tôi đã tải lên ({uploads.length})</h2>
         {uploads.length === 0
-          ? <p style={styles.empty}>Chưa có file nào được tải lên.</p>
+          ? <p style={styles.emptyText}>Chưa có file nào được tải lên.</p>
           : (
             <div style={styles.list}>
               {uploads.map(item => (
@@ -115,17 +171,19 @@ const styles: Record<string, React.CSSProperties> = {
   page: { padding: '24px 32px', color: '#fff' },
   header: { display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 24 },
   title: { fontSize: 28, fontWeight: 700 },
-  addBtn: { backgroundColor: '#1DB954', color: '#000', border: 'none', borderRadius: 20, padding: '8px 20px', fontWeight: 700, cursor: 'pointer' },
-  createForm: { display: 'flex', gap: 10, marginBottom: 24, alignItems: 'center' },
-  input: { backgroundColor: '#242424', border: '1px solid #383838', borderRadius: 6, padding: '10px 16px', color: '#fff', fontSize: 14, outline: 'none', width: 280 },
-  confirmBtn: { backgroundColor: '#1DB954', color: '#000', border: 'none', borderRadius: 6, padding: '10px 18px', fontWeight: 700, cursor: 'pointer' },
-  cancelBtn: { backgroundColor: 'transparent', color: '#b3b3b3', border: '1px solid #383838', borderRadius: 6, padding: '10px 18px', cursor: 'pointer' },
+  addBtn: { backgroundColor: '#1DB954', color: '#000', border: 'none', borderRadius: 20, padding: '8px 20px', fontWeight: 700, cursor: 'pointer', fontSize: 14 },
+  createForm: { display: 'flex', gap: 10, marginBottom: 24, alignItems: 'center', backgroundColor: '#1a1a1a', padding: '16px', borderRadius: 8 },
+  input: { backgroundColor: '#2a2a2a', border: '1px solid #535353', borderRadius: 6, padding: '10px 16px', color: '#fff', fontSize: 14, outline: 'none', width: 300 },
+  confirmBtn: { backgroundColor: '#1DB954', color: '#000', border: 'none', borderRadius: 6, padding: '10px 20px', fontWeight: 700, cursor: 'pointer', fontSize: 14 },
+  cancelBtn: { backgroundColor: 'transparent', color: '#b3b3b3', border: '1px solid #535353', borderRadius: 6, padding: '10px 18px', cursor: 'pointer', fontSize: 14 },
   section: { marginBottom: 40 },
   sectionTitle: { fontSize: 18, fontWeight: 700, marginBottom: 12 },
   list: { display: 'flex', flexDirection: 'column', gap: 2 },
   item: { display: 'flex', alignItems: 'center', gap: 14, padding: '10px 12px', borderRadius: 6, cursor: 'pointer', backgroundColor: 'transparent' },
-  itemIcon: { fontSize: 22, width: 44, height: 44, backgroundColor: '#282828', borderRadius: 6, display: 'flex', alignItems: 'center', justifyContent: 'center' },
+  itemIcon: { fontSize: 22, width: 44, height: 44, backgroundColor: '#282828', borderRadius: 6, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 },
   itemName: { fontSize: 14, fontWeight: 600 },
   itemSub: { fontSize: 12, color: '#b3b3b3', marginTop: 2 },
-  empty: { color: '#b3b3b3', fontSize: 14 },
+  emptyBox: { display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: 12 },
+  emptyText: { color: '#b3b3b3', fontSize: 14 },
+  emptyBtn: { backgroundColor: 'transparent', color: '#fff', border: '1px solid #535353', borderRadius: 20, padding: '8px 20px', cursor: 'pointer', fontSize: 13, fontWeight: 600 },
 }
