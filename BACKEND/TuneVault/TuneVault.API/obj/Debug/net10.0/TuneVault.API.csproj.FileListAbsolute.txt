@@ -1,0 +1,9 @@
+D:\!TranDieuVi\C#\Csharp_Nhom3_HK3_2025-2026\BACKEND\TuneVault\TuneVault.API\obj\Debug\net10.0\TuneVault.API.csproj.AssemblyReference.cache
+D:\!TranDieuVi\C#\Csharp_Nhom3_HK3_2025-2026\BACKEND\TuneVault\TuneVault.API\obj\Debug\net10.0\rpswa.dswa.cache.json
+D:\!TranDieuVi\C#\Csharp_Nhom3_HK3_2025-2026\BACKEND\TuneVault\TuneVault.API\obj\Debug\net10.0\TuneVault.API.GeneratedMSBuildEditorConfig.editorconfig
+D:\!TranDieuVi\C#\Csharp_Nhom3_HK3_2025-2026\BACKEND\TuneVault\TuneVault.API\obj\Debug\net10.0\TuneVault.API.AssemblyInfoInputs.cache
+D:\!TranDieuVi\C#\Csharp_Nhom3_HK3_2025-2026\BACKEND\TuneVault\TuneVault.API\obj\Debug\net10.0\TuneVault.API.AssemblyInfo.cs
+D:\!TranDieuVi\C#\Csharp_Nhom3_HK3_2025-2026\BACKEND\TuneVault\TuneVault.API\obj\Debug\net10.0\TuneVault.API.csproj.CoreCompileInputs.cache
+D:\!TranDieuVi\C#\Csharp_Nhom3_HK3_2025-2026\BACKEND\TuneVault\TuneVault.API\obj\Debug\net10.0\TuneVault.API.MvcApplicationPartsAssemblyInfo.cs
+D:\!TranDieuVi\C#\Csharp_Nhom3_HK3_2025-2026\BACKEND\TuneVault\TuneVault.API\obj\Debug\net10.0\TuneVault.API.MvcApplicationPartsAssemblyInfo.cache
+D:\!TranDieuVi\C#\Csharp_Nhom3_HK3_2025-2026\BACKEND\TuneVault\TuneVault.API\obj\Debug\net10.0\TuneVault.API.sourcelink.json
