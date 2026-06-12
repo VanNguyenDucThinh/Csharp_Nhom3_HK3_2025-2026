@@ -26,7 +26,7 @@ namespace TuneVault.Infrastructure
             services.AddScoped<IArtistRepository,ArtistRepository>();
             services.AddScoped<IFavoriteRepository, FavoriteRepository>();
             services.AddScoped<IFollowRepository, FollowRepository>();
-            services.AddScoped<IJWTGenerator, JWTGenerator>();
+            services.AddScoped<ITokenGenerator, TokenGenerator>();
             services.AddScoped<IMediaItem_ArtistRepository, MediaItem_ArtistRepository>();
             services.AddScoped<IMediaItemRepository, MediaItemRepository>();
             services.AddScoped<IMediaShareRepository, MediaShareRepository>();
@@ -39,6 +39,10 @@ namespace TuneVault.Infrastructure
             services.AddScoped<IUserProfileRepository, UserRepository>();
             services.AddScoped<IFileStorageService, FileStorageService>();
 
+            services.AddHttpContextAccessor();
+            services.AddScoped<ICurentUserService, CurrenUserService>();
+
+            services.AddScoped<ITokenRepository, TokenRepository>();
             return services;
         }
     }

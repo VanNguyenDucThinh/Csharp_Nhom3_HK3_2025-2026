@@ -175,3 +175,17 @@ create table MediaItem_Artist(
         references Artist(Id) on delete cascade
 );
 Go
+
+--table RefreshToken
+create table RefreshToken(
+    Id UNIQUEIDENTIFIER primary key default NEWID() not null,
+    UserId UNIQUEIDENTIFIER not null,
+    Token varchar(255) not null,
+    ExpiryDate datetime2 not null,
+    IsUsed bit not null default 0,
+    IsRevoked bit not null default 0,
+    constraint RefreshToken_UserId_Fkey foreign key(UserId)
+        references UserProfile(UserId) on delete cascade
+)Go; 
+CREATE NONCLUSTERED INDEX IX_RefreshToken_Token ON RefreshToken(Token); 
+GO

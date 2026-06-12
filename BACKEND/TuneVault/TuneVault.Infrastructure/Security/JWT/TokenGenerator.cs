@@ -9,10 +9,10 @@ using Microsoft.Extensions.Options;
 
 namespace TuneVault.Infrastructure.Services.JWT
 {
-    public class JWTGenerator : IJWTGenerator
+    public class TokenGenerator : ITokenGenerator
     {
         private readonly JWTSetting _jwtsett;
-        public JWTGenerator(IOptions<JWTSetting> options)
+        public TokenGenerator(IOptions<JWTSetting> options)
         {
             _jwtsett = options.Value;
         }
@@ -28,17 +28,29 @@ namespace TuneVault.Infrastructure.Services.JWT
             }; 
             //lấy key từ cấu hình rồi chuyển string thành byte
             //tạo securitykey
-            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_jwtsett.Key));
+            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_jwtsett.Secret));
             var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256); //dùng thuật toán HmacSha256 để ký key
 
             var token = new JwtSecurityToken( 
                 issuer: _jwtsett.Issuer, //nhà phát hành
                 audience: _jwtsett.Audience, //người dùng
                 claims:claims, //gắn các thông tin vào token
-                expires: DateTime.UtcNow.AddDays(_jwtsett.Expire), //thời gian tồn tại của token
+                expires: DateTime.UtcNow.AddMinutes(_jwtsett.Expire), //thời gian tồn tại của token
                 signingCredentials: creds
             );
             return new JwtSecurityTokenHandler().WriteToken(token); //chuyển thành chuỗi JWT
+        }
+
+        public string GenerateRefreshToken()
+        {
+            var randomNumb = new Byte[32];
+            //làm đầy mảng bằng bộ sinh số ngẫu nhiên của hệ thống
+            using var rng = System.Security.Cryptography.RandomNumberGenerator.Create();
+            rng.GetBytes(randomNumb);
+
+            // Chuyển mảng byte đó thành một chuỗi mã hóa Base64
+            return Convert.ToBase64String(randomNumb);
+
         }
     }
 }

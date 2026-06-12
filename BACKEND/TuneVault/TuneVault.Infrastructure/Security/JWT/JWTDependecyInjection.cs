@@ -16,10 +16,10 @@ namespace TuneVault.Infrastructure.Services.JWT
             //1.JWT setting
             services.Configure<JWTSetting>(configuration.GetSection("JwtSettings")); //lấy thông tin từ appsetting.json JwtSettings
             //2.JWT generator
-            services.AddScoped<IJWTGenerator, JWTGenerator>();
+            services.AddScoped<ITokenGenerator, TokenGenerator>();
 
             //3.Authentication(JwtBearer)
-            var key = configuration["JwtSettings:Secert"];
+            var key = configuration["JwtSettings:Secret"] ?? throw new Exception("JWT secret is missing") ; 
             var issuer = configuration["JwtSettings:Issuer"];
             var audience = configuration["JwtSettings:Audience"];
 
@@ -58,8 +58,6 @@ namespace TuneVault.Infrastructure.Services.JWT
                     }
                 };
             });
-
-            //4.Refresh token
 
             return services;
         }

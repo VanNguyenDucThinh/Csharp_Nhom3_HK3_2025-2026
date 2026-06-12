@@ -4,8 +4,8 @@ using System.Text;
 
 namespace TuneVault.Domain.Interfaces
 {
-    public interface IJWTGenerator
+    public interface ICurentUserService
     {
-        string GenerateJwt(Guid userId, string UserName, string email);
+        Guid UserId { get; }
     }
 }
