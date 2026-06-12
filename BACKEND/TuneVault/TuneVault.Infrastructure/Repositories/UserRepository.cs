@@ -24,7 +24,7 @@ namespace TuneVault.Infrastructure.Repositories
             using var connection = _connection.CreateConnection();
             var command =new CommandDefinition(sql, new
             {
-                UserName = userProfile.UserName,
+                UserName = userProfile.Name,
                 Password = userProfile.Password,
                 Email = userProfile.Email,
                 Name = userProfile.Name
@@ -60,13 +60,23 @@ namespace TuneVault.Infrastructure.Repositories
         }
 
         //Read
-        public async Task<UserProfile?> GetUserProfileByIdAsync(Guid userId)
+        public async Task<UserProfile?> GetUserProfileById(Guid userId)
         {
             string sql = @"Select UserId, [Name] , [Email], AvatarUrl, DateOfBirth, Bio, UserName
                            from UserProfile
                            where UserId=@UserId";
             using var connection = _connection.CreateConnection();
             var command = new CommandDefinition(sql , new {UserId =userId});
+            return await connection.QuerySingleOrDefaultAsync<UserProfile>(command);
+        }
+
+        public async Task<UserProfile> GetUserProfileByEmail(string email)
+        {
+            string sql = @"Select UserId, [Name] , [Email], AvatarUrl, DateOfBirth, Bio, UserName
+                           from UserProfile
+                           where [Email]=@Email";
+            using var connection = _connection.CreateConnection();
+            var command = new CommandDefinition(sql, new { Email = email });
             return await connection.QuerySingleOrDefaultAsync<UserProfile>(command);
         }
 
@@ -103,5 +113,7 @@ namespace TuneVault.Infrastructure.Repositories
             var command = new CommandDefinition(sql, new {LoginName = LoginName});
             return await connection.QueryFirstOrDefaultAsync<UserProfile>(command);
         }
+
+        
     }
 }
