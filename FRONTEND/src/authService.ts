@@ -1,5 +1,6 @@
 // src/authService.ts
-import apiClient, { type AuthResponse, type LoginRequest, type RegisterRequest } from './api/apiClient'
+import apiClient from './api/apiClient'
+import type { AuthResponse, LoginRequest, RegisterRequest } from './types/tuneVault'
 
 // =============================================
 // AUTH SERVICE — quản lý token và thông tin user

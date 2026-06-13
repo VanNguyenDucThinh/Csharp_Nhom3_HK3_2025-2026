@@ -1,70 +1,33 @@
 // src/api/apiClient.ts
 import axiosInstance from './axiosInstance'
+import type {
+  AuthResponse,
+  LoginRequest,
+  MediaItem,
+  MediaShare,
+  Notification,
+  Playlist,
+  RegisterRequest,
+  User,
+} from '../types/tuneVault'
 
-// =============================================
-// INTERFACES — khớp với DTO từ Backend C#
-// =============================================
-
-export interface User {
-  id: string
-  username: string
-  email: string
-  bio?: string
-  avatarUrl?: string
-}
-
-export interface MediaItem {
-  id: number
-  title: string
-  artist: string
-  type: 'audio' | 'video'
-  fileUrl: string
-  thumbnailUrl?: string
-  description?: string
-  duration: number
-  ownerId: string
-  createdAt: string
-}
-
-export interface Playlist {
-  id: number
-  name: string
-  isPublic: boolean
-  ownerId: string
-  tracks: MediaItem[]
-  createdAt: string
-}
-
-export interface MediaShare {
-  id: number
-  mediaItem: MediaItem
-  sender: User
-  sharedAt: string
-}
-
-export interface Notification {
-  id: number
-  type: string
-  message: string
-  isRead: boolean
-  createdAt: string
-}
-
-export interface LoginRequest {
-  username: string
-  password: string
-}
-
-export interface RegisterRequest {
-  username: string
-  email: string
-  password: string
-}
-
-export interface AuthResponse {
-  token: string
-  user: User
-}
+// Re-export các kiểu dữ liệu để component/hook vẫn import trực tiếp từ apiClient được.
+export type {
+  Album,
+  Artist,
+  AuthResponse,
+  LoginRequest,
+  MediaItem,
+  MediaShare,
+  Notification,
+  PlaybackRepeatMode,
+  PlaybackState,
+  Playlist,
+  QueueItem,
+  RegisterRequest,
+  Track,
+  User,
+} from '../types/tuneVault'
 
 // =============================================
 // API CLIENT — tất cả các hàm gọi backend

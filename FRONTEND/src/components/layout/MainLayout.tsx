@@ -1,5 +1,9 @@
+import { useEffect, useState } from 'react'
 import { Outlet } from 'react-router-dom'
-import { useState } from 'react'
+import signalRService from '../../api/signalRService'
+import MessageBox from '../common/MessageBox'
+import { useMessageBoxStore } from '../../stores/messageBoxStore'
+import { useRealtimeStore } from '../../stores/realtimeStore'
 import Sidebar from './Sidebar'
 import PlayerBar from './PlayerBar'
 import RightPanel from './RightPanel'
@@ -13,6 +17,50 @@ import CompactPlayer from './CompactPlayer'
 export default function MainLayout() {
   // Dùng state để biết menu mobile đang mở hay đóng.
   const [isMenuOpen, setIsMenuOpen] = useState(false)
+
+  // Lấy thông báo toàn cục để hiển thị lỗi realtime từ SignalR.
+  const { messageBox, hideMessage } = useMessageBoxStore()
+
+  // Lấy trạng thái kết nối realtime để hiển thị indicator nhỏ cho user.
+  const connectionStatus = useRealtimeStore(state => state.connectionStatus)
+
+  // Lấy thông báo lỗi realtime gần nhất để hiển thị rõ nguyên nhân.
+  const lastError = useRealtimeStore(state => state.lastError)
+
+  // Khi layout chính mount, kết nối SignalR để nhận dữ liệu realtime.
+  useEffect(() => {
+    // Hàm async giúp gọi SignalRService mà vẫn bắt lỗi bằng try-catch.
+    const connectSignalR = async () => {
+      try {
+        // Kết nối Hub SignalR sau khi user đã vào vùng protected route.
+        await signalRService.connect()
+      } catch (error) {
+        // Nếu connect ném lỗi, hiển thị MessageBox thay vì để app crash.
+        const message = error instanceof Error ? error.message : 'Không thể kết nối realtime.'
+        useRealtimeStore.getState().setConnectionStatus('error', message)
+        useMessageBoxStore.getState().showMessage('error', message)
+      }
+    }
+
+    // Gọi kết nối ngay khi MainLayout được render.
+    void connectSignalR()
+
+    // Khi MainLayout unmount, ngắt SignalR để giải phóng tài nguyên.
+    return () => {
+      void signalRService.disconnect()
+    }
+  }, [])
+
+  // Tạo text hiển thị trạng thái realtime theo từng trạng thái kết nối.
+  const connectionText = connectionStatus === 'connected'
+    ? 'Realtime đang hoạt động'
+    : connectionStatus === 'connecting'
+      ? 'Đang kết nối realtime...'
+      : connectionStatus === 'reconnecting'
+        ? 'Realtime đang kết nối lại...'
+        : connectionStatus === 'error'
+          ? lastError ?? 'Realtime gặp lỗi'
+          : 'Realtime chưa kết nối'
 
   return (
     <div className="flex h-screen overflow-hidden bg-black text-white">
@@ -72,40 +120,27 @@ export default function MainLayout() {
         <CompactPlayer />
         <MobileNav />
       </div>
+
+      {/* Indicator nhỏ cho trạng thái realtime để user biết kết nối có hoạt động không. */}
+      <div
+        className="fixed right-4 bottom-24 z-50 rounded-full px-3 py-2 text-xs font-semibold shadow-lg"
+        style={{
+          backgroundColor: connectionStatus === 'connected' ? '#14532d' : connectionStatus === 'error' ? '#7f1d1d' : '#1e3a8a',
+          color: '#ffffff',
+        }}
+        title={lastError ?? connectionText}
+      >
+        {connectionText}
+      </div>
+
+      {/* MessageBox toàn cục dùng cho lỗi realtime từ SignalR. */}
+      {messageBox && (
+        <MessageBox
+          type={messageBox.type}
+          message={messageBox.message}
+          onClose={hideMessage}
+        />
+      )}
     </div>
   )
-}
-
-const styles: Record<string, React.CSSProperties> = {
-  root: {
-    display: 'grid',
-    gridTemplateColumns: '240px 1fr 320px',
-    gridTemplateRows: '1fr 90px',
-    gridTemplateAreas: `
-      "sidebar main rightPanel"
-      "playerBar playerBar playerBar"
-    `,
-    height: '100vh',
-    backgroundColor: '#000000',
-    color: '#ffffff',
-    overflow: 'hidden',
-  },
-  sidebar: {
-    gridArea: 'sidebar',
-    overflowY: 'auto',
-  },
-  main: {
-    gridArea: 'main',
-    overflowY: 'auto',
-    backgroundColor: '#121212',
-  },
-  rightPanel: {
-    gridArea: 'rightPanel',
-    overflowY: 'auto',
-    backgroundColor: '#000000',
-  },
-  playerBar: {
-    gridArea: 'playerBar',
-    borderTop: '1px solid #282828',
-  },
 }

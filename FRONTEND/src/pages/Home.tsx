@@ -1,7 +1,11 @@
 // src/pages/Home.tsx
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import apiClient, { type MediaItem, type Playlist } from '../api/apiClient'
+import apiClient from '../api/apiClient'
+import type { MediaItem, Playlist } from '../types/tuneVault'
+import { useMessageBoxStore } from '../stores/messageBoxStore'
+import { useRealtimeStore } from '../stores/realtimeStore'
+import { safeApiCall } from '../utils/safeApiCall'
 
 const USE_MOCK = true
 
@@ -38,6 +42,24 @@ export default function Home() {
   const [recentTracks, setRecentTracks] = useState<MediaItem[]>([])
   const [loading, setLoading] = useState(true)
 
+  // Lấy playlist realtime từ store để UI tự cập nhật khi backend gửi PlaylistUpdated.
+  const realtimePlaylists = useRealtimeStore(state => state.playlists)
+
+  // Lấy media realtime từ store để UI tự cập nhật khi backend gửi TrackAdded.
+  const realtimeRecentTracks = useRealtimeStore(state => state.recentMediaItems)
+
+  // Lấy hàm hiển thị MessageBox toàn cục khi gọi API lỗi.
+  const showMessage = useMessageBoxStore(state => state.showMessage)
+
+  // Lấy hàm cập nhật toàn bộ playlist từ API vào store realtime.
+  const setPlaylistsInStore = useRealtimeStore(state => state.setPlaylists)
+
+  // Chọn dữ liệu realtime nếu đã có, nếu chưa có thì dùng dữ liệu API hoặc mock.
+  const playlistsToShow = realtimePlaylists.length > 0 ? realtimePlaylists : playlists
+
+  // Chọn danh sách nghe gần đây realtime nếu đã có, nếu chưa có thì dùng dữ liệu API hoặc mock.
+  const recentTracksToShow = realtimeRecentTracks.length > 0 ? realtimeRecentTracks : recentTracks
+
   useEffect(() => {
     const load = async () => {
       if (USE_MOCK) {
@@ -47,12 +69,24 @@ export default function Home() {
         return
       }
       try {
-        const [pls, tracks] = await Promise.all([
-          apiClient.playlists.getAll(),
-          apiClient.history.getRecent(),
+        const [playlistData, trackData] = await Promise.all([
+          safeApiCall(
+            () => apiClient.playlists.getAll(),
+            'Không thể tải danh sách playlist.',
+            showMessage,
+          ),
+          safeApiCall(
+            () => apiClient.history.getRecent(),
+            'Không thể tải lịch sử nghe gần đây.',
+            showMessage,
+          ),
         ])
+
+        const pls = playlistData ?? []
+        const tracks = trackData ?? []
         setPlaylists(pls)
         setRecentTracks(tracks)
+        setPlaylistsInStore(pls)
       } catch (err) {
         console.error(err)
       } finally {
@@ -60,7 +94,7 @@ export default function Home() {
       }
     }
     load()
-  }, [])
+  }, [setPlaylistsInStore, showMessage])
 
   if (loading) return <div style={{ padding: 40, color: '#b3b3b3' }}>Đang tải...</div>
 
@@ -71,7 +105,7 @@ export default function Home() {
 
       {/* Quick access grid - 2 hàng 3 cột */}
       <div style={styles.quickGrid}>
-        {playlists.slice(0, 6).map((pl, i) => (
+        {playlistsToShow.slice(0, 6).map((pl, i) => (
           <div
             key={pl.id}
             style={{ ...styles.quickCard, backgroundColor: cardColors[i % cardColors.length] }}
@@ -92,7 +126,7 @@ export default function Home() {
           <span style={styles.seeAll} onClick={() => navigate('/library')}>Hiện tất cả</span>
         </div>
         <div style={styles.cardGrid}>
-          {recentTracks.map(track => (
+          {recentTracksToShow.map(track => (
             <MediaCard key={track.id} item={track} />
           ))}
         </div>
@@ -105,7 +139,7 @@ export default function Home() {
           <span style={styles.seeAll} onClick={() => navigate('/library')}>Hiện tất cả</span>
         </div>
         <div style={styles.cardGrid}>
-          {playlists.map((pl, i) => (
+          {playlistsToShow.map((pl, i) => (
             <div
               key={pl.id}
               style={styles.mediaCard}

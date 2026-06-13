@@ -3,6 +3,8 @@
 import { useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import apiClient from "../api/apiClient";
+import { useMessageBoxStore } from "../stores/messageBoxStore";
+import { safeApiCall } from "../utils/safeApiCall";
 
 const USE_MOCK = true;
 const ACCEPTED_AUDIO = [".mp3", ".wav", ".flac", ".aac", ".ogg"];
@@ -20,6 +22,7 @@ export default function Upload() {
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState("");
   const [dragOver, setDragOver] = useState(false);
+  const showMessage = useMessageBoxStore(state => state.showMessage);
 
   const handleFileSelect = (selected: File) => {
     const ext = "." + selected.name.split(".").pop()?.toLowerCase();
@@ -68,10 +71,14 @@ export default function Upload() {
       formData.append("title", title);
       formData.append("artist", artist || "Unknown");
       formData.append("type", mediaType);
-      await apiClient.media.upload(formData);
-      setSuccess(true);
-    } catch {
-      setError("Upload thất bại. Vui lòng thử lại.");
+      const uploadedMedia = await safeApiCall(
+        () => apiClient.media.upload(formData),
+        "Upload thất bại. Vui lòng thử lại.",
+        showMessage,
+      );
+      if (uploadedMedia) {
+        setSuccess(true);
+      }
     } finally {
       setUploading(false);
     }

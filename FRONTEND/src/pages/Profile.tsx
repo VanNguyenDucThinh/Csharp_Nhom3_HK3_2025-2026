@@ -1,20 +1,35 @@
 // src/pages/Profile.tsx
 import { useEffect, useState } from 'react'
-import apiClient, { type User } from '../api/apiClient'
+import apiClient from '../api/apiClient'
+import type { User } from '../types/tuneVault'
 import authService from '../authService'
 import { useNavigate } from 'react-router-dom'
+import { useMessageBoxStore } from '../stores/messageBoxStore'
+import { safeApiCall } from '../utils/safeApiCall'
 
 export default function Profile() {
   const navigate = useNavigate()
   const [user, setUser] = useState<User | null>(null)
   const [loading, setLoading] = useState(true)
+  const showMessage = useMessageBoxStore(state => state.showMessage)
 
   useEffect(() => {
-    apiClient.profile.getMe()
-      .then(setUser)
-      .catch(() => setUser(authService.getCurrentUser()))
-      .finally(() => setLoading(false))
-  }, [])
+    const loadProfile = async () => {
+      try {
+        const data = await safeApiCall(
+          () => apiClient.profile.getMe(),
+          'Không thể tải hồ sơ cá nhân.',
+          showMessage,
+        )
+
+        setUser(data ?? authService.getCurrentUser())
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    void loadProfile()
+  }, [showMessage])
 
   const handleLogout = () => {
     authService.logout()

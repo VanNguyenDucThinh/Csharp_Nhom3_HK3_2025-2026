@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import authService from '../authService'
+import { useMessageBoxStore } from '../stores/messageBoxStore'
 
 export default function Login() {
   const navigate = useNavigate()
@@ -12,6 +13,7 @@ export default function Login() {
   const [password, setPassword] = useState('')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
+  const showMessage = useMessageBoxStore(state => state.showMessage)
 
   const handleLogin = async () => {
     if (!username || !password) { setError('Vui lòng điền đầy đủ thông tin.'); return }
@@ -19,8 +21,10 @@ export default function Login() {
     try {
       await authService.login({ username, password })
       navigate('/')
-    } catch {
-      setError('Tên đăng nhập hoặc mật khẩu không đúng.')
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'Tên đăng nhập hoặc mật khẩu không đúng.'
+      setError(message)
+      showMessage('error', message)
     } finally {
       setLoading(false)
     }
@@ -32,8 +36,10 @@ export default function Login() {
     try {
       await authService.register({ username, email, password })
       navigate('/')
-    } catch {
-      setError('Đăng ký thất bại. Tên đăng nhập hoặc email đã tồn tại.')
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'Đăng ký thất bại. Tên đăng nhập hoặc email đã tồn tại.'
+      setError(message)
+      showMessage('error', message)
     } finally {
       setLoading(false)
     }

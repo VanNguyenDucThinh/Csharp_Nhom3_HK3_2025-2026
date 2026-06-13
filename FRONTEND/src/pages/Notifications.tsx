@@ -1,30 +1,74 @@
 // src/pages/Notifications.tsx
 import { useEffect, useState } from 'react'
-import apiClient, { type Notification } from '../api/apiClient'
+import apiClient from '../api/apiClient'
+import { useMessageBoxStore } from '../stores/messageBoxStore'
+import { useRealtimeStore } from '../stores/realtimeStore'
+import { safeApiCall } from '../utils/safeApiCall'
 
 export default function Notifications() {
-  const [notifications, setNotifications] = useState<Notification[]>([])
+  // Lấy thông báo realtime từ Zustand store thay vì chỉ dùng local state.
+  const notifications = useRealtimeStore(state => state.notifications)
+
+  // Lấy số thông báo chưa đọc từ store realtime.
+  const unreadCount = useRealtimeStore(state => state.unreadCount)
+
+  // Lấy hàm cập nhật toàn bộ danh sách thông báo từ API.
+  const setNotifications = useRealtimeStore(state => state.setNotifications)
+
+  // Lấy hàm đánh dấu tất cả thông báo đã đọc.
+  const markAllNotificationsAsRead = useRealtimeStore(state => state.markAllNotificationsAsRead)
+
+  // Lấy hàm hiển thị MessageBox toàn cục khi gọi API lỗi.
+  const showMessage = useMessageBoxStore(state => state.showMessage)
+
+  // Trạng thái loading riêng cho request API, tránh phụ thuộc vào trạng thái SignalR.
   const [loading, setLoading] = useState(true)
 
+  // Khi vào trang, tải danh sách thông báo từ API rồi ghi vào store realtime.
   useEffect(() => {
-    apiClient.notifications.getAll()
-      .then(setNotifications)
-      .catch(err => console.error('Lỗi tải thông báo:', err))
-      .finally(() => setLoading(false))
-  }, [])
+    const loadNotifications = async () => {
+      setLoading(true)
+      try {
+        // safeApiCall giúp bắt lỗi backend/mạng và hiện MessageBox thay vì crash.
+        const data = await safeApiCall(
+          () => apiClient.notifications.getAll(),
+          'Không thể tải danh sách thông báo.',
+          showMessage,
+        )
 
-  const markAllRead = async () => {
-    try {
-      await apiClient.notifications.markAllAsRead()
-      setNotifications(prev => prev.map(n => ({ ...n, isRead: true })))
-    } catch (err) {
-      console.error('Lỗi đánh dấu đã đọc:', err)
+        // Nếu API trả dữ liệu thì ghi vào store để UI realtime đồng bộ.
+        if (data) {
+          setNotifications(data)
+        }
+      } finally {
+        setLoading(false)
+      }
     }
+
+    // Gọi tải dữ liệu khi component mount.
+    void loadNotifications()
+  }, [setNotifications, showMessage])
+
+  // Khi user bấm đánh dấu tất cả đã đọc, gọi API trong try-catch.
+  const markAllRead = async () => {
+    const result = await safeApiCall(
+      () => apiClient.notifications.markAllAsRead(),
+      'Không thể đánh dấu thông báo đã đọc.',
+      showMessage,
+    )
+
+    if (!result) {
+      return
+    }
+
+    markAllNotificationsAsRead()
+    showMessage('success', 'Đã đánh dấu tất cả thông báo là đã đọc.')
   }
 
-  const unreadCount = notifications.filter(n => !n.isRead).length
+  // Chỉ hiển thị loading trong lúc request API đang chạy.
+  const isLoading = loading
 
-  if (loading) return <div style={{ padding: 40, color: '#b3b3b3' }}>Đang tải...</div>
+  if (isLoading) return <div style={{ padding: 40, color: '#b3b3b3' }}>Đang tải...</div>
 
   return (
     <div style={styles.page}>

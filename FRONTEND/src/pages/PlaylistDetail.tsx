@@ -1,22 +1,57 @@
 // src/pages/PlaylistDetail.tsx
 import { useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom'
-import apiClient, { type Playlist } from '../api/apiClient'
+import apiClient from '../api/apiClient'
+import { useMessageBoxStore } from '../stores/messageBoxStore'
+import { useRealtimeStore } from '../stores/realtimeStore'
+import { safeApiCall } from '../utils/safeApiCall'
 
 export default function PlaylistDetail() {
   const { id } = useParams()
-  const [playlist, setPlaylist] = useState<Playlist | null>(null)
+
+  // Lấy playlist đang chọn từ store realtime để UI tự cập nhật khi backend gửi PlaylistUpdated.
+  const playlists = useRealtimeStore(state => state.playlists)
+
+  // Lấy hàm thêm hoặc cập nhật playlist trong store realtime.
+  const upsertPlaylist = useRealtimeStore(state => state.upsertPlaylist)
+
+  // Lấy hàm hiển thị MessageBox toàn cục khi gọi API lỗi.
+  const showMessage = useMessageBoxStore(state => state.showMessage)
+
+  // Trạng thái loading riêng cho request API, tránh hiển thị không tìm thấy khi API chưa phản hồi.
   const [loading, setLoading] = useState(true)
 
+  // Tìm playlist theo id route trong store realtime.
+  const playlist = playlists.find(item => item.id === Number(id)) ?? null
+
+  // Khi vào trang, tải playlist từ API rồi ghi vào store realtime.
   useEffect(() => {
-    if (!id) return
-    apiClient.playlists.getById(Number(id))
-      .then(setPlaylist)
-      .catch(err => console.error('Lỗi tải playlist:', err))
-      .finally(() => setLoading(false))
-  }, [id])
+    const playlistId = Number(id)
+    if (!id || Number.isNaN(playlistId)) return
+
+    const loadPlaylist = async () => {
+      setLoading(true)
+      try {
+        // safeApiCall giúp bắt lỗi backend/mạng và hiện MessageBox thay vì crash.
+        const data = await safeApiCall(
+          () => apiClient.playlists.getById(playlistId),
+          'Không thể tải playlist.',
+          showMessage,
+        )
+
+        // Nếu API trả playlist thì ghi vào store để UI realtime đồng bộ.
+        if (data) {
+          upsertPlaylist(data)
+        }
+      } finally {
+        setLoading(false)
+      }
+    }
+    void loadPlaylist()
+  }, [id, showMessage, upsertPlaylist])
 
   if (loading) return <div style={{ padding: 40, color: '#b3b3b3' }}>Đang tải...</div>
+
   if (!playlist) return <div style={{ padding: 40, color: '#b3b3b3' }}>Không tìm thấy playlist.</div>
 
   return (

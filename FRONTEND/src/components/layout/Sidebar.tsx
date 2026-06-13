@@ -1,6 +1,7 @@
 // src/components/layout/Sidebar.tsx
 import { Link, useLocation } from 'react-router-dom'
 import { useState } from 'react'
+import { useRealtimeStore } from '../../stores/realtimeStore'
 
 const mockPlaylists = [
   { id: 1, name: 'Nhạc yêu thích' },
@@ -149,6 +150,9 @@ export default function Sidebar() {
   const location = useLocation()
   const [playlists] = useState(mockPlaylists)
 
+  // Lấy số thông báo chưa đọc từ store realtime để badge cập nhật ngay khi có event mới.
+  const unreadCount = useRealtimeStore(state => state.unreadCount)
+
   return (
     <div style={styles.container}>
       {/* Logo */}
@@ -200,7 +204,16 @@ export default function Sidebar() {
           <NavLink
             key={item.to}
             to={item.to}
-            icon={item.icon}
+            icon={
+              item.to === '/notifications' && unreadCount > 0
+                ? (
+                  <div style={{ position: 'relative' }}>
+                    {item.icon}
+                    <span style={styles.badge}>{unreadCount > 99 ? '99+' : unreadCount}</span>
+                  </div>
+                )
+                : item.icon
+            }
             label={item.label}
             active={location.pathname === item.to}
           />
@@ -236,5 +249,21 @@ const styles: Record<string, React.CSSProperties> = {
     padding: '8px',
     borderTop: '1px solid #282828',
     display: 'flex', flexDirection: 'column', gap: 2,
+  },
+  badge: {
+    position: 'absolute',
+    right: -8,
+    top: -8,
+    minWidth: 18,
+    height: 18,
+    borderRadius: 999,
+    backgroundColor: '#ef4444',
+    color: '#ffffff',
+    fontSize: 10,
+    fontWeight: 700,
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    border: '2px solid #121212',
   },
 }

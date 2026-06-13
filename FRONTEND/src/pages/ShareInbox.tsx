@@ -1,28 +1,41 @@
 // src/pages/ShareInbox.tsx
 import { useEffect, useState } from 'react'
-import apiClient, { type MediaShare } from '../api/apiClient'
+import apiClient from '../api/apiClient'
+import type { MediaShare } from '../types/tuneVault'
+import { useMessageBoxStore } from '../stores/messageBoxStore'
+import { safeApiCall } from '../utils/safeApiCall'
 
 export default function ShareInbox() {
   const [shared, setShared] = useState<MediaShare[]>([])
   const [loading, setLoading] = useState(true)
   const [tab, setTab] = useState<'inbox' | 'sent'>('inbox')
+  const showMessage = useMessageBoxStore(state => state.showMessage)
 
   useEffect(() => {
     const load = async () => {
       setLoading(true)
       try {
         const data = tab === 'inbox'
-          ? await apiClient.share.getSharedWithMe()
-          : await apiClient.share.getSharedByMe()
-        setShared(data)
-      } catch (err) {
-        console.error('Lỗi tải share:', err)
+          ? await safeApiCall(
+            () => apiClient.share.getSharedWithMe(),
+            'Không thể tải danh sách media đã nhận.',
+            showMessage,
+          )
+          : await safeApiCall(
+            () => apiClient.share.getSharedByMe(),
+            'Không thể tải danh sách media đã gửi.',
+            showMessage,
+          )
+
+        if (data) {
+          setShared(data)
+        }
       } finally {
         setLoading(false)
       }
     }
     load()
-  }, [tab])
+  }, [showMessage, tab])
 
   return (
     <div style={styles.page}>

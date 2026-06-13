@@ -1,7 +1,11 @@
 // src/pages/Library.tsx
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import apiClient, { type Playlist, type MediaItem } from '../api/apiClient'
+import apiClient from '../api/apiClient'
+import type { MediaItem, Playlist } from '../types/tuneVault'
+import { useMessageBoxStore } from '../stores/messageBoxStore'
+import { useRealtimeStore } from '../stores/realtimeStore'
+import { safeApiCall } from '../utils/safeApiCall'
 
 // Mock data để test khi chưa có backend
 const USE_MOCK = true
@@ -15,6 +19,21 @@ export default function Library() {
   const [newName, setNewName] = useState('')
   const [creating, setCreating] = useState(false)
 
+  // Lấy playlist realtime từ store để Library cập nhật khi backend gửi PlaylistUpdated.
+  const realtimePlaylists = useRealtimeStore(state => state.playlists)
+
+  // Lấy media realtime từ store để Library cập nhật khi backend gửi TrackAdded.
+  const realtimeUploads = useRealtimeStore(state => state.recentMediaItems)
+
+  // Lấy hàm hiển thị MessageBox toàn cục khi gọi API lỗi.
+  const showMessage = useMessageBoxStore(state => state.showMessage)
+
+  // Chọn dữ liệu realtime nếu đã có, nếu chưa có thì dùng dữ liệu API hoặc mock.
+  const playlistsToShow = realtimePlaylists.length > 0 ? realtimePlaylists : playlists
+
+  // Chọn media realtime nếu đã có, nếu chưa có thì dùng dữ liệu API hoặc mock.
+  const uploadsToShow = realtimeUploads.length > 0 ? realtimeUploads : uploads
+
   useEffect(() => {
     const load = async () => {
       if (USE_MOCK) {
@@ -25,12 +44,24 @@ export default function Library() {
         return
       }
       try {
-        const [pls, media] = await Promise.all([
-          apiClient.playlists.getAll(),
-          apiClient.media.getAll(),
+        const [playlistData, mediaData] = await Promise.all([
+          safeApiCall(
+            () => apiClient.playlists.getAll(),
+            'Không thể tải danh sách playlist.',
+            showMessage,
+          ),
+          safeApiCall(
+            () => apiClient.media.getAll(),
+            'Không thể tải danh sách media.',
+            showMessage,
+          ),
         ])
+
+        const pls = playlistData ?? []
+        const media = mediaData ?? []
         setPlaylists(pls)
         setUploads(media)
+        useRealtimeStore.getState().setPlaylists(pls)
       } catch (err) {
         console.error('Lỗi tải Library:', err)
       } finally {
@@ -38,7 +69,7 @@ export default function Library() {
       }
     }
     load()
-  }, [])
+  }, [showMessage])
 
   const handleCreatePlaylist = async () => {
     if (!newName.trim()) return
@@ -55,9 +86,17 @@ export default function Library() {
           createdAt: new Date().toISOString(),
         }
         setPlaylists(prev => [mockPlaylist, ...prev])
+        useRealtimeStore.getState().upsertPlaylist(mockPlaylist)
       } else {
-        const pl = await apiClient.playlists.create({ name: newName.trim(), isPublic: false })
-        setPlaylists(prev => [pl, ...prev])
+        const pl = await safeApiCall(
+          () => apiClient.playlists.create({ name: newName.trim(), isPublic: false }),
+          'Không thể tạo playlist.',
+          showMessage,
+        )
+        if (pl) {
+          setPlaylists(prev => [pl, ...prev])
+          useRealtimeStore.getState().upsertPlaylist(pl)
+        }
       }
       setNewName('')
       setShowCreate(false)
@@ -109,8 +148,8 @@ export default function Library() {
 
       {/* Playlist của tôi */}
       <section style={styles.section}>
-        <h2 style={styles.sectionTitle}>Playlist của tôi ({playlists.length})</h2>
-        {playlists.length === 0
+        <h2 style={styles.sectionTitle}>Playlist của tôi ({playlistsToShow.length})</h2>
+        {playlistsToShow.length === 0
           ? (
             <div style={styles.emptyBox}>
               <p style={styles.emptyText}>Chưa có playlist nào.</p>
@@ -121,7 +160,7 @@ export default function Library() {
           )
           : (
             <div style={styles.list}>
-              {playlists.map(pl => (
+              {playlistsToShow.map(pl => (
                 <div
                   key={pl.id}
                   style={styles.item}
@@ -145,12 +184,12 @@ export default function Library() {
 
       {/* Bài hát đã tải lên */}
       <section style={styles.section}>
-        <h2 style={styles.sectionTitle}>Bài tôi đã tải lên ({uploads.length})</h2>
-        {uploads.length === 0
+        <h2 style={styles.sectionTitle}>Bài tôi đã tải lên ({uploadsToShow.length})</h2>
+        {uploadsToShow.length === 0
           ? <p style={styles.emptyText}>Chưa có file nào được tải lên.</p>
           : (
             <div style={styles.list}>
-              {uploads.map(item => (
+              {uploadsToShow.map(item => (
                 <div key={item.id} style={styles.item}>
                   <div style={styles.itemIcon}>{item.type === 'video' ? '🎬' : '🎵'}</div>
                   <div>

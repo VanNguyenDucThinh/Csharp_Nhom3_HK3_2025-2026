@@ -1,6 +1,7 @@
 // src/pages/Search.tsx
 import { useState } from 'react'
-import apiClient, { type MediaItem } from '../api/apiClient'
+import apiClient from '../api/apiClient'
+import type { MediaItem } from '../types/tuneVault'
 import { useMessageBox } from '../hooks/useMessageBox'
 import MessageBox from '../components/common/MessageBox'
 import { safeApiCall } from '../utils/safeApiCall'
@@ -16,6 +17,10 @@ export default function Search() {
   const handleSearch = async () => {
     if (!query.trim()) return
 
+    setLoading(true)
+    setSearched(true)
+    setResults([])
+
     const data = await safeApiCall(
       () => apiClient.media.search(query),
       'Không tìm kiếm được dữ liệu. Vui lòng thử lại sau.',
@@ -25,6 +30,8 @@ export default function Search() {
     if (data) {
       setResults(data)
     }
+
+    setLoading(false)
   }
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
