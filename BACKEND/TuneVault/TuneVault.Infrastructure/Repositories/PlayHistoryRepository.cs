@@ -16,7 +16,7 @@ namespace TuneVault.Infrastructure.Repositories
             _connection = connection;
         }
 
-        public async Task<bool> AddMediaItemToPlayHistory(PlayHistory playHistoryId)
+        public async Task<bool> CreatePlayHistory(PlayHistory playHistoryId)
         {
             string sql = @"insert into PlayHistory(IdUser, IdMediaItem, PlayAt)
                            values (@IdUser, @IdMediaItem, @PlayAt)";

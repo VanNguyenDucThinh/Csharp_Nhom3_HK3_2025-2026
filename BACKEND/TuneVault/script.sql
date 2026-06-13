@@ -111,6 +111,7 @@ Go
 
 --table History
 create table PlayHistory(
+	IdPlayHistory UNIQUEIDENTIFIER NOT NULL default NEWID() primary key,
 	IdUser UNIQUEIDENTIFIER NOT NULL,
 	IdMediaItem UNIQUEIDENTIFIER not null,
 	PlayAt datetime2 not null
