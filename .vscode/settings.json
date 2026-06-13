@@ -1,4 +1,5 @@
 {
     "DockerRun.DisableDockerrc": true,
-    "DockerRun.Containers": []
+    "DockerRun.Containers": [],
+    "css.lint.unknownAtRules": "ignore"
 }

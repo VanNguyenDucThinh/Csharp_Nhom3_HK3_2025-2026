@@ -1,3 +1,7 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
 /* src/index.css */
 * {
   margin: 0;
@@ -15,10 +19,21 @@ html, body, #root {
 }
 
 /* =============================================
-   HOVER EFFECTS — dùng CSS class toàn cục
+    HOVER EFFECTS — dùng CSS class toàn cục
    ============================================= */
+:root {
+  --bg-base: #121212;
+  --bg-highlight: #1a1a1a;
+  --text-subdued: #b3b3b3;
+  --essential-base: #ffffff;
+  --accent-base: #1DB954; /* Spotify green */
+}
 
-/* Card nhạc / playlist */
+
+
+
+
+   /* Card nhạc / playlist */
 .media-card {
   background-color: #181818;
   border-radius: 8px;

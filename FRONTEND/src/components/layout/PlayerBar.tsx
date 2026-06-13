@@ -1,5 +1,6 @@
 // src/components/layout/PlayerBar.tsx
-import { useState, useRef, useEffect } from 'react'
+import { useState, useRef, useEffect, useCallback } from 'react'
+import { useNavigate } from 'react-router-dom'
 
 const PlayIcon = () => (
   <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><polygon points="5,3 19,12 5,21" /></svg>
@@ -49,15 +50,46 @@ export default function PlayerBar() {
   const [shuffle, setShuffle] = useState(false)
   const [repeat, setRepeat] = useState(false)
   const audioRef = useRef<HTMLAudioElement>(null)
+  const navigate = useNavigate()
 
   const sampleAudioUrl = 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3'
 
-  const formatTime = (secs: number) => {
+  const clamp = useCallback((value: number, min: number, max: number) => Math.min(Math.max(value, min), max), [])
+
+  const isEditableTarget = useCallback((target: EventTarget | null) => {
+    if (!(target instanceof HTMLElement)) return false
+    const tag = target.tagName.toLowerCase()
+    return target.isContentEditable || tag === 'input' || tag === 'textarea' || tag === 'select'
+  }, [])
+
+  const focusSearchInput = useCallback(() => {
+    window.setTimeout(() => {
+      const input = document.querySelector<HTMLInputElement>('[data-shortcut="search-input"]')
+      input?.focus()
+    }, 0)
+  }, [])
+
+  const seekBy = useCallback((seconds: number) => {
+    const audio = audioRef.current
+    if (!audio || !Number.isFinite(audio.duration)) return
+    const nextTime = clamp(audio.currentTime + seconds, 0, audio.duration)
+    audio.currentTime = nextTime
+    setCurrentTime(nextTime)
+  }, [clamp])
+
+  const togglePlay = useCallback(() => {
+    if (!audioRef.current) return
+    if (isPlaying) audioRef.current.pause()
+    else audioRef.current.play().catch(console.error)
+    setIsPlaying(!isPlaying)
+  }, [isPlaying])
+
+  const formatTime = useCallback((secs: number) => {
     if (!secs || isNaN(secs)) return '00:00'
     const m = Math.floor(secs / 60)
     const s = Math.floor(secs % 60)
     return `${m < 10 ? '0' : ''}${m}:${s < 10 ? '0' : ''}${s}`
-  }
+  }, [])
 
   useEffect(() => {
     const audio = audioRef.current
@@ -79,12 +111,45 @@ export default function PlayerBar() {
     if (audioRef.current) audioRef.current.volume = volume
   }, [volume])
 
-  const togglePlay = () => {
-    if (!audioRef.current) return
-    if (isPlaying) audioRef.current.pause()
-    else audioRef.current.play().catch(console.error)
-    setIsPlaying(!isPlaying)
-  }
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (isEditableTarget(event.target)) return
+
+      const isSpace = event.code === 'Space' || event.key === ' '
+      const isLeft = event.key === 'ArrowLeft'
+      const isRight = event.key === 'ArrowRight'
+      const isVolumeUp = event.key === 'ArrowUp'
+      const isVolumeDown = event.key === 'ArrowDown'
+      const isSearch = event.key === '/' && !event.ctrlKey && !event.metaKey && !event.altKey && !event.shiftKey
+
+      if (isSpace) {
+        event.preventDefault()
+        if (!event.repeat) togglePlay()
+        return
+      }
+
+      if (isLeft || isRight) {
+        event.preventDefault()
+        seekBy(isRight ? 5 : -5)
+        return
+      }
+
+      if (isVolumeUp || isVolumeDown) {
+        event.preventDefault()
+        setVolume(prevVolume => clamp(prevVolume + (isVolumeUp ? 0.05 : -0.05), 0, 1))
+        return
+      }
+
+      if (isSearch) {
+        event.preventDefault()
+        navigate('/search')
+        focusSearchInput()
+      }
+    }
+
+    document.addEventListener('keydown', handleKeyDown)
+    return () => document.removeEventListener('keydown', handleKeyDown)
+  }, [clamp, focusSearchInput, isEditableTarget, navigate, seekBy, togglePlay])
 
   const progressPercent = duration ? (currentTime / duration) * 100 : 0
 

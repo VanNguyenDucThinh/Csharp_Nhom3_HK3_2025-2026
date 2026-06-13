@@ -1,6 +1,9 @@
 // src/pages/Search.tsx
 import { useState } from 'react'
 import apiClient, { type MediaItem } from '../api/apiClient'
+import { useMessageBox } from '../hooks/useMessageBox'
+import MessageBox from '../components/common/MessageBox'
+import { safeApiCall } from '../utils/safeApiCall'
 
 export default function Search() {
   const [query, setQuery] = useState('')
@@ -8,17 +11,19 @@ export default function Search() {
   const [loading, setLoading] = useState(false)
   const [searched, setSearched] = useState(false)
 
+  const { messageBox, showMessage, hideMessage } = useMessageBox()
+
   const handleSearch = async () => {
     if (!query.trim()) return
-    setLoading(true)
-    setSearched(true)
-    try {
-      const data = await apiClient.media.search(query)
+
+    const data = await safeApiCall(
+      () => apiClient.media.search(query),
+      'Không tìm kiếm được dữ liệu. Vui lòng thử lại sau.',
+      showMessage,
+    )
+
+    if (data) {
       setResults(data)
-    } catch (err) {
-      console.error('Lỗi tìm kiếm:', err)
-    } finally {
-      setLoading(false)
     }
   }
 
@@ -30,10 +35,19 @@ export default function Search() {
     <div style={styles.page}>
       <h1 style={styles.title}>Tìm kiếm</h1>
 
+      {messageBox && (
+        <MessageBox
+          type={messageBox.type}
+          message={messageBox.message}
+          onClose={hideMessage}
+        />
+      )}
+
       {/* Thanh tìm kiếm */}
       <div style={styles.searchBar}>
         <span style={styles.icon}>🔍</span>
         <input
+          data-shortcut="search-input"
           style={styles.input}
           type="text"
           placeholder="Bài hát, nghệ sĩ, playlist..."

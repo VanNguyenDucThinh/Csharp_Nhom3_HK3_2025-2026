@@ -25,19 +25,20 @@ const mockTracks: MediaItem[] = [
 // Màu gradient cho card playlist (giống Spotify)
 const cardColors = ['#1e3264', '#7358ff', '#e8115b', '#148a08', '#e91429', '#8400e7']
 
+const getGreeting = () => {
+  const hour = new Date().getHours()
+  if (hour < 12) return 'Chào buổi sáng'
+  if (hour < 18) return 'Chào buổi chiều'
+  return 'Chào buổi tối'
+}
+
 export default function Home() {
   const navigate = useNavigate()
   const [playlists, setPlaylists] = useState<Playlist[]>([])
   const [recentTracks, setRecentTracks] = useState<MediaItem[]>([])
   const [loading, setLoading] = useState(true)
-  const [greeting, setGreeting] = useState('Chào buổi tối')
 
   useEffect(() => {
-    const hour = new Date().getHours()
-    if (hour < 12) setGreeting('Chào buổi sáng')
-    else if (hour < 18) setGreeting('Chào buổi chiều')
-    else setGreeting('Chào buổi tối')
-
     const load = async () => {
       if (USE_MOCK) {
         setPlaylists(mockPlaylists)
@@ -66,7 +67,7 @@ export default function Home() {
   return (
     <div style={styles.page}>
       {/* Greeting */}
-      <h1 style={styles.greeting}>{greeting}!</h1>
+      <h1 style={styles.greeting}>{getGreeting()}!</h1>
 
       {/* Quick access grid - 2 hàng 3 cột */}
       <div style={styles.quickGrid}>
