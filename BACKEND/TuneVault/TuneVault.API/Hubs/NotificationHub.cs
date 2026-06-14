@@ -4,22 +4,33 @@ using Microsoft.AspNetCore.SignalR;
 namespace TuneVault.API.Hubs;
 
 /// <summary>
-/// SignalR Hub cho thông báo real-time
-/// Frontend kết nối: const conn = new signalR.HubConnectionBuilder()
+/// B7 — SignalR Hub cho thông báo real-time.
+///
+/// Frontend kết nối:
+/// <code>
+/// const conn = new signalR.HubConnectionBuilder()
 ///   .withUrl("/notificationHub", { accessTokenFactory: () => token })
+///   .withAutomaticReconnect()
 ///   .build();
+///
+/// // Lắng nghe sự kiện
+/// conn.on("ReceiveNotification", (notification) => { ... })
+/// conn.on("UnreadCountUpdated", (count) => { ... })
+/// conn.on("NotificationRead", (notificationId) => { ... })
+/// </code>
 /// </summary>
 [Authorize]
 public class NotificationHub : Hub
 {
-    // ── Client methods (frontend lắng nghe) ──────────────────────────
-    // conn.on("ReceiveNotification", (notification) => { ... })
-    // conn.on("UnreadCountUpdated", (count) => { ... })
+    // ── Client methods (frontend lắng nghe) ──────────────────────────────
+    // "ReceiveNotification"  — nhận notification mới (khi được share, follow, v.v.)
+    // "UnreadCountUpdated"   — badge số chưa đọc thay đổi
+    // "NotificationRead"     — một notification vừa được đánh dấu đã đọc
 
     public override async Task OnConnectedAsync()
     {
-        // Thêm user vào group riêng theo UserId
-        // → cho phép push đến user cụ thể từ bất kỳ service nào
+        // Mỗi user có group riêng theo UserId
+        // → Infrastructure layer push đến group này khi cần notify user cụ thể
         var userId = Context.UserIdentifier;
         if (userId is not null)
             await Groups.AddToGroupAsync(Context.ConnectionId, $"user-{userId}");
@@ -36,35 +47,58 @@ public class NotificationHub : Hub
         await base.OnDisconnectedAsync(exception);
     }
 
-    // ── Server method (frontend gọi lên) ─────────────────────────────
-    // conn.invoke("MarkAsRead", notificationId)
+    // ── Server methods (frontend invoke) ─────────────────────────────────
+
+    /// <summary>
+    /// Frontend gọi khi user đánh dấu đọc trực tiếp từ notification panel.
+    /// conn.invoke("MarkAsRead", notificationId)
+    /// </summary>
     public async Task MarkAsRead(Guid notificationId)
     {
-        // TODO: gọi MediatR command MarkNotificationReadCommand
-        // TODO: sau đó push lại unread count mới
+        // TODO: lấy MediatR ISender từ DI
+        // var mediator = Context.GetHttpContext()!.RequestServices.GetRequiredService<ISender>();
+        // var userId = Guid.Parse(Context.UserIdentifier!);
+        // await mediator.Send(new MarkNotificationReadCommand(notificationId, userId));
+
+        // Phản hồi cho client đã gọi
         await Clients.Caller.SendAsync("NotificationRead", notificationId);
+
+        // TODO: push unread count mới về client
+        // var count = await mediator.Send(new GetUnreadNotificationCountQuery(userId));
+        // await Clients.Caller.SendAsync("UnreadCountUpdated", count);
+    }
+
+    /// <summary>
+    /// Frontend gọi để ping giữ kết nối (tuỳ chọn).
+    /// conn.invoke("Ping")
+    /// </summary>
+    public async Task Ping()
+    {
+        await Clients.Caller.SendAsync("Pong", DateTimeOffset.UtcNow);
     }
 }
 
 /// <summary>
-/// Interface để Infrastructure layer push notification qua SignalR
-/// Inject INotificationPusher vào ShareMediaHandler
+/// Interface để Infrastructure layer push notification qua SignalR.
+/// Inject INotificationPusher vào ShareMediaHandler, FollowUserHandler, v.v.
 /// </summary>
 public interface INotificationPusher
 {
+    /// <summary>Push một notification đến user cụ thể</summary>
     Task PushToUserAsync(Guid userId, object notification, CancellationToken ct = default);
+
+    /// <summary>Cập nhật badge số chưa đọc cho user</summary>
     Task UpdateUnreadCountAsync(Guid userId, int count, CancellationToken ct = default);
 }
 
 /// <summary>
-/// Implementation — đăng ký trong Infrastructure DI
+/// Implementation của INotificationPusher — đăng ký trong HostingExtensions.
 /// </summary>
 public class SignalRNotificationPusher : INotificationPusher
 {
     private readonly IHubContext<NotificationHub> _hub;
 
-    public SignalRNotificationPusher(IHubContext<NotificationHub> hub)
-        => _hub = hub;
+    public SignalRNotificationPusher(IHubContext<NotificationHub> hub) => _hub = hub;
 
     public async Task PushToUserAsync(Guid userId, object notification, CancellationToken ct = default)
         => await _hub.Clients

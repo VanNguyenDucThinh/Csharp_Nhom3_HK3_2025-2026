@@ -1,5 +1,9 @@
 namespace TuneVault.API.Common;
 
+/// <summary>
+/// Response wrapper chuẩn hóa cho toàn bộ API.
+/// Format: { success, message, data, errors }
+/// </summary>
 public class ApiResponse<T>
 {
     public bool Success { get; set; }
@@ -11,17 +15,20 @@ public class ApiResponse<T>
     {
         Success = true,
         Message = message,
-        Data = data
+        Data    = data
     };
 
     public static ApiResponse<T> Fail(string message, IEnumerable<string>? errors = null) => new()
     {
         Success = false,
         Message = message,
-        Errors = errors
+        Errors  = errors
     };
 }
 
+/// <summary>
+/// Response không có data payload (dùng cho các action chỉ trả thông báo).
+/// </summary>
 public class ApiResponse : ApiResponse<object>
 {
     public static ApiResponse Ok(string? message = null) => new()
@@ -34,6 +41,6 @@ public class ApiResponse : ApiResponse<object>
     {
         Success = false,
         Message = message,
-        Errors = errors
+        Errors  = errors
     };
 }
