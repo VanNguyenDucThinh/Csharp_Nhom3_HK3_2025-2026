@@ -5,8 +5,8 @@ namespace TuneVault.Domain.Events;
 
 public class UserFollowedEvent:INotification
 {
-    public Guid FollowerId { get; set; }
-    public Guid FollowedId { get; set; }
+    public Guid FollowerId { get; set; }//Nguoi nhấn follow
+    public Guid FollowedId { get; set; }//Người được follow
 
     public UserFollowedEvent(Guid followerId, Guid followedId)
     {

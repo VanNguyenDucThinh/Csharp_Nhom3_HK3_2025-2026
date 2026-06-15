@@ -5,16 +5,18 @@ namespace TuneVault.Domain.Events;
 
 public class MediaSharedEvent:INotification
 {
-    public Guid MediaItemId { get; set; }
-    public Guid SharedByUserId { get; set; }
-    public Guid SharedWithUserId { get; set; }
-    public DateTime SharedDate { get; set; } = DateTime.UtcNow;
+    public Guid SenderId { get; set; }
+    public Guid ReceiverId { get; set; }
+    public string TitleItem{get; set;}
+    public Guid ItemId{get; set;}
 
-    public MediaSharedEvent(Guid mediaItemId, Guid sharedByUserId, Guid sharedWithUserId)
+
+    public MediaSharedEvent(string titleItem, Guid senderId, Guid receiverId, Guid itemId)
     {
-        MediaItemId = mediaItemId;
-        SharedByUserId = sharedByUserId;
-        SharedWithUserId = sharedWithUserId;
+        SenderId=senderId;
+        ReceiverId=receiverId;
+        TitleItem=titleItem;
+        ItemId=itemId;
     }
 
 }
