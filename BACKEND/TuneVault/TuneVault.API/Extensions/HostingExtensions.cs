@@ -3,12 +3,13 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using TuneVault.API.Hubs;
+using TuneVault.API.Services;
+using TuneVault.Application.Interface;
 
 namespace TuneVault.API.Extensions;
 
 /// <summary>
-/// Extension methods đăng ký tất cả services cho TuneVault.API layer.
-/// Gọi từ Program.cs: builder.Services.AddWebApiServices(builder.Configuration)
+/// Extension đăng ký toàn bộ services cho TuneVault.API layer.
 /// </summary>
 public static class HostingExtensions
 {
@@ -17,26 +18,25 @@ public static class HostingExtensions
         IConfiguration configuration)
     {
         // ── CORS ──────────────────────────────────────────────────────────
-        // AllowCredentials bắt buộc cho SignalR WebSocket
         services.AddCors(options =>
         {
             options.AddPolicy("CorsPolicy", policy =>
             {
                 policy
                     .WithOrigins(
-                        "http://localhost:5173",   // Vite dev server
-                        "http://localhost:3000")   // CRA fallback
+                        "http://localhost:5173",  // Vite dev server
+                        "http://localhost:3000")
                     .AllowAnyHeader()
                     .AllowAnyMethod()
                     .AllowCredentials(); // bắt buộc cho SignalR
             });
         });
 
-        // ── JWT Authentication ────────────────────────────────────────────
+        // ── JWT ───────────────────────────────────────────────────────────
         var jwtSection = configuration.GetSection("JwtSettings");
         var secretKey = Encoding.UTF8.GetBytes(
             jwtSection["Secret"]
-            ?? throw new InvalidOperationException("JwtSettings:Secret is missing in configuration"));
+            ?? throw new InvalidOperationException("JwtSettings:Secret is missing"));
 
         services
             .AddAuthentication(opts =>
@@ -55,23 +55,20 @@ public static class HostingExtensions
                     ValidateAudience         = true,
                     ValidAudience            = jwtSection["Audience"],
                     ValidateLifetime         = true,
-                    ClockSkew                = TimeSpan.Zero // không cho phép trễ thêm
+                    ClockSkew                = TimeSpan.Zero
                 };
 
-                // SignalR cần đọc token từ query string vì WebSocket không hỗ trợ header
+                // SignalR đọc token từ query string (WebSocket không hỗ trợ header)
                 opts.Events = new JwtBearerEvents
                 {
                     OnMessageReceived = ctx =>
                     {
                         var token = ctx.Request.Query["access_token"].ToString();
-                        var path  = ctx.HttpContext.Request.Path;
-
                         if (!string.IsNullOrEmpty(token) &&
-                            path.StartsWithSegments("/notificationHub"))
+                            ctx.HttpContext.Request.Path.StartsWithSegments("/notificationHub"))
                         {
                             ctx.Token = token;
                         }
-
                         return Task.CompletedTask;
                     }
                 };
@@ -79,14 +76,16 @@ public static class HostingExtensions
 
         services.AddAuthorization();
 
-        // ── SignalR ───────────────────────────────────────────────────────
-        services.AddSignalR(options =>
-        {
-            options.EnableDetailedErrors = true; // bật trong dev; tắt trong prod
-        });
+        // ── ICurrentUserService ───────────────────────────────────────────
+        // Implement interface từ Application layer — đọc UserId từ HttpContext
+        services.AddHttpContextAccessor();
+        services.AddScoped<ICurrentUserService, CurrentUserService>();
 
-        // ── SignalR Notification Pusher (dùng bởi Infrastructure layer) ──
-        services.AddScoped<INotificationPusher, SignalRNotificationPusher>();
+        // ── SignalR ───────────────────────────────────────────────────────
+        services.AddSignalR();
+
+        // INotificationService → SignalR pusher (dùng bởi Application Event Handlers)
+        // TODO: services.AddScoped<INotificationService, SignalRNotificationService>();
 
         // ── Controllers ───────────────────────────────────────────────────
         services.AddControllers()
@@ -100,7 +99,7 @@ public static class HostingExtensions
 
         services.AddEndpointsApiExplorer();
 
-        // ── Swagger / OpenAPI ─────────────────────────────────────────────
+        // ── Swagger ───────────────────────────────────────────────────────
         services.AddSwaggerGen(options =>
         {
             options.SwaggerDoc("v1", new OpenApiInfo
@@ -109,20 +108,13 @@ public static class HostingExtensions
                 Version     = "v1",
                 Description = """
                     RESTful API cho nền tảng Media Streaming TuneVault.
-                    
-                    **Xác thực:** Sử dụng JWT Bearer token. Đăng nhập qua POST /api/auth/login
-                    rồi nhấn nút "Authorize" và nhập token để test các endpoint cần auth.
-                    
-                    **SignalR Hub:** Kết nối real-time tại /notificationHub
-                    """,
-                Contact = new OpenApiContact
-                {
-                    Name = "TuneVault Team",
-                }
+                    Đăng nhập tại POST /api/auth/login → copy Token → nhấn Authorize → nhập token.
+                    SignalR Hub real-time: /notificationHub
+                    """
             });
 
-            // Cho phép nhập JWT Bearer token trong Swagger UI
-            var securityScheme = new OpenApiSecurityScheme
+            // JWT Bearer trong Swagger UI
+            options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
             {
                 Name         = "Authorization",
                 Type         = SecuritySchemeType.Http,
@@ -130,10 +122,9 @@ public static class HostingExtensions
                 BearerFormat = "JWT",
                 In           = ParameterLocation.Header,
                 Description  = "Nhập JWT token (không cần gõ 'Bearer ' phía trước)"
-            };
-            options.AddSecurityDefinition("Bearer", securityScheme);
+            });
 
-            var securityRequirement = new OpenApiSecurityRequirement
+            options.AddSecurityRequirement(new OpenApiSecurityRequirement
             {
                 {
                     new OpenApiSecurityScheme
@@ -146,17 +137,10 @@ public static class HostingExtensions
                     },
                     Array.Empty<string>()
                 }
-            };
-            options.AddSecurityRequirement(securityRequirement);
-
-            // Include XML comments nếu có
-            // var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
-            // var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
-            // options.IncludeXmlComments(xmlPath);
+            });
         });
 
-        // ── HttpClient cho Anthropic API (AI feature) ─────────────────────
-        // Đăng ký tại đây; Implementation (AnthropicService) ở Infrastructure layer
+        // ── HttpClient Anthropic (AI feature) ────────────────────────────
         services.AddHttpClient("Anthropic", client =>
         {
             client.BaseAddress = new Uri("https://api.anthropic.com/");

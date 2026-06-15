@@ -1,22 +1,21 @@
 using System.Net;
 using System.Text.Json;
+using FluentValidation;
 using TuneVault.API.Common;
 
 namespace TuneVault.API.Middlewares;
 
 /// <summary>
-/// Middleware bắt toàn bộ exception chưa được xử lý.
-/// Trả về ApiResponse chuẩn hóa thay vì stack trace.
-/// Thêm các custom exception từ Application layer vào switch expression khi team làm xong.
+/// Bắt toàn bộ exception chưa xử lý → trả ApiResponse chuẩn hóa.
+/// ValidationException từ ValidationBehavior (FluentValidation) được map → 400 Bad Request.
+/// UnauthorizedAccessException từ AuthorizationBehavior → 403 Forbidden.
 /// </summary>
 public class GlobalExceptionMiddleware
 {
     private readonly RequestDelegate _next;
     private readonly ILogger<GlobalExceptionMiddleware> _logger;
 
-    public GlobalExceptionMiddleware(
-        RequestDelegate next,
-        ILogger<GlobalExceptionMiddleware> logger)
+    public GlobalExceptionMiddleware(RequestDelegate next, ILogger<GlobalExceptionMiddleware> logger)
     {
         _next   = next;
         _logger = logger;
@@ -43,38 +42,38 @@ public class GlobalExceptionMiddleware
     {
         context.Response.ContentType = "application/json";
 
-        // Map exception type → HTTP status + message
-        // Uncomment từng case khi Application layer hoàn thành và export custom exceptions
-        var (statusCode, message, errors) = exception switch
+        ApiResponse response;
+        int statusCode;
+
+        switch (exception)
         {
-            UnauthorizedAccessException =>
-                (HttpStatusCode.Forbidden, "Không có quyền thực hiện thao tác này", (IEnumerable<string>?)null),
+            // FluentValidation — ném bởi ValidationBehavior trong Application layer
+            case ValidationException ve:
+                statusCode = (int)HttpStatusCode.BadRequest;
+                var errors = ve.Errors.Select(e => e.ErrorMessage);
+                response = ApiResponse.Fail("Dữ liệu không hợp lệ", errors);
+                break;
 
-            // NotFoundException e =>
-            //     (HttpStatusCode.NotFound, e.Message, null),
+            // AuthorizationBehavior + AddTrackToPlaylistCommandHandler
+            case UnauthorizedAccessException ue:
+                statusCode = (int)HttpStatusCode.Forbidden;
+                response = ApiResponse.Fail(ue.Message);
+                break;
 
-            // ValidationException e =>
-            //     (HttpStatusCode.BadRequest, "Dữ liệu không hợp lệ", e.Errors.Select(x => x.ErrorMessage)),
+            case OperationCanceledException:
+                statusCode = (int)HttpStatusCode.ServiceUnavailable;
+                response = ApiResponse.Fail("Yêu cầu bị hủy");
+                break;
 
-            // ConflictException e =>
-            //     (HttpStatusCode.Conflict, e.Message, null),
+            // Exception("...") từ các Handler (NotFoundException, v.v.)
+            // Sau khi Application layer tạo custom exception thì thêm case ở đây
+            default:
+                statusCode = (int)HttpStatusCode.InternalServerError;
+                response = ApiResponse.Fail("Đã xảy ra lỗi, vui lòng thử lại sau");
+                break;
+        }
 
-            // ForbiddenException e =>
-            //     (HttpStatusCode.Forbidden, e.Message, null),
-
-            OperationCanceledException =>
-                (HttpStatusCode.ServiceUnavailable, "Yêu cầu bị hủy", null),
-
-            _ => (HttpStatusCode.InternalServerError,
-                  "Đã xảy ra lỗi, vui lòng thử lại sau",
-                  null)
-        };
-
-        context.Response.StatusCode = (int)statusCode;
-
-        var response = errors is null
-            ? ApiResponse.Fail(message)
-            : ApiResponse.Fail(message, errors);
+        context.Response.StatusCode = statusCode;
 
         var json = JsonSerializer.Serialize(response, new JsonSerializerOptions
         {
