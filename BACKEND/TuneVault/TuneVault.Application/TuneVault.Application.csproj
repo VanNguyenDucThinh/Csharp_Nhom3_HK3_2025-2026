@@ -7,11 +7,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Folder Include="DTOs\" />
-    <Folder Include="Interface\" />
     <Folder Include="Security\" />
-    <Folder Include="UseCases\Command\" />
-    <Folder Include="UseCases\Handler\" />
     <Folder Include="UseCases\Query\" />
   </ItemGroup>
   

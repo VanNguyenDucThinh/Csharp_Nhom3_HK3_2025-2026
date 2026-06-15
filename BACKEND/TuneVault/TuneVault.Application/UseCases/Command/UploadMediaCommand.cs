@@ -10,27 +10,29 @@ using TuneVault.Domain.Enums;
 
 namespace TuneVault.Application.UseCases.Command;
 
-public class UploadMediaCommand : IRequest<MediaDto>
+public class UploadMediaCommand : IRequest<bool>
 {
     public string Title { get; set; }
-    public TimeSpan Duration { get; set; }
     public string Description { get; set; }
     public MediaStyle MediaStyle { get; set; }
-    public string UrlMediaItem { get; set; }
-    public DateTime UploadDateMediaItem { get; set; }
     public Category Category { get; set; }
     public Guid OwnerId { get; set; }
 
-    public UploadMediaCommand(string title, TimeSpan duration, Guid ownerId, string description, MediaStyle mediaStyle, string urlMediaItem, DateTime uploadDateMediaItem, Category category)
+    //Lấy những dữ liệu cần thiết khi API rút ruột xong
+    public string FileName{get; set;}
+    public string ContentType{get; set;}
+    public Stream FileStream{get; set;}
+
+    public UploadMediaCommand(string title, Guid ownerId, string description, MediaStyle mediaStyle, Category category, string filename, string contenttype, Stream filestream)
     {
         Title = title;
-        Duration = duration;
         OwnerId = ownerId;
         Description = description;
         MediaStyle = mediaStyle;
-        UrlMediaItem = urlMediaItem;
-        UploadDateMediaItem = uploadDateMediaItem;
         Category = category;
+        FileName=filename;
+        ContentType=contenttype;
+        FileStream=filestream;
     }
 
 

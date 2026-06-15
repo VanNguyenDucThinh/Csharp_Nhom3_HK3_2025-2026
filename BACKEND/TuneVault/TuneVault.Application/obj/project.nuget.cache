@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "IQAFtrz8RJw=",
+  "dgSpecHash": "wOO2LceZSaY=",
   "success": true,
-  "projectFilePath": "C:\\Users\\DUC KHAN\\Csharp_Nhom3_HK3_2025-2026\\BACKEND\\TuneVault\\TuneVault.Application\\TuneVault.Application.csproj",
+  "projectFilePath": "C:\\Users\\DUC KHAN\\Downloads\\Csharp_Nhom3_HK3_2025-2026\\BACKEND\\TuneVault\\TuneVault.Application\\TuneVault.Application.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\DUC KHAN\\.nuget\\packages\\bcrypt.net-next\\4.2.0\\bcrypt.net-next.4.2.0.nupkg.sha512",
     "C:\\Users\\DUC KHAN\\.nuget\\packages\\fluentvalidation\\8.3.0\\fluentvalidation.8.3.0.nupkg.sha512",
