@@ -8,11 +8,11 @@
 
   <ItemGroup>
     <Folder Include="DTOs\" />
-    <Folder Include="PipelineBehaviors\" />
-    <Folder Include="UseCases\" />
+    <Folder Include="Interface\" />
+    <Folder Include="Security\" />
     <Folder Include="UseCases\Command\" />
     <Folder Include="UseCases\Handler\" />
-    <Folder Include="Validators\" />
+    <Folder Include="UseCases\Query\" />
   </ItemGroup>
   
   <ItemGroup>
