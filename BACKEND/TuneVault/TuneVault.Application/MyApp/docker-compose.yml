@@ -1,0 +1,7 @@
+version: '3.8'
+services:
+  myapp:
+    build: .
+    image: myapp-image
+    container_name: myapp-container
+    command: ["dotnet", "MyApp.dll"]
