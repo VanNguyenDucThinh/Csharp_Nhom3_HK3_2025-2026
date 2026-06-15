@@ -1,12 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Data;
 using System.Text;
 
 namespace TuneVault.Domain.Interfaces
 {
-    public interface IDbConnectionGen
+    public interface IJWTGenerator
     {
-        IDbConnection CreateConnection();
+        string GenerateJwt(Guid userId, string UserName, string email);
     }
 }
