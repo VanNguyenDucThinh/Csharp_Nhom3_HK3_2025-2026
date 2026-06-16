@@ -1,11 +1,11 @@
 using System;
 using MediatR;
 using TuneVault.Application.DTOs;
-using TuneVault.Application.UseCases.Command;
+using TuneVault.Application.UseCases.PlayList.Command;
 using TuneVault.Domain.Interfaces;
 using TuneVault.Domain.Entities;
 
-namespace TuneVault.Application.UseCases.Handler;
+namespace TuneVault.Application.UseCases.PlayList.Handler;
 
 public class CreatePlayListCommandHandler:IRequestHandler<CreatePlayListCommand,PlayListDto>
 {

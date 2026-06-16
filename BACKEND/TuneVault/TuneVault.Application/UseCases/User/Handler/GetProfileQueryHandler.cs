@@ -1,10 +1,10 @@
 using System;
 using MediatR;
-using TuneVault.Application.UseCases.Query;
+using TuneVault.Application.UseCases.User.Command;
 using TuneVault.Application.DTOs;
 using TuneVault.Domain.Interfaces;
 
-namespace TuneVault.Application.UseCases.Handler;
+namespace TuneVault.Application.UseCases.User.Handler;
 
 public class GetProfileQueryHandler:IRequestHandler<GetProfileQuery,ProfileUserDto>
 {

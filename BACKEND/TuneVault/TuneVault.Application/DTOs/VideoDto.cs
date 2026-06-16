@@ -8,7 +8,6 @@ public class VideoDto
     public Guid Artist {get; set;}
     public string? UrlImage {get; set;}
     public string? UrlMedia{get;set;}
-    public long ViewCount{get; set;}
 
 
 }

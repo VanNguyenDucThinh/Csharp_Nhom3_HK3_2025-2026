@@ -33,7 +33,7 @@ public class AddTrackToPlaylistCommandHandler:IRequestHandler<AddTrackToPlaylist
             
         }
         //Nếu là chủ kiểm tra có bài hát này không
-        var media = await _mediaItem.GetMediaItemById(request.IdTrack);
+        var media = await _mediaItem.GetAudioById(request.IdTrack);
         if(media==null)
         {
             throw new Exception("Không có bài hát này");
