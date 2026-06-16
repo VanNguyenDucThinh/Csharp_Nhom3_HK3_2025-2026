@@ -8,6 +8,7 @@ public class MediaItem
     public Guid Id { get; set; }//khóa chính 
     public string? Title { get; set; }//Ten bai hat
     public string? Description { get; set; }//Mo ta bai hat
+    public TimeSpan Duration { get; set; }
     public Category Category { get; set; }//The loai bai hat
     public MediaStyle MediaStyle { get; set; }// Loai video hay nhac
     public string? UrlImageMedia {get;set;}//Ảnh của file audio
