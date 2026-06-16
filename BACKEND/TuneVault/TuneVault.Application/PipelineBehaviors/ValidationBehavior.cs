@@ -2,7 +2,7 @@ using System;
 using MediatR;
 using FluentValidation;
 
-namespace TuneVault.Application.Validators;
+namespace TuneVault.Application.PipelineBehaviors;
 
 public class ValidationBehavior<TRequest, TResponse> : IPipelineBehavior<TRequest, TResponse>
 where TRequest : IRequest<TResponse>

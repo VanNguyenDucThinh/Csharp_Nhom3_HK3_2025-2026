@@ -2,16 +2,16 @@ using System;
 using MediatR;
 using System.Reflection;
 using FluentValidation;
-using TuneVault.Application.Interface;
+using TuneVault.Domain.Interfaces;
 using TuneVault.Application.Security;
 namespace TuneVault.Application.PipelineBehaviors;
 
 public class AuthorizationBehavior<TRequest, TResponse>:IPipelineBehavior<TRequest, TResponse>
 where TRequest : notnull
 {
-    private readonly ICurrentUserService _currentUserService;
+    private readonly ICurentUserService _currentUserService;
 
-    public AuthorizationBehavior(ICurrentUserService CurrentUserService)
+    public AuthorizationBehavior(ICurentUserService CurrentUserService)
     {
         _currentUserService=CurrentUserService;
     }
@@ -24,7 +24,7 @@ where TRequest : notnull
         if (authorizeAttributes.Any())
         {
             //nếu nó rỗng thì quăng ra lỗi
-            if (string.IsNullOrEmpty(_currentUserService.UserId))
+            if (_currentUserService.UserId == Guid.Empty)
             {
                 throw new UnauthorizedAccessException("Bạn chưa đăng nhập hoặc token không hợp lệ.");
             }
