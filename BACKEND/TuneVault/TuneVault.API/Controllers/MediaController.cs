@@ -22,51 +22,46 @@ public class MediaController : BaseApiController
     private static readonly string[] AllowedVideo = [".mp4", ".webm", ".mkv"];
 
     // POST api/media/upload
-    /// <summary>Upload file audio hoặc video — Chức năng 3 (B5)</summary>
+    /// <summary>Upload file audio hoặc video kèm ảnh bìa — Chức năng 3 (B5)</summary>
     /// <remarks>
-    /// Hỗ trợ audio: mp3, wav, flac, aac, ogg | video: mp4, webm, mkv.
-    /// Controller rút ruột IFormFile → truyền Stream xuống UploadMediaCommand.
-    /// Handler (Infrastructure) gọi IFileStorageService.UploadFileAsync() lưu file.
+    /// Nhận thông tin qua Form-data bao gồm file media chính và ảnh bìa (coverImage) tùy chọn.
     /// </remarks>
     [HttpPost("upload")]
-    [RequestSizeLimit(500 * 1024 * 1024)] // 500MB
-    [Consumes("multipart/form-data")]
-    [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status201Created)]
+    [Consumes("multipart/form-data")] // Khai báo rõ ràng kiểu dữ liệu để Swagger UI hiển thị đúng form upload
+    [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status400BadRequest)]
-    public async Task<IActionResult> Upload([FromForm] UploadMediaRequest request)
+    public async Task<IActionResult> UploadFile(
+        [FromForm] IFormFile mediaFile, 
+        [FromForm] IFormFile? coverImage, // Ảnh bìa có thể null nếu người dùng không upload
+        [FromForm] string title,
+        [FromForm] string description,
+        [FromForm] string category)
     {
-        if (request.File is null || request.File.Length == 0)
-            return BadRequest(ApiResponse.Fail("File không được để trống"));
+        if (mediaFile == null || mediaFile.Length == 0)
+            return BadRequest(ApiResponse.Fail("File media không được để trống"));
 
-        var allowed = AllowedAudio.Concat(AllowedVideo).ToArray();
-        var ext = Path.GetExtension(request.File.FileName).ToLowerInvariant();
-        if (!allowed.Contains(ext))
-            return BadRequest(ApiResponse.Fail(
-                $"Định dạng không hỗ trợ. Chấp nhận: {string.Join(", ", allowed)}"));
+        var command = new UploadMediaCommand 
+        {
+            // Map thông tin dữ liệu của File Media chính
+            FileName = mediaFile.FileName,
+            ContentType = mediaFile.ContentType,
+            ContentStream = mediaFile.OpenReadStream(),
 
-        // Phân loại MediaStyle dựa vào ContentType
-        var mediaStyle = request.File.ContentType.StartsWith("video/")
-            ? MediaStyle.Video
-            : MediaStyle.Audio;
+            // Map thông tin dữ liệu của Ảnh bìa (Kiểm tra nếu có ảnh mới truyền Stream)
+            ImageFileName = coverImage?.FileName,
+            ImageContentType = coverImage?.ContentType,
+            ImageStream = coverImage?.OpenReadStream(),
 
-        // Rút ruột IFormFile → truyền stream xuống Application layer
-        await using var stream = request.File.OpenReadStream();
+            Title = title,
+            Description = description,
+            Category = category
+        };
 
-        var command = new UploadMediaCommand(
-            title:       request.Title,
-            ownerId:     CurrentUserId,
-            description: request.Description ?? string.Empty,
-            mediaStyle:  mediaStyle,
-            category:    request.Category,
-            filename:    request.File.FileName,
-            contenttype: request.File.ContentType,
-            filestream:  stream);
-
-        var success = await Mediator.Send(command);
-
-        return success
-            ? StatusCode(StatusCodes.Status201Created, ApiResponse.Ok("Upload thành công"))
-            : BadRequest(ApiResponse.Fail("Upload thất bại"));
+        // Sử dụng Mediator (viết hoa) được thừa kế sẵn từ BaseApiController thay vì _mediator
+        var result = await Mediator.Send(command); 
+        
+        // Bọc kết quả bằng ApiResponse.Ok để đồng bộ format dữ liệu trả về với toàn bộ hệ thống
+        return Ok(ApiResponse.Ok(result, "Tải tệp tin lên hệ thống thành công"));
     }
 
     // GET api/media/{id}
