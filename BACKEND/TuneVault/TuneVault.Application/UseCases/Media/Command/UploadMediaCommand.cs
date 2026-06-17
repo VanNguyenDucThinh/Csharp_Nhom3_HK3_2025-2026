@@ -1,7 +1,7 @@
 using System;
 using MediatR;
 using TuneVault.Application.DTOs;
-using TuneVault.Application.UseCases.Command;
+using TuneVault.Application.UseCases.Media.Command;
 using TuneVault.Domain.Interfaces;
 using TuneVault.Domain.Events;
 using TuneVault.Domain.Entities;

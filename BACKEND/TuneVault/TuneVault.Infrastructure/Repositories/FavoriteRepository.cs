@@ -16,16 +16,15 @@ namespace TuneVault.Infrastructure.Repositories
             _connection = connection;
         }
 
-        public async Task<bool> AddToFavorites(Favorite favorite)
+        public async Task<bool> AddToFavorites(Guid userId, Guid mediaItemId)
         {
             string sql = @"insert into Favorite(IdUser , IdMediaItem, FavoriteAt)
-                           values(@IdUser , @IdMediaItem , @FavoriteAt)";
+                           values(@IdUser , @IdMediaItem)";
             using var connection = _connection.CreateConnection();
             var command = new CommandDefinition(sql, new
             {
-                IdUser = favorite.IdUser,
-                IdMediaItem = favorite.IdMediaItem,
-                FavoriteAt = favorite.FavoritedAt
+                IdUser = userId,
+                IdMediaItem = mediaItemId,
             });
             int RowsAffected = await connection.ExecuteAsync(command);
             return RowsAffected > 0;
@@ -44,6 +43,24 @@ namespace TuneVault.Infrastructure.Repositories
                 UserId = userId
             });
             return await connection.QueryAsync<MediaItem>(command);
+        }
+
+        public async Task<bool> IsFavoriteMedia(Guid userId, Guid mediaItemId)
+        {
+            string sql = @"select case
+                           when exists(
+                                select 1
+                                from Favorite
+                                where IdUser = @userId and IdMediaItem = @mediaItemId)
+                           then cast (1 as bit)
+                           else cast (0 as bit) end";
+            using var connection = _connection.CreateConnection();
+            var command = new CommandDefinition(sql, new
+            {
+                userId = userId,
+                mediaItemId = mediaItemId
+            });
+            return await connection.ExecuteScalarAsync<bool>(command);
         }
 
         public async Task<bool> RemoveFromFavorites(Guid userId, Guid mediaItemId)

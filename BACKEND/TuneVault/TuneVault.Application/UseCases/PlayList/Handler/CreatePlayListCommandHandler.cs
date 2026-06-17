@@ -19,7 +19,7 @@ public class CreatePlayListCommandHandler:IRequestHandler<CreatePlayListCommand,
     public async Task<PlayListDto> Handle (CreatePlayListCommand request, CancellationToken cancellationToken)
     {
         //Tạo 1 playlist mới
-        var newPlaylist = new PlayList()
+        var newPlaylist = new PlayListEntities
         {
             Id=Guid.NewGuid(),
             Name=request.Name,

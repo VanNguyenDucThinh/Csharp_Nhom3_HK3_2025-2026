@@ -17,18 +17,38 @@ namespace TuneVault.Infrastructure.Repositories
             _connection = connection;
         }
 
-        public async Task<bool> AddTrackToPlaylist(Guid playlistId, Guid mediaItemId)
+        public async Task<bool> AddTrackToPlaylist(PlayListTrack playListTrack)
         {
             string sql = @"insert into PlayListTrack(IdPlaylist , IdMediaItem)
                            values (@PlayListId , @MediaItemId)";
             using var connection = _connection.CreateConnection();
             var command = new CommandDefinition(sql, new
             {
-                PlayListId = playlistId,
-                MediaItemId = mediaItemId,
+                PlayListId = playListTrack.IdPlaylist,
+                MediaItemId = playListTrack.IdMediaItem,
             });
             int RowsAffected = await connection.ExecuteAsync(command);
             return RowsAffected > 0;
+        }
+
+        public async Task<bool> Exists(Guid playlistId, Guid mediaItemId)
+        {
+            string sql = @"select case
+                           when exists(
+                                select 1 from PlayListTrack
+                                where IdPlayList = @PlayListId and IdMediaItem = @mediaItemId)
+                                then cast (1 as bit)
+                                else cast (0 as bit)
+                                end"; // 1 tồn tại - 0 không tồn tại , cast ép kiểu
+            using var connection = _connection.CreateConnection();
+            var command = new CommandDefinition(sql , new
+            {
+                PlayListId = playlistId,
+                mediaItemId = mediaItemId
+            });
+            return await connection.ExecuteScalarAsync<bool>(command);
+
+
         }
 
         public async Task<IEnumerable<MediaItem>> GetTracksInPlaylist(Guid playlistId)

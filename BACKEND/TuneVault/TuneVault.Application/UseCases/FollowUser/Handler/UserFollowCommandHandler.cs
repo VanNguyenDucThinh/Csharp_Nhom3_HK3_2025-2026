@@ -14,10 +14,11 @@ public class UserFollowCommandHandler:IRequestHandler<UserFollowCommand, FollowD
     private readonly ICurentUserService _curUser;
     private readonly IMediator _mediator;
 
-    public UserFollowCommandHandler(IFollowRepository follow, IMediator mediator, ICurentUserService _curUser)
+    public UserFollowCommandHandler(IFollowRepository follow, IMediator mediator, ICurentUserService curUser)
     {
         _follow=follow;
         _mediator=mediator;
+        _curUser = curUser; // <--- Phải có dòng gán này thì mới hết bị NULL
     }
 
     public async Task<FollowDto> Handle(UserFollowCommand request, CancellationToken cancellationToken)
@@ -46,7 +47,7 @@ public class UserFollowCommandHandler:IRequestHandler<UserFollowCommand, FollowD
         }
         else
         {
-            var addFollow = new Follow
+            var addFollow = new FollowEntities
             {
                 IdFollower=_curUser.UserId,
                 IdFollowing=request.IdUser,

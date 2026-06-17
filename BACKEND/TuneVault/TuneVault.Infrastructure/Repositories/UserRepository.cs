@@ -16,7 +16,7 @@ namespace TuneVault.Infrastructure.Repositories
         }
         
         //Create
-        public async Task<Guid> CreateUserProfile(UserProfile userProfile) //register
+        public async Task<bool> CreateUserProfile(UserProfile userProfile) //register
         {
             string sql = @"Insert into UserProfile(UserName, [Password], [Email] , [Name])
                            output INSERTED.[UserId]
@@ -29,7 +29,8 @@ namespace TuneVault.Infrastructure.Repositories
                 Email = userProfile.Email,
                 Name = userProfile.Name
             });
-            return await connection.QuerySingleAsync<Guid>(command); //Trả về 1 Guid user vừa register 
+            int RowsAffected = await connection.ExecuteAsync(command);
+            return RowsAffected > 0;
         }
 
         //Delete
@@ -114,6 +115,16 @@ namespace TuneVault.Infrastructure.Repositories
             return await connection.QueryFirstOrDefaultAsync<UserProfile>(command);
         }
 
+        public async Task<UserProfile> GetArtistById(Guid userId)
+        {
+            string sql = @"select u.UserId u.[Name], u.Email, u.AvatarUrl, u.DateOfBirth, u.Bio, u.UserName,
+                           from UserProfile u
+                           inner join Artist a on u.UserId = a.IdUserProfile
+                           where u.UserId = @UserId";
+            using var connection = _connection.CreateConnection();
+            var command = new CommandDefinition(sql , new {UserId = userId });
+            return await connection.QueryFirstOrDefaultAsync<UserProfile>(command);
         
+        }
     }
 }

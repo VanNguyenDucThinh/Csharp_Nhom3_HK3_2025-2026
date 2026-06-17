@@ -79,7 +79,7 @@ public record RegisterRequest(
     string Password,
 
     /// <example>2000-01-15</example>
-    [property: System.ComponentModel.DataAnnotations.Required]
+    // [property: System.ComponentModel.DataAnnotations.Required]
     DateTime DateOfBirth
 );
 

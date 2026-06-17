@@ -4,5 +4,15 @@
   "success": true,
   "projectFilePath": "D:\\!TranDieuVi\\C#\\Csharp_Nhom3_HK3_2025-2026\\BACKEND\\TuneVault\\TuneVault.Infrastructure\\TuneVault.Infrastructure.csproj",
   "expectedPackageFiles": [],
-  "logs": []
+  "logs": [
+    {
+      "code": "Undefined",
+      "level": "Warning",
+      "message": "Problem reading the cache file D:\\!TranDieuVi\\C#\\Csharp_Nhom3_HK3_2025-2026\\BACKEND\\TuneVault\\TuneVault.Infrastructure\\obj\\project.nuget.cache : '<' is an invalid start of a property name. Expected a '\"'. Path: $ | LineNumber: 2 | BytePositionInLine: 0.",
+      "projectPath": "D:\\!TranDieuVi\\C#\\Csharp_Nhom3_HK3_2025-2026\\BACKEND\\TuneVault\\TuneVault.Infrastructure\\TuneVault.Infrastructure.csproj",
+      "warningLevel": 1,
+      "filePath": "D:\\!TranDieuVi\\C#\\Csharp_Nhom3_HK3_2025-2026\\BACKEND\\TuneVault\\TuneVault.Infrastructure\\TuneVault.Infrastructure.csproj",
+      "targetGraphs": []
+    }
+  ]
 }

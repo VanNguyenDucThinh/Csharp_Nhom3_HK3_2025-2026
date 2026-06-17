@@ -22,6 +22,7 @@ public class RegisterCommandValidator:AbstractValidator<RegisterCommand>
         .Matches(@"[a-z]").WithMessage("Mật khẩu chứa tối thiểu một kí tự thường")
         .Matches(@"[A-Z]").WithMessage("Mật khẩu chứa tối thiểu kí tự hoa");
 
+        RuleFor(x=>x.DateOfBirth).NotEmpty().WithMessage("Ngày sinh không được để trống");
 
 
     }

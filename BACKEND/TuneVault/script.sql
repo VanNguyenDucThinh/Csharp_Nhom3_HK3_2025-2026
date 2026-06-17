@@ -1,4 +1,4 @@
-﻿Create database TuneVaultDB
+﻿	Create database TuneVaultDB
 Go
 
 Use TuneVaultDB
@@ -17,17 +17,38 @@ create table UserProfile(
 );
 Go
 
+--create artist
+create table Artist(
+    Id UNIQUEIDENTIFIER not null default NEWID() primary key,
+    IdUserProfile UNIQUEIDENTIFIER  not null,
+    NameArtist nvarchar(255) not null,
+    IsVerified bit not null default(0),
+	
+    constraint Artist_IdUserProfile_Fkey foreign key(IdUserProfile)
+        references [User](UserId) on delete cascade
+);
+Go
+
 --Table media
 create table MediaItem(
 	Id UNIQUEIDENTIFIER primary key,
 	Title nvarchar(255) not null, 
 	[Description] NVARCHAR(MAX) NULL,
+	Duration time not null,	
 	CategoryId INT NOT NULL,
-	Duration int not null,
 	MediaStyleId INT NOT NULL,
+	UrlImageMedia VARCHAR(2048) NULL,
 	UrlMediaItem VARCHAR(2048) NOT NULL,
-	OwnerMediaItem UNIQUEIDENTIFIER NOT NULL,
-	UploadDateMediaItem  datetime2 not null
+	ViewCount BIGINT NOT NULL DEFAULT 0,
+	[Owner] UNIQUEIDENTIFIER NOT NULL,	
+	UploadDateMediaItem  datetime2 not null,
+	IdAlbum UNIQUEIDENTIFIER NULL,
+
+	CONSTRAINT FK_MediaItem_Owner FOREIGN KEY ([Owner]) 
+        REFERENCES UserProfile(UserId) ON DELETE CASCADE,
+
+    CONSTRAINT FK_MediaItem_Album FOREIGN KEY (IdAlbum) 
+        REFERENCES Album(IdAlbum) ON DELETE SET NULL
 );
 Go
 
@@ -46,7 +67,7 @@ Go
 
 --Table TrackPlayList
 create table PlayListTrack(
-	IdPlaylist UNIQUEIDENTIFIER not null,
+	IdPlaylist UNIQUEIDENTIFIER not null,	
 	IdMediaItem UNIQUEIDENTIFIER not null,
 	AddAt datetime2 not null,
 	Primary Key (IdPlaylist , IdMediaItem),
@@ -74,9 +95,9 @@ create table MediaShare(
 		references PlayList(Id) on delete set null,
 
 	constraint MediaShare_IdSender_Fkey foreign key(IdSender)
-		references UserProfile(UserId),
+		references UserProfile(UserId) no action,
 	constraint MediaShare_IdReceiver_Fkey foreign key(IdReceiver)
-		references UserProfile(UserId)
+		references UserProfile(UserId) no action	
 
 );
 Go
@@ -97,7 +118,7 @@ GO
 create table Favorite(
 	IdUser UNIQUEIDENTIFIER NOT NULL,
 	IdMediaItem UNIQUEIDENTIFIER not null,
-	FavoriteAt DATETIME2 NOT NULL,
+	FavoriteAt DATETIME2 NOT NULL default getutcdate(),	
 
 	PRIMARY KEY (IdUser, IdMediaItem),
 
