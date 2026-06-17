@@ -28,7 +28,23 @@ namespace TuneVault.Infrastructure.Repositories
                 ShareAt = mediaShare.ShareAt,
             });
             int RowsAffected = await connection.ExecuteAsync(command);
-            return RowsAffected> 0;
+            return RowsAffected > 0;
+        }
+
+        public async Task<List<MediaShare>> GetSharedByIdUser(Guid id)
+        {
+            string sql = @"select IdSender , IdReceiver , IdMediaItem, IdPlayList, ShareAt
+                           from MediaShare
+                           where IdReceiver = @Id
+                           order by ShareAt desc";
+            using var connection = _connection.CreateConnection();
+            var command = new CommandDefinition(sql, new
+            {
+                Id = id,
+            });
+            var result = await connection.QueryAsync<MediaShare>(command);
+            return result.ToList();     
         }
     }
 }
+

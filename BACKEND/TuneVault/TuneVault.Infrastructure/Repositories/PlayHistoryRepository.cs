@@ -16,7 +16,7 @@ namespace TuneVault.Infrastructure.Repositories
             _connection = connection;
         }
 
-        public async Task<bool> CreatePlayHistory(PlayHistory playHistoryId)
+        public async Task<bool> AddMediaPlayHistory(PlayHistory playHistoryId)
         {
             string sql = @"insert into PlayHistory(IdUser, IdMediaItem, PlayAt)
                            values (@IdUser, @IdMediaItem, @PlayAt)";
@@ -31,14 +31,14 @@ namespace TuneVault.Infrastructure.Repositories
             return RowsAffected > 0;
         }
 
-        public async Task<bool> DeletePlayHistory(Guid userId)
+        public async Task<bool> DeletePlayHistory(Guid playHistoryId)
         {
             string sql = @"delete from PlayHistory
-                           where IdUser=@IdUser";
+                           where IdUser=@playHistoryId";
             using var connection = _connection.CreateConnection();
             var command = new CommandDefinition(sql, new
             {
-                UserId = userId
+                UserId = playHistoryId
             });
             int RowsAffected = await connection.ExecuteAsync(command);
             return RowsAffected > 0;
