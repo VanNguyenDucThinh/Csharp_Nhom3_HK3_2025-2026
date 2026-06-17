@@ -1,6 +1,6 @@
 using System;
 using FluentValidation;
-using TuneVault.Application.UseCases.Command;
+using TuneVault.Application.UseCases.Auth.Command;
 
 namespace TuneVault.Application.Validators;
 

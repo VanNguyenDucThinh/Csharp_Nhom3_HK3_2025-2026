@@ -10,6 +10,7 @@ public interface IUserProfileRepository
     Task<bool> DeleteUserProfile(Guid userId);//Xóa thông tin người dùng
     Task<UserProfile> GetUserProfileById(Guid userId);//Lấy thông tin người dùng theo ID
     Task<UserProfile> GetUserProfileByEmail(string email);//Lấy thông tin người dùng theo email
+    Task<UserProfile> GetArtistById(Guid userId);//Lấy nghệ sĩ
 
 
 

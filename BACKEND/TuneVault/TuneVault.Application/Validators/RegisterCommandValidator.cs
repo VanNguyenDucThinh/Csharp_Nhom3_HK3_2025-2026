@@ -1,6 +1,6 @@
 using System;
 using FluentValidation;
-using TuneVault.Application.UseCases.Command;
+using TuneVault.Application.UseCases.Auth.Command;
 
 namespace TuneVault.Application.Validators;
 
@@ -21,6 +21,8 @@ public class RegisterCommandValidator:AbstractValidator<RegisterCommand>
         .Matches(@"[0-9]").WithMessage("Mật khẩu chứa tối thiểu một kí tự số")
         .Matches(@"[a-z]").WithMessage("Mật khẩu chứa tối thiểu một kí tự thường")
         .Matches(@"[A-Z]").WithMessage("Mật khẩu chứa tối thiểu kí tự hoa");
+
+
 
     }
 
