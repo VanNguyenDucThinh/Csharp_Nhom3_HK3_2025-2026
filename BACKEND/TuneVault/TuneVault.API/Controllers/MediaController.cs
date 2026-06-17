@@ -2,8 +2,8 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using TuneVault.API.Common;
 using TuneVault.Application.DTOs;
-using TuneVault.Application.UseCases.Command;
-using TuneVault.Application.UseCases.Query;
+using TuneVault.Application.UseCases.Media.Command;
+using TuneVault.Application.UseCases.Media.Handler;
 using TuneVault.Domain.Enums;
 
 namespace TuneVault.API.Controllers;
@@ -40,21 +40,22 @@ public class MediaController : BaseApiController
         if (mediaFile == null || mediaFile.Length == 0)
             return BadRequest(ApiResponse.Fail("File media không được để trống"));
 
-        var command = new UploadMediaCommand 
+        var command = new UploadMediaCommand
         {
             // Map thông tin dữ liệu của File Media chính
             FileName = mediaFile.FileName,
             ContentType = mediaFile.ContentType,
-            ContentStream = mediaFile.OpenReadStream(),
+            FileStream = mediaFile.OpenReadStream(),
 
             // Map thông tin dữ liệu của Ảnh bìa (Kiểm tra nếu có ảnh mới truyền Stream)
             ImageFileName = coverImage?.FileName,
             ImageContentType = coverImage?.ContentType,
-            ImageStream = coverImage?.OpenReadStream(),
+            ImageFileStream = coverImage?.OpenReadStream(),
 
             Title = title,
             Description = description,
-            Category = category
+            Category = Enum.TryParse<Category>(category, true, out var parsedCategory) ? parsedCategory : Category.Pop, // Mặc định Pop nếu không parse được
+            MediaStyle = mediaFile.ContentType.StartsWith("video/") ? MediaStyle.Video : MediaStyle.Audio;
         };
 
         // Sử dụng Mediator (viết hoa) được thừa kế sẵn từ BaseApiController thay vì _mediator

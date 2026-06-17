@@ -2,7 +2,8 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using TuneVault.API.Common;
 using TuneVault.Application.DTOs;
-using TuneVault.Application.UseCases.Command;
+using TuneVault.Application.UseCases.PlayList.Command;
+using TuneVault.Application.UseCases.PlayList.Handler;
 
 namespace TuneVault.API.Controllers;
 

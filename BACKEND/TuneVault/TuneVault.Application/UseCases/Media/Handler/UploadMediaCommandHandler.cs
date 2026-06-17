@@ -7,7 +7,7 @@ using TuneVault.Domain.Events;
 using TuneVault.Domain.Entities;
 using TuneVault.Domain.Enums;
 
-namespace TuneVault.Application.UseCases.Command.Handler;
+namespace TuneVault.Application.UseCases.Media.Handler;
 
 public class UploadMediaCommandHandler : IRequestHandler<UploadMediaCommand, bool>
 {

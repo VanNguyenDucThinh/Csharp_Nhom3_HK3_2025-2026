@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using TuneVault.API.Common;
 using TuneVault.Application.DTOs;
 using TuneVault.Application.UseCases;
-using TuneVault.Application.UseCases.Query;
+using TuneVault.Application.UseCases.Share.Command;
 using TuneVault.Domain.Enums;
 
 namespace TuneVault.API.Controllers;
