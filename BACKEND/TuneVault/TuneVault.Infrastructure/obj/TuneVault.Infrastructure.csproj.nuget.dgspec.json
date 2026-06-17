@@ -1,20 +1,20 @@
 {
   "format": 1,
   "restore": {
-    "D:\\!TranDieuVi\\C#\\Csharp_Nhom3_HK3_2025-2026\\BACKEND\\TuneVault\\TuneVault.Infrastructure\\TuneVault.Infrastructure.csproj": {}
+    "C:\\Users\\DUC KHAN\\Documents\\GitHub\\Csharp_Nhom3_HK3_2025-2026\\BACKEND\\TuneVault\\TuneVault.Infrastructure\\TuneVault.Infrastructure.csproj": {}
   },
   "projects": {
-    "D:\\!TranDieuVi\\C#\\Csharp_Nhom3_HK3_2025-2026\\BACKEND\\TuneVault\\TuneVault.Infrastructure\\TuneVault.Infrastructure.csproj": {
+    "C:\\Users\\DUC KHAN\\Documents\\GitHub\\Csharp_Nhom3_HK3_2025-2026\\BACKEND\\TuneVault\\TuneVault.Infrastructure\\TuneVault.Infrastructure.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "D:\\!TranDieuVi\\C#\\Csharp_Nhom3_HK3_2025-2026\\BACKEND\\TuneVault\\TuneVault.Infrastructure\\TuneVault.Infrastructure.csproj",
+        "projectUniqueName": "C:\\Users\\DUC KHAN\\Documents\\GitHub\\Csharp_Nhom3_HK3_2025-2026\\BACKEND\\TuneVault\\TuneVault.Infrastructure\\TuneVault.Infrastructure.csproj",
         "projectName": "TuneVault.Infrastructure",
-        "projectPath": "D:\\!TranDieuVi\\C#\\Csharp_Nhom3_HK3_2025-2026\\BACKEND\\TuneVault\\TuneVault.Infrastructure\\TuneVault.Infrastructure.csproj",
-        "packagesPath": "C:\\Users\\Hp\\.nuget\\packages\\",
-        "outputPath": "D:\\!TranDieuVi\\C#\\Csharp_Nhom3_HK3_2025-2026\\BACKEND\\TuneVault\\TuneVault.Infrastructure\\obj\\",
+        "projectPath": "C:\\Users\\DUC KHAN\\Documents\\GitHub\\Csharp_Nhom3_HK3_2025-2026\\BACKEND\\TuneVault\\TuneVault.Infrastructure\\TuneVault.Infrastructure.csproj",
+        "packagesPath": "C:\\Users\\DUC KHAN\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\DUC KHAN\\Documents\\GitHub\\Csharp_Nhom3_HK3_2025-2026\\BACKEND\\TuneVault\\TuneVault.Infrastructure\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
-          "C:\\Users\\Hp\\AppData\\Roaming\\NuGet\\NuGet.Config"
+          "C:\\Users\\DUC KHAN\\AppData\\Roaming\\NuGet\\NuGet.Config"
         ],
         "originalTargetFrameworks": [
           "net10.0"

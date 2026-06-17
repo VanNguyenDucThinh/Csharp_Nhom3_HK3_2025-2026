@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "qYY4yBthHY0=",
+  "dgSpecHash": "QfcHxZWwxyo=",
   "success": false,
-  "projectFilePath": "C:\\Users\\DUC KHAN\\Downloads\\Csharp_Nhom3_HK3_2025-2026\\BACKEND\\TuneVault\\TuneVault.Application\\TuneVault.Application.csproj",
+  "projectFilePath": "C:\\Users\\DUC KHAN\\Documents\\GitHub\\Csharp_Nhom3_HK3_2025-2026\\BACKEND\\TuneVault\\TuneVault.Application\\TuneVault.Application.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\DUC KHAN\\.nuget\\packages\\bcrypt.net-next\\4.2.0\\bcrypt.net-next.4.2.0.nupkg.sha512",
     "C:\\Users\\DUC KHAN\\.nuget\\packages\\fluentvalidation\\8.3.0\\fluentvalidation.8.3.0.nupkg.sha512",
@@ -22,8 +22,8 @@
       "code": "NU1605",
       "level": "Error",
       "message": "Warning As Error: Detected package downgrade: FluentValidation from 12.1.1 to 8.3.0. Reference the package directly from the project to select a different version. \r\n TuneVault.Application -> FluentValidation.DependencyInjectionExtensions 12.1.1 -> FluentValidation (>= 12.1.1) \r\n TuneVault.Application -> FluentValidation (>= 8.3.0)",
-      "projectPath": "C:\\Users\\DUC KHAN\\Downloads\\Csharp_Nhom3_HK3_2025-2026\\BACKEND\\TuneVault\\TuneVault.Application\\TuneVault.Application.csproj",
-      "filePath": "C:\\Users\\DUC KHAN\\Downloads\\Csharp_Nhom3_HK3_2025-2026\\BACKEND\\TuneVault\\TuneVault.Application\\TuneVault.Application.csproj",
+      "projectPath": "C:\\Users\\DUC KHAN\\Documents\\GitHub\\Csharp_Nhom3_HK3_2025-2026\\BACKEND\\TuneVault\\TuneVault.Application\\TuneVault.Application.csproj",
+      "filePath": "C:\\Users\\DUC KHAN\\Documents\\GitHub\\Csharp_Nhom3_HK3_2025-2026\\BACKEND\\TuneVault\\TuneVault.Application\\TuneVault.Application.csproj",
       "libraryId": "FluentValidation",
       "targetGraphs": [
         "net10.0"
