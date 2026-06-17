@@ -1,7 +1,7 @@
 using System.Text;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
-using Microsoft.OpenApi.Models;
+using Microsoft.OpenApi;
 using TuneVault.API.Hubs;
 using TuneVault.API.Services;
 using TuneVault.Application.Interface;
@@ -124,20 +124,13 @@ public static class HostingExtensions
                 Description  = "Nhập JWT token (không cần gõ 'Bearer ' phía trước)"
             });
 
-            options.AddSecurityRequirement(new OpenApiSecurityRequirement
+            options.AddSecurityRequirement(document=>new OpenApiSecurityRequirement
             {
                 {
-                    new OpenApiSecurityScheme
-                    {
-                        Reference = new OpenApiReference
-                        {
-                            Type = ReferenceType.SecurityScheme,
-                            Id   = "Bearer"
-                        }
-                    },
-                    Array.Empty<string>()
+                    new OpenApiSecuritySchemeReference("Bearer"),
+                    new List<string>()
                 }
-            });
+        });
         });
 
         // ── HttpClient Anthropic (AI feature) ────────────────────────────
@@ -145,8 +138,7 @@ public static class HostingExtensions
         {
             client.BaseAddress = new Uri("https://api.anthropic.com/");
             client.DefaultRequestHeaders.Add("anthropic-version", "2023-06-01");
-        });
-
+        });      
         return services;
     }
 }

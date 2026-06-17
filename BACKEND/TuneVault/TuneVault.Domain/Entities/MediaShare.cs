@@ -9,6 +9,6 @@ public class MediaShare
     public Guid? IdMediaItem { get; set; }//khoa ngoại, bài hát được chia sẻ
     public MediaItem? MediaItem{get; set;}
     public Guid? IdPlayList { get; set; }//khoa ngoại, playlist được chia sẻ
-    public PlayList? PlayList{get; set;}
+    public PlayListEntities? PlayList{get; set;}
     public DateTime ShareAt { get; set; }=DateTime.UtcNow;//Ngay chia sẻ
 }

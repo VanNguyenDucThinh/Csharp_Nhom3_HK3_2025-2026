@@ -46,7 +46,7 @@ public class UserFollowCommandHandler:IRequestHandler<UserFollowCommand, FollowD
         }
         else
         {
-            var addFollow = new Follow
+            var addFollow = new FollowEntities
             {
                 IdFollower=_curUser.UserId,
                 IdFollowing=request.IdUser,
