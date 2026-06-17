@@ -16,6 +16,21 @@ namespace TuneVault.Infrastructure.Repositories
             _connection = connection;
         }
 
+        public async Task<bool> AddMediaPlayHistory(PlayHistory playHistory)
+        {
+            string sql = @"insert into PlayHistory(IdUser, IdMediaItem, PlayAt)
+                           values (@IdUser, @IdMediaItem, @PlayAt)";
+            using var connection = _connection.CreateConnection();
+            var command = new CommandDefinition(sql, new
+            {
+                IdUser = playHistory.IdUser,
+                IdMediaItem = playHistory.IdMediaItem,
+                PlayAt = playHistory.PlayAt
+            });
+            int rowsAffected = await connection.ExecuteAsync(command);
+            return rowsAffected > 0;
+        }
+
         public async Task<bool> CreatePlayHistory(PlayHistory playHistoryId)
         {
             string sql = @"insert into PlayHistory(IdUser, IdMediaItem, PlayAt)

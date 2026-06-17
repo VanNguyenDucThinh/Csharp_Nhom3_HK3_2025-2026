@@ -12,6 +12,7 @@ using TuneVault.Infrastructure.Repositories;
 using TuneVault.Infrastructure.Security;
 using TuneVault.Infrastructure.Services.JWT;
 using TuneVault.Infrastructure.SignalR;
+using TuneVault.Infrastructure.DataDapper;
 
 namespace TuneVault.Infrastructure
 {
@@ -19,6 +20,7 @@ namespace TuneVault.Infrastructure
     {
         public static IServiceCollection AddInfrastructure(this IServiceCollection services, IConfiguration configuration)
         {
+            services.AddJWT(configuration);
             services.AddScoped<IDbConnection>(sp =>
                 new SqlConnection(configuration.GetConnectionString("DefaultConnection")));
 
@@ -43,6 +45,7 @@ namespace TuneVault.Infrastructure
             services.AddScoped<ICurentUserService, CurrenUserService>();
 
             services.AddScoped<ITokenRepository, TokenRepository>();
+            services.AddScoped<IDbConnectionGen, DbConnectionGen>();
             return services;
         }
     }

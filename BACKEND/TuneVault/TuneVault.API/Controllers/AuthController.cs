@@ -24,8 +24,7 @@ public class AuthController : BaseApiController
         var command = new RegisterCommand(
             request.Name,
             request.Email,
-            request.Password,
-            request.DateOfBirth);
+            request.Password);
 
         var result = await Mediator.Send(command);
         return StatusCode(StatusCodes.Status201Created,
@@ -62,26 +61,22 @@ public class AuthController : BaseApiController
 // ── Request DTOs (API layer — không để lộ Command trực tiếp) ──────────────
 
 /// <summary>Dữ liệu đăng ký tài khoản</summary>
-public record RegisterRequest(
+public record RegisterRequest{
     /// <example>Nguyễn Văn A</example>
-    [property: System.ComponentModel.DataAnnotations.Required]
-    [property: System.ComponentModel.DataAnnotations.StringLength(30, MinimumLength = 1)]
-    string Name,
+    [System.ComponentModel.DataAnnotations.Required]
+    [System.ComponentModel.DataAnnotations.StringLength(30, MinimumLength = 1)]
+    public string Name{get; set;}
 
     /// <example>example@email.com</example>
-    [property: System.ComponentModel.DataAnnotations.Required]
-    [property: System.ComponentModel.DataAnnotations.EmailAddress]
-    string Email,
+    [System.ComponentModel.DataAnnotations.Required]
+    [System.ComponentModel.DataAnnotations.EmailAddress]
+    public string Email{get; set;}
 
     /// <example>Password123</example>
-    [property: System.ComponentModel.DataAnnotations.Required]
-    [property: System.ComponentModel.DataAnnotations.StringLength(100, MinimumLength = 8)]
-    string Password,
-
-    /// <example>2000-01-15</example>
-    [property: System.ComponentModel.DataAnnotations.Required]
-    DateTime DateOfBirth
-);
+    [System.ComponentModel.DataAnnotations.Required]
+    [System.ComponentModel.DataAnnotations.StringLength(100, MinimumLength = 8)]
+    public string Password{get; set;}
+};
 
 /// <summary>Dữ liệu đăng nhập</summary>
 public record LoginRequest(

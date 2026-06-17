@@ -11,6 +11,7 @@ public interface IUserProfileRepository
     Task<UserProfile> GetUserProfileById(Guid userId);//Lấy thông tin người dùng theo ID
     Task<UserProfile> GetUserProfileByEmail(string email);//Lấy thông tin người dùng theo email
     Task<UserProfile> GetArtistById(Guid userId);//Lấy nghệ sĩ
+    Task<bool> IsEmailTakenAsync(string email);
 
 
 

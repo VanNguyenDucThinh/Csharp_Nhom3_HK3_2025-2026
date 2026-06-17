@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
+using TuneVault.Domain.Entities;
 using TuneVault.Domain.Interfaces;
 
 namespace TuneVault.Infrastructure.Repositories
@@ -12,6 +13,23 @@ namespace TuneVault.Infrastructure.Repositories
         public FollowRepository(IDbConnectionGen connection)
         {
             _connection = connection;
+        }
+
+        public async Task<bool> AddFollow(FollowEntities follow)
+        {
+            string sql = @"insert into Follow(IdFollower, IdFollowing)
+                           values (@IdFollower, @IdFollowing)";
+            
+            using var connection = _connection.CreateConnection();
+            var command = new CommandDefinition(sql, new
+            {
+                // Lấy các thuộc tính từ object 'follow' truyền vào
+                IdFollower = follow.IdFollower,
+                IdFollowing = follow.IdFollowing
+            });
+            
+            int rowsAffected = await connection.ExecuteAsync(command);
+            return rowsAffected > 0;
         }
 
         public async Task<bool> FollowUser(Guid followerId, Guid followeeId)

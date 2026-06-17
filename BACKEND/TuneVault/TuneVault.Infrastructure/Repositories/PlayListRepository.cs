@@ -15,7 +15,7 @@ namespace TuneVault.Infrastructure.Repositories
             _connection = connection;
         }
 
-        public async Task<bool> CreatePlayList(PlayList playList)
+        public async Task<bool> CreatePlayList(PlayListEntities playList)
         {
             string sql = @"insert into PlayList([Name] , [Owner] , IsPublic , CreateDate)
                            values(@Name , @Owner , @IsPublic ,@CreateDate)";
@@ -30,6 +30,7 @@ namespace TuneVault.Infrastructure.Repositories
             int RowsAffected = await connection.ExecuteAsync(command);
             return RowsAffected > 0;
         }
+        
 
         public async Task<bool> DeletePlayList(Guid playListId)
         {
@@ -44,7 +45,37 @@ namespace TuneVault.Infrastructure.Repositories
             return RowsAffected > 0;
         }
 
-        public async Task<bool> UpdatePlayList(PlayList playList)
+        public async Task<PlayListEntities> GetPlayListById(Guid playListId)
+        {
+            string sql = @"select [Id], [Name], [Owner], [IsPublic], [CreateDate]
+                           from PlayList
+                           where Id = @Id";
+            using var connection = _connection.CreateConnection();
+            var command = new CommandDefinition(sql, new { Id = playListId });
+            return await connection.QueryFirstOrDefaultAsync<PlayListEntities>(command);
+        }
+
+        public async Task<List<PlayListEntities>> GetPlayListByTitle(string title, int skip, int take)
+        {
+            string sql = @"select [Id], [Name], [Owner], [IsPublic], [CreateDate]
+                           from PlayList
+                           where [Name] LIKE @Title
+                           order by CreateDate desc
+                           offset @Skip rows fetch next @Take rows only";
+
+            using var connection = _connection.CreateConnection();
+            var command = new CommandDefinition(sql, new
+            {
+                Title = $"%{title}%", // Tìm kiếm chuỗi gần đúng
+                Skip = skip,
+                Take = take
+            });
+            
+            var result = await connection.QueryAsync<PlayListEntities>(command);
+            return result.ToList();
+        }
+
+        public async Task<bool> UpdatePlayList(PlayListEntities playList)
         {
             string sql = @"update PlayList
                            set [Name] = @Name,

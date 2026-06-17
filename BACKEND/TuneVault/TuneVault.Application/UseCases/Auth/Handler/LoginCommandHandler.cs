@@ -18,14 +18,15 @@ public class LoginCommandHandler : IRequestHandler<LoginCommand, AuthResponseDto
 
     public async Task<AuthResponseDto> Handle(LoginCommand request, CancellationToken cancellationToken)
     {
-        var userProfile = await _userProfile.GetUserProfileByEmail(request.Email);
+        var userProfile = await _userProfile.IsEmailTakenAsync(request.Email);
+        var userProfilePassword = await _userProfile.GetUserProfileByEmail(request.Email);
         //Kiểm tra email tồn tại chưa
-        if(userProfile == null)
+        if(!userProfile)
         {
             throw new Exception("Email hoặc mật khẩu không đúng");
         }
         //Kiểm tra mật khẩu
-        bool isPasswordValid = BCrypt.Net.BCrypt.Verify(request.Password, userProfile.Password);
+        bool isPasswordValid = BCrypt.Net.BCrypt.Verify(request.Password, userProfilePassword.Password);
         if (!isPasswordValid)
         {
             throw new Exception("Email hoặc mật khẩu không đúng");
@@ -33,10 +34,10 @@ public class LoginCommandHandler : IRequestHandler<LoginCommand, AuthResponseDto
         //Đăng nhập thành công, trả về thông tin người dùng và token (JWT)
         return new AuthResponseDto
         {
-            Id = userProfile.Id,
-            Name = userProfile.Name,
-            Email = userProfile.Email,
-            Token = "JWT_TOKEN" //TODO: Tạo JWT token thực tế
+            Id = userProfilePassword.Id,
+            Name = userProfilePassword.Name,
+            Email = userProfilePassword.Email,
+            Token = "JWT_TOKEN" 
         };
     }
 }

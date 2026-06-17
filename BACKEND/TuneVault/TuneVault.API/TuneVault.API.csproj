@@ -17,5 +17,11 @@
   <ItemGroup>
       <ProjectReference Include="..\TuneVault.Application\TuneVault.Application.csproj" />
       <ProjectReference Include="..\TuneVault.Domain\TuneVault.Domain.csproj" />
+      <ProjectReference Include="..\TuneVault.Infrastructure\TuneVault.Infrastructure.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Update="appsettings.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 </Project>

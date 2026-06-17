@@ -16,19 +16,50 @@ namespace TuneVault.Infrastructure.Repositories
         {
             _connection = connection;
         }
+        
 
-        public async Task<bool> AddTrackToPlaylist(Guid playlistId, Guid mediaItemId)
+        // public async Task<bool> AddTrackToPlaylist(Guid playlistId, Guid mediaItemId)
+        // {
+        //     string sql = @"insert into PlayListTrack(IdPlaylist , IdMediaItem)
+        //                    values (@PlayListId , @MediaItemId)";
+        //     using var connection = _connection.CreateConnection();
+        //     var command = new CommandDefinition(sql, new
+        //     {
+        //         PlayListId = playlistId,
+        //         MediaItemId = mediaItemId,
+        //     });
+        //     int RowsAffected = await connection.ExecuteAsync(command);
+        //     return RowsAffected > 0;
+        // }
+
+        public async Task<bool> AddTrackToPlaylist(PlayListTrack playListTrack)
         {
-            string sql = @"insert into PlayListTrack(IdPlaylist , IdMediaItem)
-                           values (@PlayListId , @MediaItemId)";
+            string sql = @"insert into PlayListTrack(IdPlaylist, IdMediaItem)
+                           values (@PlayListId, @MediaItemId)";
             using var connection = _connection.CreateConnection();
             var command = new CommandDefinition(sql, new
             {
-                PlayListId = playlistId,
-                MediaItemId = mediaItemId,
+                PlayListId = playListTrack.IdPlaylist, 
+                MediaItemId = playListTrack.IdMediaItem
             });
-            int RowsAffected = await connection.ExecuteAsync(command);
-            return RowsAffected > 0;
+            int rowsAffected = await connection.ExecuteAsync(command);
+            return rowsAffected > 0;
+        }
+
+        public async Task<bool> Exists(Guid playlistId, Guid mediaItemId)
+        {
+            string sql = @"select 1 from PlayListTrack 
+                           where IdPlaylist = @PlayListId and IdMediaItem = @MediaItemId";
+            
+            using var connection = _connection.CreateConnection();
+            
+            var result = await connection.ExecuteScalarAsync<int?>(sql, new 
+            { 
+                PlayListId = playlistId, 
+                MediaItemId = mediaItemId 
+            });
+            
+            return result != null;
         }
 
         public async Task<IEnumerable<MediaItem>> GetTracksInPlaylist(Guid playlistId)

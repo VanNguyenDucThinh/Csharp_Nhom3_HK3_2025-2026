@@ -15,6 +15,7 @@ namespace TuneVault.Infrastructure.Repositories
         {
             _connection = connection;
         }
+        
 
         public async Task<bool> AddToFavorites(Favorite favorite)
         {
@@ -31,6 +32,11 @@ namespace TuneVault.Infrastructure.Repositories
             return RowsAffected > 0;
         }
 
+        public Task<bool> AddToFavorites(Guid userId, Guid mediaItemId)
+        {
+            throw new NotImplementedException();
+        }
+
         public async Task<IEnumerable<MediaItem>> GetFavoriteTracks(Guid userId)
         {
             string sql = @"select med.*
@@ -44,6 +50,11 @@ namespace TuneVault.Infrastructure.Repositories
                 UserId = userId
             });
             return await connection.QueryAsync<MediaItem>(command);
+        }
+
+        public Task<bool> IsFavoriteMedia(Guid userId, Guid mediaItemId)
+        {
+            throw new NotImplementedException();
         }
 
         public async Task<bool> RemoveFromFavorites(Guid userId, Guid mediaItemId)

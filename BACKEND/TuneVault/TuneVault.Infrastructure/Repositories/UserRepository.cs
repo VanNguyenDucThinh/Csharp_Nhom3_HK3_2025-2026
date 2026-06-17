@@ -16,11 +16,11 @@ namespace TuneVault.Infrastructure.Repositories
         }
         
         //Create
-        public async Task<Guid> CreateUserProfile(UserProfile userProfile) //register
+        public async Task<bool> CreateUserProfile(UserProfile userProfile) //register
         {
-            string sql = @"Insert into UserProfile(UserName, [Password], [Email] , [Name])
+            string sql = @"Insert into UserProfile([Password], [Email] , [Name])
                            output INSERTED.[UserId]
-                           values (@UserName , @Password , @Email , @Name)";
+                           values (@Password , @Email , @Name)";
             using var connection = _connection.CreateConnection();
             var command =new CommandDefinition(sql, new
             {
@@ -29,7 +29,8 @@ namespace TuneVault.Infrastructure.Repositories
                 Email = userProfile.Email,
                 Name = userProfile.Name
             });
-            return await connection.QuerySingleAsync<Guid>(command); //Trả về 1 Guid user vừa register 
+            int rowsAffected = await connection.ExecuteAsync(command);
+            return rowsAffected > 0;
         }
 
         //Delete
@@ -72,7 +73,7 @@ namespace TuneVault.Infrastructure.Repositories
 
         public async Task<UserProfile> GetUserProfileByEmail(string email)
         {
-            string sql = @"Select UserId, [Name] , [Email], AvatarUrl, DateOfBirth, Bio, UserName
+            string sql = @"Select UserId, [Name] , [Email], AvatarUrl, DateOfBirth, Bio, UserName, Password
                            from UserProfile
                            where [Email]=@Email";
             using var connection = _connection.CreateConnection();
@@ -114,6 +115,9 @@ namespace TuneVault.Infrastructure.Repositories
             return await connection.QueryFirstOrDefaultAsync<UserProfile>(command);
         }
 
-        
+        public Task<UserProfile> GetArtistById(Guid userId)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

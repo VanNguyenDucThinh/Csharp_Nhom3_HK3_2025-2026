@@ -31,6 +31,10 @@ public static class HostingExtensions
                     .AllowCredentials(); // bắt buộc cho SignalR
             });
         });
+        var secret = configuration["JwtSettings:Secret"];
+        var allSections = string.Join(", ", configuration.GetSection("JwtSettings").GetChildren().Select(x => x.Key));
+        Console.WriteLine($"Secret value: {secret}");
+        Console.WriteLine($"Keys found in JwtSettings: {allSections}");
 
         // ── JWT ───────────────────────────────────────────────────────────
         var jwtSection = configuration.GetSection("JwtSettings");

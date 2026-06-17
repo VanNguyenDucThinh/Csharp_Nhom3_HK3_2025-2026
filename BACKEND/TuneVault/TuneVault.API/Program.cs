@@ -1,15 +1,22 @@
 using TuneVault.API.Extensions;
 using TuneVault.API.Hubs;
 using TuneVault.API.Middlewares;
+using TuneVault.Application;
+using TuneVault.Infrastructure;
+using TuneVault.Infrastructure.Services.JWT;
 
 var builder = WebApplication.CreateBuilder(args);
+;
+
+builder.Configuration.AddJsonFile("appsettings.json", optional: false, reloadOnChange: true);
 
 // ── Đăng ký services ────────────────────────────────────────────────────────
 builder.Services.AddWebApiServices(builder.Configuration);
+//builder.Services.AddWebApiServices(builder.Configuration);
 
 // Uncomment khi các layer khác hoàn thành:
-// builder.Services.AddApplicationServices();
-// builder.Services.AddInfrastructureServices(builder.Configuration);
+builder.Services.AddApplicationServices();
+builder.Services.AddInfrastructure(builder.Configuration);
 
 // ── Build app ────────────────────────────────────────────────────────────────
 var app = builder.Build();

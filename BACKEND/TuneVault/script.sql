@@ -10,24 +10,24 @@ create table UserProfile(
 	[Name] nvarchar(50) not null,
 	Email nvarchar(150) not null unique,
 	AvatarUrl VARCHAR(max) NULL,
-	DateOfBirth DATETIME2 NOT NULL,
 	Bio NVARCHAR(max) NULL,
-	UserName varchar(50) NOT NULL UNIQUE, --loginName
 	[Password] varchar(255) not null
 );
 Go
 
 --Table media
-create table MediaItem(
-	Id UNIQUEIDENTIFIER primary key,
-	Title nvarchar(255) not null, 
-	[Description] NVARCHAR(MAX) NULL,
-	CategoryId INT NOT NULL,
-	Duration int not null,
-	MediaStyleId INT NOT NULL,
-	UrlMediaItem VARCHAR(2048) NOT NULL,
-	OwnerMediaItem UNIQUEIDENTIFIER NOT NULL,
-	UploadDateMediaItem  datetime2 not null
+CREATE TABLE MediaItems (
+    Id UNIQUEIDENTIFIER PRIMARY KEY,               
+    Title NVARCHAR(255) NULL,                      
+    Description NVARCHAR(MAX) NULL,                
+    Category INT NOT NULL,                         
+    MediaStyle INT NOT NULL,                       
+    UrlImageMedia NVARCHAR(MAX) NULL,              
+    ViewCount BIGINT NOT NULL DEFAULT 0,           
+    UrlMediaItem NVARCHAR(MAX) NOT NULL,           
+    Owner UNIQUEIDENTIFIER NOT NULL,               
+    UploadDateMediaItem DATETIME2 NOT NULL DEFAULT GETUTCDATE(), 
+    IdAlbum UNIQUEIDENTIFIER NULL                  
 );
 Go
 

@@ -15,14 +15,14 @@ namespace TuneVault.Infrastructure.SignalR
             _hubContext = hubContext;
         }
 
-        public async Task SendNotificationToGroup(Guid UserId, Notification notification)
+        public async Task SendNotificationToUser(Guid UserId, Notification notification)
         {
-            await _hubContext.Clients.User(UserId).SendAsync("ReceiveNotification", notification);
+            await _hubContext.Clients.User(UserId.ToString()).SendAsync("ReceiveNotification", notification);
         }
 
-        public async Task SendNotificationToUser(Guid GroupName, Notification notification)
+        public async Task SendNotificationToGroup(Guid GroupName, Notification notification)
         {
-            await _hubContext.Clients.Group(GroupName).SendAsync("ReceiveNotification", notification);
+            await _hubContext.Clients.Group(GroupName.ToString()).SendAsync("ReceiveNotification", notification);
         }
     }
 }

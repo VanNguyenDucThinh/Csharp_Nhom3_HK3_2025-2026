@@ -17,10 +17,23 @@ namespace TuneVault.Infrastructure.Repositories
             _connection = connection;
         }
 
+        public async Task<bool> CountView(Guid mediaItemId)
+        {
+            // Giả sử cột lưu lượt xem trong DB của bạn tên là ViewCount (hoặc thay bằng Views tùy DB)
+            string sql = @"Update MediaItem 
+                           set ViewCount = ISNULL(ViewCount, 0) + 1 
+                           where Id = @Id";
+
+            using var connection = _connection.CreateConnection();
+            var command = new CommandDefinition(sql, new { Id = mediaItemId });
+            int rowsAffected = await connection.ExecuteAsync(command);
+            return rowsAffected > 0;
+        }
+
         public async Task<bool> CreateMediaItem(MediaItem mediaItem) //tạo bài hát
         {
-            string sql = @"Insert into MediaItem(Title, CategoryId, MediaStyleId, UrlMediaItem, Description)
-                           values (@Title, @CategoryId , @MediaStyleId, @UrlMediaItem, @Description)";
+            string sql = @"Insert into MediaItems(Id, Title, Description, Category, MediaStyle, UrlImageMedia, UrlMediaItem, Owner)
+               values (@Id, @Title, @Description, @Category, @MediaStyle, @UrlImageMedia, @UrlMediaItem, @Owner)";
             using var connection = _connection.CreateConnection();
             var command = new CommandDefinition(sql, new
             {
@@ -44,24 +57,80 @@ namespace TuneVault.Infrastructure.Repositories
             return RowsAffected > 0;
         }
 
+        public async Task<MediaItem> GetAudioById(Guid mediaItemId)
+        {
+            string sql = @"Select Id, Title, Description, Category, MediaStyle, UrlImageMedia, ViewCount, UrlMediaItem, Owner, UploadDateMediaItem, IdAlbum
+               from MediaItems
+               where Id = @Id AND Category = 1";
+            using var connection = _connection.CreateConnection();
+            var command = new CommandDefinition(sql, new { Id = mediaItemId });
+            return await connection.QueryFirstOrDefaultAsync<MediaItem>(command);
+        }
+
         public async Task<MediaItem> GetMediaItemById(Guid mediaItemId) //Lấy thông tin bài hát theo Id
         {
-            string sql = @"Select [Id], [Title], [Description], [CategoryId], [Duration], [MediaStyleId], [UrlMediaItem],[OwnerMediaItem],[UploadDateMediaItem]
-                           from MediaItem
-                           where [Id] = @Id";
+            string sql = @"Select Id, Title, Description, Category, MediaStyle, UrlImageMedia, ViewCount, UrlMediaItem, Owner, UploadDateMediaItem, IdAlbum
+               from MediaItems
+               where Id = @Id";
             using var connection = _connection.CreateConnection();
             var command = new CommandDefinition(sql, new {Id = mediaItemId});
             return await connection.QueryFirstOrDefaultAsync<MediaItem>(command);
         }
 
+        public async Task<List<MediaItem>> GetMediaItemByTitle(string title, int skip, int take)
+        {
+            string sql = @"Select Id, Title, Description, Category, MediaStyle, UrlImageMedia, ViewCount, UrlMediaItem, Owner, UploadDateMediaItem, IdAlbum
+                           from MediaItems
+                           where Title LIKE @Title
+                           order by Id
+                           offset @Skip rows fetch next @Take rows only";
+
+            using var connection = _connection.CreateConnection();
+            var command = new CommandDefinition(sql, new
+            {
+                Title = $"%{title}%", // Tìm kiếm chứa từ khóa (Ký tự % của SQL)
+                Skip = skip,
+                Take = take
+            });
+            
+            var result = await connection.QueryAsync<MediaItem>(command);
+            return result.ToList();
+        }
+
+        public async Task<MediaItem> GetVideoById(Guid mediaItemId)
+        {
+            // Giả định: Danh mục Video trong CSDL của bạn có mã Category là 1
+            string sql = @"Select Id, Title, Description, Category, MediaStyle, UrlImageMedia, ViewCount, UrlMediaItem, Owner, UploadDateMediaItem, IdAlbum
+                           from MediaItems
+                           where Id = @Id AND Category = 1"; 
+                           
+            using var connection = _connection.CreateConnection();
+            var command = new CommandDefinition(sql, new { Id = mediaItemId });
+            return await connection.QueryFirstOrDefaultAsync<MediaItem>(command);
+        }
+
+        public async Task<List<MediaItem>> GetViewHigh(int skip, int take)
+        {
+            string sql = @"Select Id, Title, Description, Category, MediaStyle, UrlImageMedia, ViewCount, UrlMediaItem, Owner, UploadDateMediaItem, IdAlbum
+                           from MediaItems
+                           order by ViewCount desc
+                           offset @Skip rows fetch next @Take rows only";
+
+            using var connection = _connection.CreateConnection();
+            var command = new CommandDefinition(sql, new { Skip = skip, Take = take });
+            
+            var result = await connection.QueryAsync<MediaItem>(command);
+            return result.ToList();
+        }
+
         public async Task<bool> UpdateMediaItem(MediaItem mediaItem) // Cập nhật bài hát
         {
-            string sql = @"Update MediaItem
-                           set [Title] = @Title,
-                               [Description] = @Description
-                               [CategoryId] = @CategoryId
-                               [MediaStyleId] =@MediaStyleId
-                               where [Id]= @Id";
+            string sql = @"Update MediaItems
+               set Title = @Title,
+                   Description = @Description,
+                   Category = @Category,
+                   MediaStyle = @MediaStyle
+               where Id = @Id";
             using var connection = _connection.CreateConnection();
             var command = new CommandDefinition(sql, mediaItem);
             int RowsAffected = await connection.ExecuteAsync(command);
