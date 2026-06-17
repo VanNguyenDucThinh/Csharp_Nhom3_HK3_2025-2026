@@ -10,10 +10,12 @@ namespace TuneVault.Application.UseCases.Auth.Handler;
 public class LoginCommandHandler : IRequestHandler<LoginCommand, AuthResponseDto>
 {
     private readonly IUserProfileRepository _userProfile;
+    private readonly ITokenGenerator _token;
 
-    public LoginCommandHandler(IUserProfileRepository userProfile)
+    public LoginCommandHandler(IUserProfileRepository userProfile, ITokenGenerator token)
     {
         _userProfile = userProfile;
+        _token=token;
     }
 
     public async Task<AuthResponseDto> Handle(LoginCommand request, CancellationToken cancellationToken)
@@ -31,13 +33,14 @@ public class LoginCommandHandler : IRequestHandler<LoginCommand, AuthResponseDto
         {
             throw new Exception("Email hoặc mật khẩu không đúng");
         }
+        var token = _token.GenerateJwt(userProfilePassword.Id, userProfilePassword.Name, userProfilePassword.Email);
         //Đăng nhập thành công, trả về thông tin người dùng và token (JWT)
         return new AuthResponseDto
         {
             Id = userProfilePassword.Id,
             Name = userProfilePassword.Name,
             Email = userProfilePassword.Email,
-            Token = "JWT_TOKEN" 
+            Token = token
         };
     }
 }

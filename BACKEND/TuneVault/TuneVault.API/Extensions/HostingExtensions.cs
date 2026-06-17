@@ -31,52 +31,52 @@ public static class HostingExtensions
                     .AllowCredentials(); // bắt buộc cho SignalR
             });
         });
-        var secret = configuration["JwtSettings:Secret"];
-        var allSections = string.Join(", ", configuration.GetSection("JwtSettings").GetChildren().Select(x => x.Key));
-        Console.WriteLine($"Secret value: {secret}");
-        Console.WriteLine($"Keys found in JwtSettings: {allSections}");
+//         var secret = configuration["JwtSettings:Secret"];
+//         var allSections = string.Join(", ", configuration.GetSection("JwtSettings").GetChildren().Select(x => x.Key));
+// Console.WriteLine($"Secret value: {secret}");
+// Console.WriteLine($"Keys found in JwtSettings: {allSections}");
 
-        // ── JWT ───────────────────────────────────────────────────────────
-        var jwtSection = configuration.GetSection("JwtSettings");
-        var secretKey = Encoding.UTF8.GetBytes(
-            jwtSection["Secret"]
-            ?? throw new InvalidOperationException("JwtSettings:Secret is missing"));
+//         // ── JWT ───────────────────────────────────────────────────────────
+//         var jwtSection = configuration.GetSection("JwtSettings");
+//         var secretKey = Encoding.UTF8.GetBytes(
+//             jwtSection["Secret"]
+//             ?? throw new InvalidOperationException("JwtSettings:Secret is missing"));
 
-        services
-            .AddAuthentication(opts =>
-            {
-                opts.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-                opts.DefaultChallengeScheme    = JwtBearerDefaults.AuthenticationScheme;
-            })
-            .AddJwtBearer(opts =>
-            {
-                opts.TokenValidationParameters = new TokenValidationParameters
-                {
-                    ValidateIssuerSigningKey = true,
-                    IssuerSigningKey         = new SymmetricSecurityKey(secretKey),
-                    ValidateIssuer           = true,
-                    ValidIssuer              = jwtSection["Issuer"],
-                    ValidateAudience         = true,
-                    ValidAudience            = jwtSection["Audience"],
-                    ValidateLifetime         = true,
-                    ClockSkew                = TimeSpan.Zero
-                };
+//         services
+//             .AddAuthentication(opts =>
+//             {
+//                 opts.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+//                 opts.DefaultChallengeScheme    = JwtBearerDefaults.AuthenticationScheme;
+//             })
+//             .AddJwtBearer(opts =>
+//             {
+//                 opts.TokenValidationParameters = new TokenValidationParameters
+//                 {
+//                     ValidateIssuerSigningKey = true,
+//                     IssuerSigningKey         = new SymmetricSecurityKey(secretKey),
+//                     ValidateIssuer           = true,
+//                     ValidIssuer              = jwtSection["Issuer"],
+//                     ValidateAudience         = true,
+//                     ValidAudience            = jwtSection["Audience"],
+//                     ValidateLifetime         = true,
+//                     ClockSkew                = TimeSpan.Zero
+//                 };
 
-                // SignalR đọc token từ query string (WebSocket không hỗ trợ header)
-                opts.Events = new JwtBearerEvents
-                {
-                    OnMessageReceived = ctx =>
-                    {
-                        var token = ctx.Request.Query["access_token"].ToString();
-                        if (!string.IsNullOrEmpty(token) &&
-                            ctx.HttpContext.Request.Path.StartsWithSegments("/notificationHub"))
-                        {
-                            ctx.Token = token;
-                        }
-                        return Task.CompletedTask;
-                    }
-                };
-            });
+//                 // SignalR đọc token từ query string (WebSocket không hỗ trợ header)
+//                 opts.Events = new JwtBearerEvents
+//                 {
+//                     OnMessageReceived = ctx =>
+//                     {
+//                         var token = ctx.Request.Query["access_token"].ToString();
+//                         if (!string.IsNullOrEmpty(token) &&
+//                             ctx.HttpContext.Request.Path.StartsWithSegments("/notificationHub"))
+//                         {
+//                             ctx.Token = token;
+//                         }
+//                         return Task.CompletedTask;
+//                     }
+//                 };
+//             });
 
         services.AddAuthorization();
 
@@ -125,16 +125,16 @@ public static class HostingExtensions
                 Scheme       = "Bearer",
                 BearerFormat = "JWT",
                 In           = ParameterLocation.Header,
-                Description  = "Nhập JWT token (không cần gõ 'Bearer ' phía trước)"
+                Description  = "Nhập JWT token "
             });
 
-            options.AddSecurityRequirement(document=>new OpenApiSecurityRequirement
+            options.AddSecurityRequirement(document => new OpenApiSecurityRequirement
             {
                 {
-                    new OpenApiSecuritySchemeReference("Bearer"),
-                    new List<string>()
+                new OpenApiSecuritySchemeReference("Bearer"),
+                [] 
                 }
-        });
+            });
         });
 
         // ── HttpClient Anthropic (AI feature) ────────────────────────────

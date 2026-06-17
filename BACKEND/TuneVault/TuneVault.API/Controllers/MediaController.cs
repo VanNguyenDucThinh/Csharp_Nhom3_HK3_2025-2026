@@ -18,7 +18,6 @@ namespace TuneVault.API.Controllers;
 /// Chức năng 5 — Video Player (stream với Range header)
 /// Chức năng 7 — Tìm kiếm media
 /// </summary>
-[Authorize]
 public class MediaController : BaseApiController
 {
     private readonly ICurentUserService _currentUserService;
@@ -36,6 +35,7 @@ public class MediaController : BaseApiController
     /// <remarks>
     /// Nhận thông tin qua Form-data bao gồm file media chính và ảnh bìa (coverImage) tùy chọn.
     /// </remarks>
+    [Authorize]
     [HttpPost("upload")]
     [Consumes("multipart/form-data")] // Khai báo rõ ràng kiểu dữ liệu để Swagger UI hiển thị đúng form upload
     [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status200OK)]
@@ -133,7 +133,21 @@ public class MediaController : BaseApiController
 
         return Ok(ApiResponse<SearchTrendingDto>.Ok(result));
     }
+    [HttpGet("test-header")]
+    [AllowAnonymous] // Cố tình thả cửa để ai cũng vào được
+    public IActionResult TestHeader()
+    {
+        // Bắt quả tang xem trong Header có chữ Authorization nào bay lên không
+        var authHeader = Request.Headers["Authorization"].ToString();
+        
+        return Ok(new 
+        { 
+            TrangThai = string.IsNullOrEmpty(authHeader) ? "TRẮNG TAY (Không nhận được Token)" : "ĐÃ NHẬN ĐƯỢC",
+            GiaTriThucTe = authHeader 
+        });
+    }
 }
+
 
 // ── Request DTOs ──────────────────────────────────────────────────────────
 

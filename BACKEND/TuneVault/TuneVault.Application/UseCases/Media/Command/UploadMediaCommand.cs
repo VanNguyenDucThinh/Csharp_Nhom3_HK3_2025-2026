@@ -6,9 +6,11 @@ using TuneVault.Domain.Interfaces;
 using TuneVault.Domain.Events;
 using TuneVault.Domain.Entities;
 using TuneVault.Domain.Enums;
+using TuneVault.Application.Security;
 
 
 namespace TuneVault.Application.UseCases.Media.Command;
+[Authorize]
 
 public class UploadMediaCommand : IRequest<bool>
 {

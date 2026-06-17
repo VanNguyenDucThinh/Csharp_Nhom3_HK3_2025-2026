@@ -13,10 +13,9 @@ builder.Configuration.AddJsonFile("appsettings.json", optional: false, reloadOnC
 // ── Đăng ký services ────────────────────────────────────────────────────────
 builder.Services.AddWebApiServices(builder.Configuration);
 //builder.Services.AddWebApiServices(builder.Configuration);
-
-// Uncomment khi các layer khác hoàn thành:
-builder.Services.AddApplicationServices();
 builder.Services.AddInfrastructure(builder.Configuration);
+builder.Services.AddApplicationServices();
+
 
 // ── Build app ────────────────────────────────────────────────────────────────
 var app = builder.Build();

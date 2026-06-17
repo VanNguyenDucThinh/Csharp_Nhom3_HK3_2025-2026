@@ -63,7 +63,7 @@ namespace TuneVault.Infrastructure.Repositories
         //Read
         public async Task<UserProfile?> GetUserProfileById(Guid userId)
         {
-            string sql = @"Select UserId, [Name] , [Email], AvatarUrl, DateOfBirth, Bio, UserName
+            string sql = @"Select UserId, [Name] , [Email], AvatarUrl, Bio
                            from UserProfile
                            where UserId=@UserId";
             using var connection = _connection.CreateConnection();
@@ -73,7 +73,7 @@ namespace TuneVault.Infrastructure.Repositories
 
         public async Task<UserProfile> GetUserProfileByEmail(string email)
         {
-            string sql = @"Select UserId, [Name] , [Email], AvatarUrl, DateOfBirth, Bio, UserName, Password
+            string sql = @"Select UserId, [Name] , [Email], AvatarUrl, Bio, Password
                            from UserProfile
                            where [Email]=@Email";
             using var connection = _connection.CreateConnection();
@@ -107,7 +107,7 @@ namespace TuneVault.Infrastructure.Repositories
         //login
         public async Task<UserProfile?> GetByUserNameOrEmailAsync(string LoginName)
         {
-            string sql = @"select UserId, [Name], [Email], [AvatarUrl], [DateOfBirth], [Bio], [UserName], [Password]
+            string sql = @"select UserId, [Name], [Email], [AvatarUrl], [Bio], [Password]
                            from UserProfile
                            where UserName = @LoginName or [Email] = @LoginName";
             using var connection = _connection.CreateConnection();

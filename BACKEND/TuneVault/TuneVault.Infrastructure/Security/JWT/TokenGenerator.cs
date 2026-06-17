@@ -35,7 +35,7 @@ namespace TuneVault.Infrastructure.Services.JWT
                 issuer: _jwtsett.Issuer, //nhà phát hành
                 audience: _jwtsett.Audience, //người dùng
                 claims:claims, //gắn các thông tin vào token
-                expires: DateTime.UtcNow.AddMinutes(_jwtsett.Expire), //thời gian tồn tại của token
+                expires: DateTime.UtcNow.AddMinutes(_jwtsett.Expiry), //thời gian tồn tại của token
                 signingCredentials: creds
             );
             return new JwtSecurityTokenHandler().WriteToken(token); //chuyển thành chuỗi JWT

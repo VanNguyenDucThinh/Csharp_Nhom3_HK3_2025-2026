@@ -79,13 +79,13 @@ public record RegisterRequest{
 };
 
 /// <summary>Dữ liệu đăng nhập</summary>
-public record LoginRequest(
+public record LoginRequest{
     /// <example>example@email.com</example>
-    [property: System.ComponentModel.DataAnnotations.Required]
-    [property: System.ComponentModel.DataAnnotations.EmailAddress]
-    string Email,
+    [System.ComponentModel.DataAnnotations.Required]
+    [System.ComponentModel.DataAnnotations.EmailAddress]
+    public string Email{get; set;}
 
     /// <example>Password123</example>
-    [property: System.ComponentModel.DataAnnotations.Required]
-    string Password
-);
+    [System.ComponentModel.DataAnnotations.Required]
+    public string Password{get; set;}
+};

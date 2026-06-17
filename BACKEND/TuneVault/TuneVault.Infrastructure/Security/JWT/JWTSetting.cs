@@ -9,6 +9,6 @@ namespace TuneVault.Infrastructure.Services.JWT
         public string Secret { get; set; } = null!;  // khóa
         public string Issuer { get; set; } = null!; // Nhà phát hành token (thường là tên hoặc URL của server)
         public string Audience { get; set; } = null!; //Đối tượng dùng token
-        public int Expire { get; set; } // Thời gian tồn tại key
+        public int Expiry { get; set; } // Thời gian tồn tại key
     }
 }

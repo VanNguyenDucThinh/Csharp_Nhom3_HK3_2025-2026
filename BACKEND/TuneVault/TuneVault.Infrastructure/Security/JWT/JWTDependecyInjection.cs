@@ -27,6 +27,7 @@ namespace TuneVault.Infrastructure.Services.JWT
             {
                 option.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme; //Mặc định tìm kiếm/giải mã token dạng Bearer
                 option.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme; //Kiểm tra xem token có hợp lệ(tồn tại) không | nếu không -> 401
+                option.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
             }
             ).AddJwtBearer(option =>  // cấu hình luật
             {
@@ -55,7 +56,14 @@ namespace TuneVault.Infrastructure.Services.JWT
                             context.Token = accessToken;
                         }
                         return Task.CompletedTask;
-                    }
+                    },
+                    OnAuthenticationFailed = context =>
+                        {
+        // ĐÂY LÀ CHỖ QUAN TRỌNG NHẤT
+        // Nó sẽ in ra lỗi cụ thể: "Signature invalid", "Lifetime expired", v.v.
+        Console.WriteLine($"Auth Error: {context.Exception.Message}");
+        return Task.CompletedTask;
+    }
                 };
             });
 
