@@ -2,10 +2,13 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using TuneVault.API.Common;
 using TuneVault.Application.DTOs;
-using TuneVault.Application.UseCases.Command;
-using TuneVault.Application.UseCases.Query;
+using TuneVault.Application.UseCases.Media.Command;
+using TuneVault.Application.UseCases.Media.Handler;
+using TuneVault.Application.UseCases.Audio.Command;
+using TuneVault.Application.UseCases.Audio.Handler;
+using TuneVault.Application.UseCases.SearchAndTrending.Command;
 using TuneVault.Domain.Enums;
-
+using TuneVault.Domain.Interfaces;
 namespace TuneVault.API.Controllers;
 
 /// <summary>
@@ -18,55 +21,56 @@ namespace TuneVault.API.Controllers;
 [Authorize]
 public class MediaController : BaseApiController
 {
+    private readonly ICurentUserService _currentUserService;
+
+    // Inject ICurrentUserService vào Controller
+    public MediaController(ICurentUserService currentUserService)
+    {
+        _currentUserService = currentUserService;
+    }
     private static readonly string[] AllowedAudio = [".mp3", ".wav", ".flac", ".aac", ".ogg"];
     private static readonly string[] AllowedVideo = [".mp4", ".webm", ".mkv"];
 
     // POST api/media/upload
-    /// <summary>Upload file audio hoặc video — Chức năng 3 (B5)</summary>
+    /// <summary>Upload file audio hoặc video kèm ảnh bìa — Chức năng 3 (B5)</summary>
     /// <remarks>
-    /// Hỗ trợ audio: mp3, wav, flac, aac, ogg | video: mp4, webm, mkv.
-    /// Controller rút ruột IFormFile → truyền Stream xuống UploadMediaCommand.
-    /// Handler (Infrastructure) gọi IFileStorageService.UploadFileAsync() lưu file.
+    /// Nhận thông tin qua Form-data bao gồm file media chính và ảnh bìa (coverImage) tùy chọn.
     /// </remarks>
     [HttpPost("upload")]
-    [RequestSizeLimit(500 * 1024 * 1024)] // 500MB
-    [Consumes("multipart/form-data")]
-    [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status201Created)]
+    [Consumes("multipart/form-data")] // Khai báo rõ ràng kiểu dữ liệu để Swagger UI hiển thị đúng form upload
+    [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status400BadRequest)]
-    public async Task<IActionResult> Upload([FromForm] UploadMediaRequest request)
+    public async Task<IActionResult> UploadFile(
+        IFormFile mediaFile, 
+        IFormFile? coverImage, // Ảnh bìa có thể null nếu người dùng không upload
+        [FromForm] string title,
+        [FromForm] string description,
+        [FromForm] string category)
     {
-        if (request.File is null || request.File.Length == 0)
-            return BadRequest(ApiResponse.Fail("File không được để trống"));
-
-        var allowed = AllowedAudio.Concat(AllowedVideo).ToArray();
-        var ext = Path.GetExtension(request.File.FileName).ToLowerInvariant();
-        if (!allowed.Contains(ext))
-            return BadRequest(ApiResponse.Fail(
-                $"Định dạng không hỗ trợ. Chấp nhận: {string.Join(", ", allowed)}"));
-
-        // Phân loại MediaStyle dựa vào ContentType
-        var mediaStyle = request.File.ContentType.StartsWith("video/")
-            ? MediaStyle.Video
-            : MediaStyle.Audio;
-
-        // Rút ruột IFormFile → truyền stream xuống Application layer
-        await using var stream = request.File.OpenReadStream();
-
+        if (mediaFile == null || mediaFile.Length == 0)
+            return BadRequest(ApiResponse.Fail("File media không được để trống"));
+        var parsedCategory = Enum.TryParse<Category>(category, true, out var c) ? c : Category.Pop;
+        var mediaStyle = mediaFile.ContentType.StartsWith("video/") ? MediaStyle.Video : MediaStyle.Audio;
+        var userId = _currentUserService.UserId;
         var command = new UploadMediaCommand(
-            title:       request.Title,
-            ownerId:     CurrentUserId,
-            description: request.Description ?? string.Empty,
-            mediaStyle:  mediaStyle,
-            category:    request.Category,
-            filename:    request.File.FileName,
-            contenttype: request.File.ContentType,
-            filestream:  stream);
+            title, 
+            userId, // Đã có ownerId chuẩn xác từ service
+            description, 
+            mediaStyle, 
+            parsedCategory, 
+            mediaFile.FileName, 
+            mediaFile.ContentType, 
+            mediaFile.OpenReadStream(), 
+            coverImage?.FileName, 
+            coverImage?.ContentType, 
+            coverImage?.OpenReadStream() 
+        );
 
-        var success = await Mediator.Send(command);
-
-        return success
-            ? StatusCode(StatusCodes.Status201Created, ApiResponse.Ok("Upload thành công"))
-            : BadRequest(ApiResponse.Fail("Upload thất bại"));
+        // Sử dụng Mediator (viết hoa) được thừa kế sẵn từ BaseApiController thay vì _mediator
+        var result = await Mediator.Send(command); 
+        
+        // Bọc kết quả bằng ApiResponse.Ok để đồng bộ format dữ liệu trả về với toàn bộ hệ thống
+        return Ok(ApiResponse.Ok(result, "Tải tệp tin lên hệ thống thành công"));
     }
 
     // GET api/media/{id}
@@ -105,17 +109,29 @@ public class MediaController : BaseApiController
     /// <summary>Tìm kiếm media theo tên — Chức năng 7</summary>
     [HttpGet("search")]
     [AllowAnonymous]
-    [ProducesResponseType(typeof(ApiResponse<List<MediaDto>>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ApiResponse<SearchTrendingDto>), StatusCodes.Status200OK)] // Đổi type trả về thành SearchTrendingDto
     [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status400BadRequest)]
-    public async Task<IActionResult> Search([FromQuery] string q)
+    public async Task<IActionResult> Search(
+        [FromQuery] string? q, 
+        [FromQuery] bool isTrending = false, 
+        [FromQuery] int pageNumber = 1, 
+        [FromQuery] int pageSize = 10)
     {
-        if (string.IsNullOrWhiteSpace(q))
+        // Nếu không lấy trending mà cũng không có từ khóa thì mới báo lỗi
+        if (!isTrending && string.IsNullOrWhiteSpace(q))
             return BadRequest(ApiResponse.Fail("Từ khóa tìm kiếm không được trống"));
 
-        // SearchMediaQuery(title) → SearchMediaQueryHandler → IMediaItemRepository.GetMediaItemByTitle
-        var query = new SearchMediaQuery(q);
+        var query = new SearchAndTrendingQuery
+        {
+            Title = q,
+            IsTreading = isTrending,
+            PageNumber = pageNumber,
+            PageSize = pageSize
+        };
+
         var result = await Mediator.Send(query);
-        return Ok(ApiResponse<List<MediaDto>>.Ok(result));
+
+        return Ok(ApiResponse<SearchTrendingDto>.Ok(result));
     }
 }
 

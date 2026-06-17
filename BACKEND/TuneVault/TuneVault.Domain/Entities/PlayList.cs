@@ -3,7 +3,7 @@ using TuneVault.Domain.Enums;
 
 namespace TuneVault.Domain.Entities;
 
-public class PlayList
+public class PlayListEntities
 {
     public Guid Id { get; set; }//khoa chính
     public string? Name { get; set; }//Ten playlist

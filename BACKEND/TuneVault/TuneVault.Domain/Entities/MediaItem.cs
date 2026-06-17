@@ -16,6 +16,7 @@ public class MediaItem
     public string UrlMediaItem { get; set; }//Duong dan den file media
     public Guid Owner { get; set; }//Nguoi tai len
     public DateTime UploadDateMediaItem { get; set; }=DateTime.UtcNow;//Ngay tai len
+    public Guid? IdAlbum{get; set;}
 
 
 }

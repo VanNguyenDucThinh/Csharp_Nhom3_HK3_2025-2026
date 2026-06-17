@@ -5,9 +5,10 @@ namespace TuneVault.Domain.Interfaces;
 
 public interface IPlayListRepository
 {
-    Task<bool> CreatePlayList(PlayList playList);//Tạo mới danh sách phát
-    Task<bool> UpdatePlayList(PlayList playList);//Cập nhật thông tin danh sách phát
+    Task<bool> CreatePlayList(PlayListEntities playList);//Tạo mới danh sách phát
+    Task<bool> UpdatePlayList(PlayListEntities playList);//Cập nhật thông tin danh sách phát
     Task<bool> DeletePlayList(Guid playListId);//Xóa danh sách phát theo ID
-    Task<PlayList> GetPlayListById(Guid playListId);//Lấy thông tin playlist
+    Task<PlayListEntities> GetPlayListById(Guid playListId);//Lấy thông tin playlist
+    Task<List<PlayListEntities>> GetPlayListByTitle(string title, int skip, int take);
 
 }
