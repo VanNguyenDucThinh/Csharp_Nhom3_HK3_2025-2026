@@ -111,22 +111,22 @@ public class PlaylistController : BaseApiController
 
 // ── Request DTOs ──────────────────────────────────────────────────────────
 
-public record CreatePlaylistRequest(
-    [property: System.ComponentModel.DataAnnotations.Required]
-    [property: System.ComponentModel.DataAnnotations.StringLength(200, MinimumLength = 1)]
-    string Name,
+public record CreatePlaylistRequest{
+    [System.ComponentModel.DataAnnotations.Required]
+    [System.ComponentModel.DataAnnotations.StringLength(200, MinimumLength = 1)]
+    public string Name{get; set;}
 
-    bool IsPublic = true
-);
+    public bool IsPublic{get; set;} = true;
+};
 
-public record UpdatePlaylistRequest(
-    [property: System.ComponentModel.DataAnnotations.StringLength(200, MinimumLength = 1)]
-    string? Name,
+public record UpdatePlaylistRequest{
+    [System.ComponentModel.DataAnnotations.StringLength(200, MinimumLength = 1)]
+    public string? Name{get; set;}
 
-    bool? IsPublic
-);
+    public bool? IsPublic{get; set;}
+};
 
-public record AddTrackRequest(
-    [property: System.ComponentModel.DataAnnotations.Required]
-    Guid MediaId
-);
+public record AddTrackRequest{
+    [System.ComponentModel.DataAnnotations.Required]
+    public Guid MediaId{get; set;}
+};

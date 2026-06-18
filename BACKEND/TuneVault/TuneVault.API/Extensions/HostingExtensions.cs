@@ -74,7 +74,7 @@ public static class HostingExtensions
             {
                 Name         = "Authorization",
                 Type         = SecuritySchemeType.Http,
-                Scheme       = "Bearer",
+                Scheme       = "bearer",
                 BearerFormat = "JWT",
                 In           = ParameterLocation.Header,
                 Description  = "Nhập JWT token "
@@ -82,10 +82,11 @@ public static class HostingExtensions
 
             options.AddSecurityRequirement(document => new OpenApiSecurityRequirement
             {
-                {
-                new OpenApiSecuritySchemeReference("Bearer"),
-                [] 
-                }
+                // {
+                // new OpenApiSecuritySchemeReference("Bearer",),
+                // [] 
+                // }
+                [new OpenApiSecuritySchemeReference("Bearer",document)]=[]
             });
         });
 
