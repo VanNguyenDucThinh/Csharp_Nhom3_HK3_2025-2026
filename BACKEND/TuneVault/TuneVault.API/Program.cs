@@ -14,6 +14,7 @@ builder.Configuration.AddJsonFile("appsettings.json", optional: false, reloadOnC
 builder.Services.AddWebApiServices(builder.Configuration);
 //builder.Services.AddWebApiServices(builder.Configuration);
 builder.Services.AddInfrastructure(builder.Configuration);
+
 builder.Services.AddApplicationServices();
 
 
