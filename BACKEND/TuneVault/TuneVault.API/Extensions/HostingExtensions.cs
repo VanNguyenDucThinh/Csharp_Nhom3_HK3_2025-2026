@@ -31,54 +31,6 @@ public static class HostingExtensions
                     .AllowCredentials(); // bắt buộc cho SignalR
             });
         });
-//         var secret = configuration["JwtSettings:Secret"];
-//         var allSections = string.Join(", ", configuration.GetSection("JwtSettings").GetChildren().Select(x => x.Key));
-// Console.WriteLine($"Secret value: {secret}");
-// Console.WriteLine($"Keys found in JwtSettings: {allSections}");
-
-//         // ── JWT ───────────────────────────────────────────────────────────
-//         var jwtSection = configuration.GetSection("JwtSettings");
-//         var secretKey = Encoding.UTF8.GetBytes(
-//             jwtSection["Secret"]
-//             ?? throw new InvalidOperationException("JwtSettings:Secret is missing"));
-
-//         services
-//             .AddAuthentication(opts =>
-//             {
-//                 opts.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-//                 opts.DefaultChallengeScheme    = JwtBearerDefaults.AuthenticationScheme;
-//             })
-//             .AddJwtBearer(opts =>
-//             {
-//                 opts.TokenValidationParameters = new TokenValidationParameters
-//                 {
-//                     ValidateIssuerSigningKey = true,
-//                     IssuerSigningKey         = new SymmetricSecurityKey(secretKey),
-//                     ValidateIssuer           = true,
-//                     ValidIssuer              = jwtSection["Issuer"],
-//                     ValidateAudience         = true,
-//                     ValidAudience            = jwtSection["Audience"],
-//                     ValidateLifetime         = true,
-//                     ClockSkew                = TimeSpan.Zero
-//                 };
-
-//                 // SignalR đọc token từ query string (WebSocket không hỗ trợ header)
-//                 opts.Events = new JwtBearerEvents
-//                 {
-//                     OnMessageReceived = ctx =>
-//                     {
-//                         var token = ctx.Request.Query["access_token"].ToString();
-//                         if (!string.IsNullOrEmpty(token) &&
-//                             ctx.HttpContext.Request.Path.StartsWithSegments("/notificationHub"))
-//                         {
-//                             ctx.Token = token;
-//                         }
-//                         return Task.CompletedTask;
-//                     }
-//                 };
-//             });
-
-        services.AddAuthorization();
 
         // ── ICurrentUserService ───────────────────────────────────────────
         // Implement interface từ Application layer — đọc UserId từ HttpContext

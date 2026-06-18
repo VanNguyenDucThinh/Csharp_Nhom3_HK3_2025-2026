@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading.Tasks;
 using TuneVault.Domain.Entities;
 using TuneVault.Domain.Interfaces;
 
@@ -10,19 +11,20 @@ namespace TuneVault.Infrastructure.Repositories
     public class UserRepository : IUserProfileRepository
     {
         private readonly IDbConnectionGen _connection;
+        
         public UserRepository(IDbConnectionGen connection)
         {
             _connection = connection;
         }
         
-        //Create
+        // Create
         public async Task<bool> CreateUserProfile(UserProfile userProfile) //register
         {
             string sql = @"Insert into UserProfile([Password], [Email] , [Name])
-                           output INSERTED.[UserId]
+                           output INSERTED.[Id]
                            values (@Password , @Email , @Name)";
             using var connection = _connection.CreateConnection();
-            var command =new CommandDefinition(sql, new
+            var command = new CommandDefinition(sql, new
             {
                 UserName = userProfile.Name,
                 Password = userProfile.Password,
@@ -33,56 +35,56 @@ namespace TuneVault.Infrastructure.Repositories
             return rowsAffected > 0;
         }
 
-        //Delete
+        // Delete
         public async Task<bool> DeleteUserProfile(Guid userId)
         {
             string sql = @"Delete from UserProfile
-                           where UserId = @UserId";
+                           where Id = @Id"; // Đổi @UserId thành @Id
             using var connection = _connection.CreateConnection();
-            var command = new CommandDefinition(sql , new {UserId = userId});
+            // Đổi tên tham số truyền vào cho khớp với @Id
+            var command = new CommandDefinition(sql, new { Id = userId }); 
             int RowsAffected = await connection.ExecuteAsync(command);
             return RowsAffected > 0;
         }
 
-
-        //Update
+        // Update
         public async Task<bool> UpdateUserProfile(UserProfile userProfile)
         {
             string sql = @"update UserProfile
                            set [Name] = @Name,
                                AvatarUrl = @AvatarUrl,
-                               DateOfBirth = @DateOfBirth,
                                Bio = @Bio
-                               where UserId = @UserId";
+                           where Id = @Id"; // Đổi @UserId thành @Id
             using var connection = _connection.CreateConnection();
+            // userProfile đã có sẵn thuộc tính Id, Dapper sẽ tự động map vào @Id
             var command = new CommandDefinition(sql, userProfile);
             int RowsAffected = await connection.ExecuteAsync(command);
             return RowsAffected > 0;
         }
 
-        //Read
+        // Read
         public async Task<UserProfile?> GetUserProfileById(Guid userId)
         {
-            string sql = @"Select UserId, [Name] , [Email], AvatarUrl, Bio
+            string sql = @"Select Id, [Name] , [Email], AvatarUrl, Bio
                            from UserProfile
-                           where UserId=@UserId";
+                           where Id = @Id"; // Sửa UserId thành Id và @UserId thành @Id
             using var connection = _connection.CreateConnection();
-            var command = new CommandDefinition(sql , new {UserId =userId});
+            var command = new CommandDefinition(sql, new { Id = userId });
             return await connection.QuerySingleOrDefaultAsync<UserProfile>(command);
         }
 
         public async Task<UserProfile> GetUserProfileByEmail(string email)
         {
-            string sql = @"Select UserId, [Name] , [Email], AvatarUrl, Bio, Password
+            string sql = @"Select Id, [Name] , [Email], AvatarUrl, Bio, Password
                            from UserProfile
-                           where [Email]=@Email";
+                           where [Email]=@Email"; // Sửa UserId thành Id
             using var connection = _connection.CreateConnection();
             var command = new CommandDefinition(sql, new { Email = email });
             return await connection.QuerySingleOrDefaultAsync<UserProfile>(command);
         }
 
-        //Kiem tra trung
-        public async Task<bool> IsEmailTakenAsync(string email) //Kiem tra da co Email nay chua
+        // Kiem tra trung
+        public async Task<bool> IsEmailTakenAsync(string email) 
         {
             string sql = @"select 1 
                            from UserProfile 
@@ -93,7 +95,7 @@ namespace TuneVault.Infrastructure.Repositories
             return count == 1;
         }
 
-        public async Task<bool> IsUserNameTakenAsync(string userName)// Kiem tra xem da co UserName nay chua
+        public async Task<bool> IsUserNameTakenAsync(string userName)
         {
             string sql = @"select 1 
                            from UserProfile 
@@ -104,14 +106,14 @@ namespace TuneVault.Infrastructure.Repositories
             return count == 1;
         }
 
-        //login
+        // login
         public async Task<UserProfile?> GetByUserNameOrEmailAsync(string LoginName)
         {
-            string sql = @"select UserId, [Name], [Email], [AvatarUrl], [Bio], [Password]
+            string sql = @"select Id, [Name], [Email], [AvatarUrl], [Bio], [Password]
                            from UserProfile
-                           where UserName = @LoginName or [Email] = @LoginName";
+                           where UserName = @LoginName or [Email] = @LoginName"; // Sửa UserId thành Id
             using var connection = _connection.CreateConnection();
-            var command = new CommandDefinition(sql, new {LoginName = LoginName});
+            var command = new CommandDefinition(sql, new { LoginName = LoginName });
             return await connection.QueryFirstOrDefaultAsync<UserProfile>(command);
         }
 

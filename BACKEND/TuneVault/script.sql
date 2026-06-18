@@ -6,7 +6,7 @@ Go
 
 --Table user
 create table UserProfile(
-	UserId UNIQUEIDENTIFIER not null default NEWID() primary key,
+	Id UNIQUEIDENTIFIER not null default NEWID() primary key,
 	[Name] nvarchar(50) not null,
 	Email nvarchar(150) not null unique,
 	AvatarUrl VARCHAR(max) NULL,
@@ -40,7 +40,7 @@ create table PlayList(
 	[Owner] UNIQUEIDENTIFIER not null
 
 	Constraint PlayList_Owner_FKey foreign key([Owner])
-		References UserProfile(UserId) on delete cascade
+		References UserProfile(Id) on delete cascade
 );
 Go
 
@@ -55,7 +55,7 @@ create table PlayListTrack(
 		References PlayList(Id) on delete cascade,
 
 	Constraint PlayListTrack_IdMediaItem_FKey foreign key(IdMediaItem)
-		References MediaItem(Id) on delete cascade
+		References MediaItems(Id) on delete cascade
 );
 Go
 
@@ -68,15 +68,15 @@ create table MediaShare(
 	ShareAt DATETIME2 not null
 
 	Constraint MediaShare_IdMediaItem_Fkey foreign key(IdMediaItem)
-		references MediaItem(Id) on delete set null,
+		references MediaItems(Id) on delete set null,
 
 	Constraint MediaShare_IdPlayList_Fkey foreign key(IdPlayList)
 		references PlayList(Id) on delete set null,
 
 	constraint MediaShare_IdSender_Fkey foreign key(IdSender)
-		references UserProfile(UserId),
+		references UserProfile(Id),
 	constraint MediaShare_IdReceiver_Fkey foreign key(IdReceiver)
-		references UserProfile(UserId)
+		references UserProfile(Id)
 
 );
 Go
@@ -89,9 +89,9 @@ create table Notification(
 	Payload NVARCHAR(MAX) NOT NULL
 
 	constraint notification_IdUser_Fkey foreign key(IdUser)
-		references UserProfile(UserId)
+		references UserProfile(Id)
 );
-GO
+Go
 
 --table favorite
 create table Favorite(
@@ -102,10 +102,10 @@ create table Favorite(
 	PRIMARY KEY (IdUser, IdMediaItem),
 
 	constraint Favorite_IdUser_Fkey foreign key(IdUser)
-		references UserProfile(UserId) on delete cascade,
+		references UserProfile(Id) on delete cascade,
 
 	Constraint Favorite_IdMediaItem_FKey foreign key(IdMediaItem)
-		References MediaItem(Id) on delete cascade
+		References MediaItems(Id) on delete cascade
 );
 Go
 
@@ -117,9 +117,9 @@ create table PlayHistory(
 	PlayAt datetime2 not null
 
 	constraint PlayHistory_IdUser_Fkey foreign key(IdUser)
-		references UserProfile(UserId) on delete cascade,
+		references UserProfile(Id) on delete cascade,
 	Constraint PlayHistory_IdMediaItem_FKey foreign key(IdMediaItem)
-		References MediaItem(Id) on delete cascade
+		References MediaItems(Id) on delete cascade
 
 );
 Go
@@ -131,9 +131,9 @@ create table Follow(
 	FollowAt datetime2 not null
 
 	constraint Follow_IdFollower_Fkey foreign key(IdFollower)
-		references UserProfile(UserId) on delete no action,
+		references UserProfile(Id) on delete no action,
 	constraint Follow_IdFollowing_Fkey foreign key(IdFollowing)
-		references UserProfile(UserId) on delete no action,
+		references UserProfile(Id) on delete no action,
 );
 Go
 
@@ -186,7 +186,8 @@ create table RefreshToken(
     IsUsed bit not null default 0,
     IsRevoked bit not null default 0,
     constraint RefreshToken_UserId_Fkey foreign key(UserId)
-        references UserProfile(UserId) on delete cascade
-)Go; 
+        references UserProfile(Id) on delete cascade
+);
+Go 
 CREATE NONCLUSTERED INDEX IX_RefreshToken_Token ON RefreshToken(Token); 
 GO
