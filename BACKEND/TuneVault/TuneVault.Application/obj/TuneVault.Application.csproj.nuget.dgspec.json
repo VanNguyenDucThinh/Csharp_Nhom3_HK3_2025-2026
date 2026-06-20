@@ -1,20 +1,20 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\DUC KHAN\\BACKEND\\TuneVault\\TuneVault.Application\\TuneVault.Application.csproj": {}
+    "D:\\!TranDieuVi\\C#\\Csharp_Nhom3_HK3_2025-2026\\BACKEND\\TuneVault\\TuneVault.Application\\TuneVault.Application.csproj": {}
   },
   "projects": {
-    "C:\\Users\\DUC KHAN\\BACKEND\\TuneVault\\TuneVault.Application\\TuneVault.Application.csproj": {
+    "D:\\!TranDieuVi\\C#\\Csharp_Nhom3_HK3_2025-2026\\BACKEND\\TuneVault\\TuneVault.Application\\TuneVault.Application.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\DUC KHAN\\BACKEND\\TuneVault\\TuneVault.Application\\TuneVault.Application.csproj",
+        "projectUniqueName": "D:\\!TranDieuVi\\C#\\Csharp_Nhom3_HK3_2025-2026\\BACKEND\\TuneVault\\TuneVault.Application\\TuneVault.Application.csproj",
         "projectName": "TuneVault.Application",
-        "projectPath": "C:\\Users\\DUC KHAN\\BACKEND\\TuneVault\\TuneVault.Application\\TuneVault.Application.csproj",
-        "packagesPath": "C:\\Users\\DUC KHAN\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\DUC KHAN\\BACKEND\\TuneVault\\TuneVault.Application\\obj\\",
+        "projectPath": "D:\\!TranDieuVi\\C#\\Csharp_Nhom3_HK3_2025-2026\\BACKEND\\TuneVault\\TuneVault.Application\\TuneVault.Application.csproj",
+        "packagesPath": "C:\\Users\\Hp\\.nuget\\packages\\",
+        "outputPath": "D:\\!TranDieuVi\\C#\\Csharp_Nhom3_HK3_2025-2026\\BACKEND\\TuneVault\\TuneVault.Application\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
-          "C:\\Users\\DUC KHAN\\AppData\\Roaming\\NuGet\\NuGet.Config"
+          "C:\\Users\\Hp\\AppData\\Roaming\\NuGet\\NuGet.Config"
         ],
         "originalTargetFrameworks": [
           "net10.0"

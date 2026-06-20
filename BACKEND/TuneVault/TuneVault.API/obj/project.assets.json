@@ -83,19 +83,19 @@
     ]
   },
   "packageFolders": {
-    "C:\\Users\\DUC KHAN\\.nuget\\packages\\": {}
+    "C:\\Users\\Hp\\.nuget\\packages\\": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\DUC KHAN\\BACKEND\\TuneVault\\TuneVault.API\\TuneVault.API.csproj",
+      "projectUniqueName": "D:\\!TranDieuVi\\C#\\Csharp_Nhom3_HK3_2025-2026\\BACKEND\\TuneVault\\TuneVault.API\\TuneVault.API.csproj",
       "projectName": "TuneVault.API",
-      "projectPath": "C:\\Users\\DUC KHAN\\BACKEND\\TuneVault\\TuneVault.API\\TuneVault.API.csproj",
-      "packagesPath": "C:\\Users\\DUC KHAN\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\DUC KHAN\\BACKEND\\TuneVault\\TuneVault.API\\obj\\",
+      "projectPath": "D:\\!TranDieuVi\\C#\\Csharp_Nhom3_HK3_2025-2026\\BACKEND\\TuneVault\\TuneVault.API\\TuneVault.API.csproj",
+      "packagesPath": "C:\\Users\\Hp\\.nuget\\packages\\",
+      "outputPath": "D:\\!TranDieuVi\\C#\\Csharp_Nhom3_HK3_2025-2026\\BACKEND\\TuneVault\\TuneVault.API\\obj\\",
       "projectStyle": "PackageReference",
       "configFilePaths": [
-        "C:\\Users\\DUC KHAN\\AppData\\Roaming\\NuGet\\NuGet.Config"
+        "C:\\Users\\Hp\\AppData\\Roaming\\NuGet\\NuGet.Config"
       ],
       "originalTargetFrameworks": [
         "net10.0"
