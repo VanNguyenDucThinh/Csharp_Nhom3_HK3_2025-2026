@@ -16,6 +16,7 @@ public class UploadMediaCommand : IRequest<bool>
 {
     public string Title { get; set; }
     public string Description { get; set; }
+    public string Artist {get; set;}
     public MediaStyle MediaStyle { get; set; }
     public Category Category { get; set; }
     public Guid OwnerId { get; set; }
@@ -29,9 +30,10 @@ public class UploadMediaCommand : IRequest<bool>
     public string? ImageContentType{get; set;}
     public Stream? ImageFileStream{get; set;}
 
-    public UploadMediaCommand(string title, Guid ownerId, string description, MediaStyle mediaStyle, Category category, string filename, string contenttype, Stream filestream,string? imageFileName,string? imageContentType,Stream? imageFileStream)
+    public UploadMediaCommand(string title, string artist, Guid ownerId, string description, MediaStyle mediaStyle, Category category, string filename, string contenttype, Stream filestream,string? imageFileName,string? imageContentType,Stream? imageFileStream)
     {
         Title = title;
+        Artist = artist;
         OwnerId = ownerId;
         Description = description;
         MediaStyle = mediaStyle;

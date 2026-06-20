@@ -34,13 +34,14 @@ namespace TuneVault.Infrastructure.Repositories
 
         public async Task<bool> AddTrackToPlaylist(PlayListTrack playListTrack)
         {
-            string sql = @"insert into PlayListTrack(IdPlaylist, IdMediaItem)
-                           values (@PlayListId, @MediaItemId)";
+            string sql = @"insert into PlayListTrack(IdPlaylist, IdMediaItem, AddAt)
+                           values (@PlayListId, @MediaItemId, @AddAt)";
             using var connection = _connection.CreateConnection();
             var command = new CommandDefinition(sql, new
             {
                 PlayListId = playListTrack.IdPlaylist, 
-                MediaItemId = playListTrack.IdMediaItem
+                MediaItemId = playListTrack.IdMediaItem,
+                AddAt=playListTrack.AddAt
             });
             int rowsAffected = await connection.ExecuteAsync(command);
             return rowsAffected > 0;
@@ -64,8 +65,8 @@ namespace TuneVault.Infrastructure.Repositories
 
         public async Task<IEnumerable<MediaItem>> GetTracksInPlaylist(Guid playlistId)
         {
-            string sql = @"select mi.Id, mi.Title, mi.Duration, mi.UrlMediaItem 
-                           from MediaItem mi
+            string sql = @"select mi.Id, mi.Title, mi.UrlMediaItem, mi.Owner, mi.Category 
+                           from MediaItems mi
                            inner join PlayListTrack plt
                                  on mi.Id = plt.IdMediaItem
                            where plt.IdPlaylist = @PlayListId";
@@ -78,7 +79,7 @@ namespace TuneVault.Infrastructure.Repositories
 
             var command = new CommandDefinition(sql, new
             {
-                PlaylistId = playlistId,
+                PlayListId = playlistId
             });
             return await connection.QueryAsync<MediaItem>(command);
         }
@@ -86,7 +87,7 @@ namespace TuneVault.Infrastructure.Repositories
         public async Task<bool> RemoveTrackFromPlaylist(Guid playlistId, Guid mediaItemId)
         {
             string sql = @"delete from PlayListTrack
-                           where IdPlaylist = @PlayListId and MediaItemId = @MediaItemId";
+                           where IdPlaylist = @PlayListId and IdMediaItem = @MediaItemId";
             using var connection = _connection.CreateConnection();
             var command = new CommandDefinition(sql, new
             {

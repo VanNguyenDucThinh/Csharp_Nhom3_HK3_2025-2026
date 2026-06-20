@@ -36,6 +36,7 @@ public class UploadMediaCommandHandler : IRequestHandler<UploadMediaCommand, boo
         {
             Id = Guid.NewGuid(),
             Title = request.Title,
+            Artist=request.Artist,
             Owner = _curUser.UserId,
             Description=request.Description,
             MediaStyle=autoMediaStyle,

@@ -24,12 +24,9 @@ namespace TuneVault.Infrastructure
             services.AddScoped<IDbConnection>(sp =>
                 new SqlConnection(configuration.GetConnectionString("DefaultConnection")));
 
-            services.AddScoped<IAlbumRepository,AlbumRepository>();
-            services.AddScoped<IArtistRepository,ArtistRepository>();
             services.AddScoped<IFavoriteRepository, FavoriteRepository>();
             services.AddScoped<IFollowRepository, FollowRepository>();
             services.AddScoped<ITokenGenerator, TokenGenerator>();
-            services.AddScoped<IMediaItem_ArtistRepository, MediaItem_ArtistRepository>();
             services.AddScoped<IMediaItemRepository, MediaItemRepository>();
             services.AddScoped<IMediaShareRepository, MediaShareRepository>();
             services.AddScoped<INotificationRepository, NotificationRepository>();

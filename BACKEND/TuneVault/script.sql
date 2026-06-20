@@ -18,7 +18,8 @@ Go
 --Table media
 CREATE TABLE MediaItems (
     Id UNIQUEIDENTIFIER PRIMARY KEY,               
-    Title NVARCHAR(255) NULL,                      
+    Title NVARCHAR(255) NULL, 
+	Artist NVARCHAR(255) NOT NULL,                    
     Description NVARCHAR(MAX) NULL,                
     Category INT NOT NULL,                         
     MediaStyle INT NOT NULL,                       
@@ -35,7 +36,7 @@ Go
 create table PlayList(
 	Id UNIQUEIDENTIFIER primary key,
 	[Name] varchar(255) not null,
-	IsPublic bit not null default 1, --0:Private|1:not Private
+	IsPublic INT not null ,
 	CreateDate datetime2 not null ,
 	[Owner] UNIQUEIDENTIFIER not null
 
@@ -147,33 +148,6 @@ create table Album(
 
 	constraint Album_ArtistId_Fkey foreign key (ArtistId)
 		references Artist(Id) on delete cascade
-);
-Go
-
---table artist
-create table Artist(
-	Id UNIQUEIDENTIFIER PRIMARY KEY DEFAULT NEWSEQUENTIALID(),
-	IdUserProfile UNIQUEIDENTIFIER not null,
-	NameArtist nvarchar(150) null,
-	IsVerified bit not null default 0 --0:chua
-
-	constraint Artist_IdUserProfile_FKey foreign key (IdUserProfile) 
-        references UserProfile(UserId) on delete cascade
-);
-Go
-
---table MediaItem_Artist
-create table MediaItem_Artist(
-	IdMediaItem UNIQUEIDENTIFIER not null,
-	IdArtist UNIQUEIDENTIFIER not null,
-
-	primary key(IdMediaItem , IdArtist),
-
-	constraint MediaItemArtist_IdMediaItem_FKey foreign key (IdMediaItem) 
-        references MediaItem(Id) on delete cascade,
-        
-    constraint MediaItemArtist_IdArtist_FKey foreign key (IdArtist) 
-        references Artist(Id) on delete cascade
 );
 Go
 

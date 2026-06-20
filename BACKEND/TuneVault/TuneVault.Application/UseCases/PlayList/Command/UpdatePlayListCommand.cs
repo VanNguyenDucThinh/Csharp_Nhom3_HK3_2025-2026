@@ -1,5 +1,6 @@
 using System;
 using MediatR;
+using TuneVault.Domain.Enums;
 using TuneVault.Application.DTOs;
 using TuneVault.Application.Security;
 
@@ -10,16 +11,20 @@ public class UpdatePlayListCommand:IRequest<PlayListDto>
     public Guid IdOwner{get; set;}
     public Guid IdPlayList{get; set;}
     public string? Name{get; set;}
-    public bool IsPublic{get;set;}
-    public string? UrlImage{get; set;}
+    public PlayListStatus IsPublic{get;set;}
+    public string? FileName{get; set;}
+    public string? ContentType{get; set;}
+    public Stream? FileStream{get; set;}
 
-    public UpdatePlayListCommand(Guid idOwner, Guid idPlayList, string? name, bool isPublic, string? urlImage)
+    public UpdatePlayListCommand(Guid idOwner, Guid idPlayList, string? name, PlayListStatus isPublic, string? fileName, string? contentType, Stream? fileStream)
     {
         IdOwner=idOwner;
         IdPlayList=idPlayList;
         Name=name;
         IsPublic=isPublic;
-        UrlImage=urlImage;
+        FileName=fileName;
+        ContentType=contentType;
+        FileStream=fileStream;
     }
 
 }

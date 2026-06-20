@@ -17,15 +17,16 @@ namespace TuneVault.Infrastructure.Repositories
 
         public async Task<bool> AddFollow(FollowEntities follow)
         {
-            string sql = @"insert into Follow(IdFollower, IdFollowing)
-                           values (@IdFollower, @IdFollowing)";
+            string sql = @"insert into Follow(IdFollower, IdFollowing, FollowAt)
+                           values (@IdFollower, @IdFollowing, @FollowAt)";
             
             using var connection = _connection.CreateConnection();
             var command = new CommandDefinition(sql, new
             {
                 // Lấy các thuộc tính từ object 'follow' truyền vào
                 IdFollower = follow.IdFollower,
-                IdFollowing = follow.IdFollowing
+                IdFollowing = follow.IdFollowing,
+                FollowAt=follow.FollowAt
             });
             
             int rowsAffected = await connection.ExecuteAsync(command);
@@ -34,15 +35,16 @@ namespace TuneVault.Infrastructure.Repositories
 
         public async Task<bool> FollowUser(Guid followerId, Guid followeeId)
         {
-            string sql = @"insert into Follow(IdFollower, IdFollowing)
-                           values (@IdFollower, @IdFollowing)";
+            string sql = @"select count(1) 
+                           from Follow 
+                           where IdFollower = @IdFollower and IdFollowing = @IdFollowing";
             using var connection = _connection.CreateConnection();
             var command= new CommandDefinition(sql , new
             {
                 IdFollower= followerId,
                 IdFollowing = followeeId,
             });
-            int RowsAffected = await connection.ExecuteAsync(command);
+            int RowsAffected = await connection.ExecuteScalarAsync<int>(command);
             return RowsAffected > 0;
         }
 

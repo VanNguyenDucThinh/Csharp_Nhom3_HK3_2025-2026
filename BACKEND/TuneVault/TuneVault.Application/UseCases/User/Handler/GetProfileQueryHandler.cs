@@ -18,7 +18,10 @@ public class GetProfileQueryHandler:IRequestHandler<GetProfileQuery,ProfileUserD
     public async Task<ProfileUserDto> Handle (GetProfileQuery request, CancellationToken cancellationToken)
     {
         var profile = await _userProfile.GetUserProfileById(request.IdProfile);
-
+        if (profile == null)
+        {
+            throw new KeyNotFoundException($"Không tìm thấy người dùng với ID: {request.IdProfile}");
+        }
         return new ProfileUserDto
         {
             Id=profile.Id,

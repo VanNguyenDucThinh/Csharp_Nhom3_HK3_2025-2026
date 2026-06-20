@@ -1,8 +1,11 @@
 ﻿using Microsoft.AspNetCore.Hosting;
+using CloudinaryDotNet;
+using CloudinaryDotNet.Actions;
 using System;
 using System.Collections.Generic;
 using System.Text;
 using TuneVault.Domain.Interfaces;
+using Microsoft.Extensions.Configuration;
 
 namespace TuneVault.Infrastructure.FileStorage
 {
@@ -59,5 +62,13 @@ namespace TuneVault.Infrastructure.FileStorage
 
             return Path.Combine(FolderName, uniqueFileName).Replace('\\', '/'); //thay thế dấu \\ của window thành / của URL web
         }
+        // private readonly Cloudinary _cloudinary;
+        // public FileStorageService(IConfiguration configuration)
+        // {
+            
+        // }
     }
+
+
+
 }

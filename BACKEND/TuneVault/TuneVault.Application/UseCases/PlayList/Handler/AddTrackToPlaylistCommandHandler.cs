@@ -27,6 +27,10 @@ public class AddTrackToPlaylistCommandHandler:IRequestHandler<AddTrackToPlaylist
         var currentUserId=_curUserSer.UserId;
         //Kiểm tra người dùng có phải là chủ playlist không
         var playlist = await _playList.GetPlayListById(request.IdPlayList);
+        if(playlist == null)
+        {
+            throw new KeyNotFoundException("Không tìm thấy Playlist này");
+        }
         if(playlist.Owner!=currentUserId)
         {
             throw new UnauthorizedAccessException("Không có quyền chỉnh sửa playlist người khác");

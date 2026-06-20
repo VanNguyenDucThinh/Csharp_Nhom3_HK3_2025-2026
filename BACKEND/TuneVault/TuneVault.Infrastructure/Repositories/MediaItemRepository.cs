@@ -32,8 +32,8 @@ namespace TuneVault.Infrastructure.Repositories
 
         public async Task<bool> CreateMediaItem(MediaItem mediaItem) //tạo bài hát
         {
-            string sql = @"Insert into MediaItems(Id, Title, Description, Category, MediaStyle, UrlImageMedia, UrlMediaItem, Owner)
-               values (@Id, @Title, @Description, @Category, @MediaStyle, @UrlImageMedia, @UrlMediaItem, @Owner)";
+            string sql = @"Insert into MediaItems(Id, Title, Artist, Description, Category, MediaStyle, UrlImageMedia, UrlMediaItem, Owner)
+               values (@Id, @Title, @Artist, @Description, @Category, @MediaStyle, @UrlImageMedia, @UrlMediaItem, @Owner)";
             using var connection = _connection.CreateConnection();
             // var command = new CommandDefinition(sql, new
             // {
@@ -57,11 +57,25 @@ namespace TuneVault.Infrastructure.Repositories
             return RowsAffected > 0;
         }
 
+        public async Task<List<MediaItem>> GetAudioByArtist(string nameArtist)
+        {
+            string sql = @"Select Id, Title, Artist, Description, Category, MediaStyle, UrlImageMedia, ViewCount, UrlMediaItem, Owner, UploadDateMediaItem, IdAlbum
+               from MediaItems
+               where Artist Like @Artist  AND MediaStyle = 1";
+            using var connection = _connection.CreateConnection();
+             var command = new CommandDefinition(sql, new
+            {
+                Artist = $"%{nameArtist}%"
+            });
+            var result = await connection.QueryAsync<MediaItem>(command);
+            return result.ToList();
+        }
+
         public async Task<MediaItem> GetAudioById(Guid mediaItemId)
         {
-            string sql = @"Select Id, Title, Description, Category, MediaStyle, UrlImageMedia, ViewCount, UrlMediaItem, Owner, UploadDateMediaItem, IdAlbum
+            string sql = @"Select Id, Title, Artist, Description, Category, MediaStyle, UrlImageMedia, ViewCount, UrlMediaItem, Owner, UploadDateMediaItem, IdAlbum
                from MediaItems
-               where Id = @Id AND MediaStyle = 1";
+               where Id = @Id AND MediaStyle = 0";
             using var connection = _connection.CreateConnection();
             var command = new CommandDefinition(sql, new { Id = mediaItemId });
             return await connection.QueryFirstOrDefaultAsync<MediaItem>(command);
@@ -69,7 +83,7 @@ namespace TuneVault.Infrastructure.Repositories
 
         public async Task<MediaItem> GetMediaItemById(Guid mediaItemId) //Lấy thông tin bài hát theo Id
         {
-            string sql = @"Select Id, Title, Description, Category, MediaStyle, 
+            string sql = @"Select Id, Title, Artist, Description, Category, MediaStyle, 
                       UrlImageMedia, ViewCount, UrlMediaItem, Owner
                     from MediaItems
                     where Id = @Id";
@@ -80,7 +94,7 @@ namespace TuneVault.Infrastructure.Repositories
 
         public async Task<List<MediaItem>> GetMediaItemByTitle(string title, int skip, int take)
         {
-            string sql = @"Select Id, Title, Description, Category, MediaStyle, UrlImageMedia, ViewCount, UrlMediaItem, Owner, UploadDateMediaItem, IdAlbum
+            string sql = @"Select Id, Title, Artist, Description, Category, MediaStyle, UrlImageMedia, ViewCount, UrlMediaItem, Owner, UploadDateMediaItem, IdAlbum
                            from MediaItems
                            where Title LIKE @Title
                            order by Id
@@ -101,9 +115,9 @@ namespace TuneVault.Infrastructure.Repositories
         public async Task<MediaItem> GetVideoById(Guid mediaItemId)
         {
             // Giả định: Danh mục Video trong CSDL của bạn có mã Category là 1
-            string sql = @"Select Id, Title, Description, Category, MediaStyle, UrlImageMedia, ViewCount, UrlMediaItem, Owner, UploadDateMediaItem, IdAlbum
+            string sql = @"Select Id, Title, Artist, Description, Category, MediaStyle, UrlImageMedia, ViewCount, UrlMediaItem, Owner, UploadDateMediaItem, IdAlbum
                            from MediaItems
-                           where Id = @Id AND Category = 2"; 
+                           where Id = @Id AND Category = 1"; 
                            
             using var connection = _connection.CreateConnection();
             var command = new CommandDefinition(sql, new { Id = mediaItemId });
@@ -112,7 +126,7 @@ namespace TuneVault.Infrastructure.Repositories
 
         public async Task<List<MediaItem>> GetViewHigh(int skip, int take)
         {
-            string sql = @"Select Id, Title, Description, Category, MediaStyle, UrlImageMedia, ViewCount, UrlMediaItem, Owner, UploadDateMediaItem, IdAlbum
+            string sql = @"Select Id, Title, Artist, Description, Category, MediaStyle, UrlImageMedia, ViewCount, UrlMediaItem, Owner, UploadDateMediaItem, IdAlbum
                            from MediaItems
                            order by ViewCount desc
                            offset @Skip rows fetch next @Take rows only";
@@ -128,6 +142,7 @@ namespace TuneVault.Infrastructure.Repositories
         {
             string sql = @"Update MediaItems
                set Title = @Title,
+                    Artist = @Artist,
                    Description = @Description,
                    Category = @Category,
                    MediaStyle = @MediaStyle
@@ -137,5 +152,6 @@ namespace TuneVault.Infrastructure.Repositories
             int RowsAffected = await connection.ExecuteAsync(command);
             return RowsAffected > 0;
         }
+        
     }
 }

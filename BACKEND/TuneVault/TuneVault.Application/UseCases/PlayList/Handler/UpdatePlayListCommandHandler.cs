@@ -11,12 +11,14 @@ namespace TuneVault.Application.UseCases.PlayList.Handler;
 public class UpdatePlayListCommandHandler:IRequestHandler<UpdatePlayListCommand,PlayListDto>
 {
     private readonly IPlayListRepository _playList;
+    private readonly IFileStorageService _file; 
     private readonly ICurentUserService _curUser;
 
-    public UpdatePlayListCommandHandler(IPlayListRepository playList, ICurentUserService curUser)
+    public UpdatePlayListCommandHandler(IPlayListRepository playList, ICurentUserService curUser, IFileStorageService file)
     {
         _playList=playList;
         _curUser=curUser;
+        _file=file;
     }
 
     public async Task<PlayListDto> Handle (UpdatePlayListCommand request, CancellationToken cancellationToken)
@@ -28,15 +30,15 @@ public class UpdatePlayListCommandHandler:IRequestHandler<UpdatePlayListCommand,
         }
         playlist.Name=request.Name;
         playlist.IsPublic=request.IsPublic;
-        playlist.UrlPlayList=request.UrlImage;
+        var urlImage = await _file.UploadFileAsync(request.FileStream, request.FileName, "image_files", request.ContentType);
 
         await _playList.UpdatePlayList(playlist);
 
         return new PlayListDto
         {
             Name=request.Name,
-            IsPublic=request.IsPublic,
-            UrlImage=request.UrlImage,
+            UrlImage=urlImage,
+            
             
 
         };

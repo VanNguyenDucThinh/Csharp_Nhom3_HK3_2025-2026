@@ -8,6 +8,7 @@ public class MediaItem
     public Guid Id { get; set; }//khóa chính 
     public string? Title { get; set; }//Ten bai hat
     public string? Description { get; set; }//Mo ta bai hat
+    public string Artist{get; set;}//Nghệ sĩ
     public Category Category { get; set; }//The loai bai hat
     public MediaStyle MediaStyle { get; set; }// Loai video hay nhac
     public string? UrlImageMedia {get;set;}//Ảnh của file audio
@@ -15,7 +16,6 @@ public class MediaItem
     public string UrlMediaItem { get; set; }//Duong dan den file media
     public Guid Owner { get; set; }//Nguoi tai len
     public DateTime UploadDateMediaItem { get; set; }=DateTime.UtcNow;//Ngay tai len
-    public Guid? IdAlbum{get; set;}
 
 
 }

@@ -4,7 +4,7 @@ using TuneVault.Application.DTOs;
 
 namespace TuneVault.Application.UseCases.PlayList.Command;
 
-public class GetPlayListQuery:IRequest<PlayListDto>
+public class GetPlayListQuery:IRequest<List<PlayListDto>>
 {
     public Guid IdPlayList{get; set;}
 

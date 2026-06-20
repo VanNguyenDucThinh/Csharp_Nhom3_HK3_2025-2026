@@ -32,23 +32,37 @@ namespace TuneVault.Infrastructure.Repositories
             return RowsAffected> 0;
         }
 
-        public async Task<List<MediaShare>> GetSharedByIdUser(Guid id)
-        {
-            // Lấy danh sách nhạc được share cho User này (Receiver)
-            // Sắp xếp theo thời gian share mới nhất lên trên
-            string sql = @"select * from MediaShare 
-                           where IdReceiver = @Id 
-                           order by ShareAt desc";
-                           
-            using var connection = _connection.CreateConnection();
-            var command = new CommandDefinition(sql, new 
-            { 
-                Id = id 
-            });
-            
-            // QueryAsync trả về IEnumerable, nên ta dùng .ToList() để khớp với kiểu trả về của Interface
-            var result = await connection.QueryAsync<MediaShare>(command);
-            return result.ToList();
-        }
+    public async Task<List<MediaShare>> GetSharedByIdUser(Guid id)
+    {
+    // Dùng LEFT JOIN vì một lượt share có thể là MediaItem HOẶC PlayList (cái còn lại sẽ null)
+        string sql = @"
+            SELECT 
+                ms.*, 
+                m.*, 
+                p.*
+                FROM MediaShare ms
+                LEFT JOIN MediaItems m ON ms.IdMediaItem = m.Id
+                LEFT JOIN PlayList p ON ms.IdPlayList = p.Id
+                WHERE ms.IdReceiver = @Id 
+                ORDER BY ms.ShareAt DESC";
+                       
+        using var connection = _connection.CreateConnection();
+    
+    // Multi-mapping: Ánh xạ 3 bảng (MediaShare, MediaItem, PlayList) trả về 1 object (MediaShare)
+        var result = await connection.QueryAsync<MediaShare, MediaItem, PlayListEntities, MediaShare>(
+            sql,
+            (mediaShare, mediaItems, playList) => 
+            {
+            // Gán các object con vào object cha
+                mediaShare.MediaItem = mediaItems;
+                mediaShare.PlayList = playList;
+                return mediaShare;
+            },
+            new { Id = id },
+            splitOn: "Id,Id" 
+        );
+    
+        return result.ToList();
+    }
     }
 }

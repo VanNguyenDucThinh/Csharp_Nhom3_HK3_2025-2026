@@ -20,7 +20,9 @@ public class UserController : BaseApiController
     [ProducesResponseType(typeof(ApiResponse<ProfileUserDto>), StatusCodes.Status200OK)]
     public async Task<IActionResult> GetMyProfile()
     {
-        return StatusCode(501, ApiResponse.Fail("Chờ GetMyProfileQuery"));
+        var query = new GetProfileQuery(CurrentUserId);
+        var result = await Mediator.Send(query);
+        return Ok(result);
     }
 
     // GET api/user/{id}
@@ -31,7 +33,9 @@ public class UserController : BaseApiController
     [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status404NotFound)]
     public async Task<IActionResult> GetUserById(Guid id)
     {
-        return StatusCode(501, ApiResponse.Fail("Chờ GetUserByIdQuery"));
+        var query = new GetProfileQuery(id);
+        var result = await Mediator.Send(query);
+        return Ok(result);
     }
 
     // PUT api/user/profile
@@ -43,37 +47,17 @@ public class UserController : BaseApiController
     [HttpPut("profile")]
     [ProducesResponseType(typeof(ApiResponse<ProfileUserDto>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status400BadRequest)]
-    public async Task<IActionResult> UpdateProfile([FromBody] UpdateProfileRequest request)
+    public async Task<IActionResult> UpdateProfile([FromForm] UpdateProfileRequest request)
     {
+        string? fileName=request.AvatarUrl?.FileName;
+        string? contentType=request.AvatarUrl?.ContentType;
+        Stream? fileStream=request.AvatarUrl != null ? request.AvatarUrl.OpenReadStream() : null;
+
         var command = new UpdateProfileCommand(
-            request.Name,
-            request.AvatarUrl ?? string.Empty,
-            request.Bio ?? string.Empty);
+            request?.Name,request?.Bio,fileName, contentType, fileStream);
 
         var result = await Mediator.Send(command);
         return Ok(ApiResponse<ProfileUserDto>.Ok(result, "Cập nhật profile thành công"));
-    }
-
-    // PUT api/user/avatar
-    /// <summary>Upload ảnh đại diện</summary>
-    /// <remarks>Chấp nhận: jpg, jpeg, png, webp. Tối đa 5MB.</remarks>
-    [HttpPut("avatar")]
-    [RequestSizeLimit(5 * 1024 * 1024)]
-    [ProducesResponseType(typeof(ApiResponse<ProfileUserDto>), StatusCodes.Status200OK)]
-    [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status400BadRequest)]
-    public async Task<IActionResult> UpdateAvatar(IFormFile file)
-    {
-        if (file is null || file.Length == 0)
-            return BadRequest(ApiResponse.Fail("File không hợp lệ"));
-
-        var allowed = new[] { ".jpg", ".jpeg", ".png", ".webp" };
-        var ext = Path.GetExtension(file.FileName).ToLowerInvariant();
-        if (!allowed.Contains(ext))
-            return BadRequest(ApiResponse.Fail("Chỉ chấp nhận jpg, jpeg, png, webp"));
-
-        // Chờ IFileStorageService từ Infrastructure layer.
-        // Khi có: upload file → lấy url → gọi UpdateProfileCommand(currentName, url, currentBio).
-        return StatusCode(501, ApiResponse.Fail("Chờ IFileStorageService"));
     }
 
     // POST api/user/{id}/follow
@@ -117,13 +101,13 @@ public class UserController : BaseApiController
 // ── Request DTOs ──────────────────────────────────────────────────────────
 
 /// <summary>Dữ liệu cập nhật profile</summary>
-public record UpdateProfileRequest(
-    [property: System.ComponentModel.DataAnnotations.Required]
-    [property: System.ComponentModel.DataAnnotations.StringLength(30, MinimumLength = 1)]
-    string Name,
+public record UpdateProfileRequest{
+    [System.ComponentModel.DataAnnotations.Required]
+    [System.ComponentModel.DataAnnotations.StringLength(30, MinimumLength = 1)]
+    public string? Name{get; set;}
 
-    string? AvatarUrl,
+    public IFormFile? AvatarUrl{get; set;}
 
-    [property: System.ComponentModel.DataAnnotations.StringLength(300)]
-    string? Bio
-);
+    [System.ComponentModel.DataAnnotations.StringLength(300)]
+    public string? Bio{get; set;}
+};

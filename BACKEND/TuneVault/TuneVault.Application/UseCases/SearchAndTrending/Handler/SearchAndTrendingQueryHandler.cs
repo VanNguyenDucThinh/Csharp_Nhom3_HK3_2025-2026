@@ -36,6 +36,7 @@ public class SearchAndTrendingQueryHandler:IRequestHandler<SearchAndTrendingQuer
             {
                 Id=x.Id,
                 Category=x.Category,
+                Artist=x.Artist,
                 Owner=x.Owner,
                 Title=x.Title,
                 UrlImage=x.UrlImageMedia,
@@ -45,6 +46,7 @@ public class SearchAndTrendingQueryHandler:IRequestHandler<SearchAndTrendingQuer
         else
         {
             var listMedia = await _mediaItem.GetMediaItemByTitle(request.Title,skip,take);
+            var listMediaByArtist = await _mediaItem.GetAudioByArtist(request.Title);
             var listPlaylist = await _playList.GetPlayListByTitle(request.Title,skip, take);
             page.ListMedia=listMedia.Select(x=>new MediaDto
             {
@@ -52,6 +54,7 @@ public class SearchAndTrendingQueryHandler:IRequestHandler<SearchAndTrendingQuer
                 Category=x.Category,
                 Owner=x.Owner,
                 Title=x.Title,
+                Artist=x.Artist,
                 UrlImage=x.UrlImageMedia,
                 UrlMedia=x.UrlMediaItem
             }).ToList();
@@ -65,7 +68,6 @@ public class SearchAndTrendingQueryHandler:IRequestHandler<SearchAndTrendingQuer
                 playlistDtos.Add(new PlayListDto
                 {
                     Id = p.Id,
-                    IsPublic = p.IsPublic,
                     Name = p.Name,
                     Owner = p.Owner,
                     // Map danh sách Track Entity sang DTO (Giả sử bạn có PlaylistTrackDto)
@@ -75,12 +77,27 @@ public class SearchAndTrendingQueryHandler:IRequestHandler<SearchAndTrendingQuer
                         Category=x.Category,
                         Owner=x.Owner,
                         Title=x.Title,
+                        Artist=x.Artist,
                         UrlImage=x.UrlImageMedia,
                         UrlMedia=x.UrlMediaItem
                     }).ToList()
                 });
 
             page.ListPlayList = playlistDtos;
+        }
+        page.ListMediaByArtist=listMediaByArtist.Select(x=>new MediaDto
+        {
+            Id=x.Id,
+            Category=x.Category,
+            Owner=x.Owner,
+            Title=x.Title,
+            Artist=x.Artist,
+            UrlImage=x.UrlImageMedia,
+            UrlMedia=x.UrlMediaItem
+        }).ToList();
+                
+        {
+            
         }
         }
         return page;

@@ -1,7 +1,9 @@
 ﻿using Dapper;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
 using TuneVault.Domain.Entities;
 using TuneVault.Domain.Interfaces;
 
@@ -17,15 +19,17 @@ namespace TuneVault.Infrastructure.Repositories
 
         public async Task<bool> CreatePlayList(PlayListEntities playList)
         {
-            string sql = @"insert into PlayList([Name] , [Owner] , IsPublic , CreateDate)
-                           values(@Name , @Owner , @IsPublic ,@CreateDate)";
+            string sql = @"insert into PlayList([Id], [Name] , [Owner] , IsPublic , CreateDate, [UrlImage])
+                           values(@Id, @Name , @Owner , @IsPublic ,@CreateDate, @UrlImage)";
             using var connection = _connection.CreateConnection();
             var command = new CommandDefinition(sql, new
             {
+                Id=playList.Id,
                 Name = playList.Name,
                 Owner = playList.Owner,
                 IsPublic = playList.IsPublic,
-                CreateDate = playList.CreatedDate
+                CreateDate = playList.CreatedDate,
+                UrlImage=playList.UrlImage
             });
             int RowsAffected = await connection.ExecuteAsync(command);
             return RowsAffected > 0;
@@ -47,19 +51,20 @@ namespace TuneVault.Infrastructure.Repositories
 
         public async Task<PlayListEntities> GetPlayListById(Guid playListId)
         {
-            string sql = @"select [Id], [Name], [Owner], [IsPublic], [CreateDate]
+            string sql = @"select [Id], [Name], [Owner], [IsPublic], [CreateDate], [UrlImage]
                            from PlayList
-                           where Id = @Id";
+                           where Id = @Id AND IsPublic = 1";
             using var connection = _connection.CreateConnection();
             var command = new CommandDefinition(sql, new { Id = playListId });
             return await connection.QueryFirstOrDefaultAsync<PlayListEntities>(command);
         }
 
+
         public async Task<List<PlayListEntities>> GetPlayListByTitle(string title, int skip, int take)
         {
-            string sql = @"select [Id], [Name], [Owner], [IsPublic], [CreateDate]
+            string sql = @"select [Id], [Name], [Owner], [IsPublic], [CreateDate], [UrlImage]
                            from PlayList
-                           where [Name] LIKE @Title
+                           where [Name] LIKE @Title AND IsPublic = 1
                            order by CreateDate desc
                            offset @Skip rows fetch next @Take rows only";
 
@@ -75,18 +80,32 @@ namespace TuneVault.Infrastructure.Repositories
             return result.ToList();
         }
 
+        public async Task<List<PlayListEntities>> GetPlayListForMe(Guid owner)
+        {
+            var sql = @"select [Id], [Name], [Owner], [IsPublic], [CreateDate], [UrlImage]
+                   from PlayList
+                   where [Owner] = @OwnerId";
+            using var connection = _connection.CreateConnection();
+            var command = new CommandDefinition(sql, new { OwnerId = owner });
+    
+            var result = await connection.QueryAsync<PlayListEntities>(command);
+            return result.ToList();
+        }
+
         public async Task<bool> UpdatePlayList(PlayListEntities playList)
         {
             string sql = @"update PlayList
                            set [Name] = @Name,
-                               IsPublic = @IsPublic
+                               IsPublic = @IsPublic,
+                               [UrlImage] = @UrlImage
                            where Id=@Id";
             using var connection = _connection.CreateConnection();
             var command = new CommandDefinition(sql, new
             {
                 Name = playList.Name,
                 IsPublic = playList.IsPublic,
-                Id = playList.Id
+                Id = playList.Id,
+                UrlImage=playList.UrlImage
             });
             int RowsAffected = await connection.ExecuteAsync(command);
             return RowsAffected > 0;

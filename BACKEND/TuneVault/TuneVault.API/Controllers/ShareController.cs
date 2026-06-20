@@ -64,16 +64,16 @@ public class ShareController : BaseApiController
 // ── Request DTOs ──────────────────────────────────────────────────────────
 
 /// <summary>Dữ liệu chia sẻ media</summary>
-public record ShareMediaRequest(
+public record ShareMediaRequest{
     /// <summary>ID người nhận</summary>
-    [property: System.ComponentModel.DataAnnotations.Required]
-    Guid ReceiverUserId,
+    [System.ComponentModel.DataAnnotations.Required]
+    public Guid ReceiverUserId{get; set;}
 
     /// <summary>ID của media hoặc playlist cần chia sẻ</summary>
-    [property: System.ComponentModel.DataAnnotations.Required]
-    Guid ItemId,
+    [System.ComponentModel.DataAnnotations.Required]
+    public Guid ItemId{get; set;}
 
     /// <summary>Loại item: Media = 0, Playlist = 1 (theo Domain.Enums.ShareStyle)</summary>
-    [property: System.ComponentModel.DataAnnotations.Required]
-    ShareStyle ShareStyle
-);
+    [System.ComponentModel.DataAnnotations.Required]
+    public ShareStyle ShareStyle{get; set;}
+};

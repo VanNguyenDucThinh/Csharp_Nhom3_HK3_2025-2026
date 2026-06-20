@@ -34,7 +34,7 @@ public class AudioQueryHandler:IRequestHandler<AudioQuery,AudioMediaDto>
         return new AudioMediaDto
         {
             Title=audio.Title,
-            Artist=audio.Owner,
+            Artist=audio.Artist,
             UrlImage=audio.UrlImageMedia,
             UrlMedia=audio.UrlMediaItem
         };

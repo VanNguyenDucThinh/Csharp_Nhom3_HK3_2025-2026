@@ -10,14 +10,17 @@ namespace TuneVault.Application.UseCases.PlayList.Handler;
 public class CreatePlayListCommandHandler:IRequestHandler<CreatePlayListCommand,PlayListDto>
 {
     private readonly IPlayListRepository _playlist;
+    private readonly IFileStorageService _file;
 
-    public CreatePlayListCommandHandler(IPlayListRepository Playlist)
+    public CreatePlayListCommandHandler(IPlayListRepository Playlist, IFileStorageService file)
     {
         _playlist=Playlist;
+        _file=file;
     }
 
     public async Task<PlayListDto> Handle (CreatePlayListCommand request, CancellationToken cancellationToken)
     {
+        var urlImage = await _file.UploadFileAsync(request.ImageFileStream, request.ImageFileName, "image_files",request.ImageContentType);
         //Tạo 1 playlist mới
         var newPlaylist = new PlayListEntities
         {
@@ -25,7 +28,8 @@ public class CreatePlayListCommandHandler:IRequestHandler<CreatePlayListCommand,
             Name=request.Name,
             IsPublic=request.IsPublic,
             Owner=request.Owner,
-            CreatedDate=DateTime.UtcNow
+            CreatedDate=DateTime.UtcNow,
+            UrlImage=urlImage
 
         };
         //Thêm vào database
@@ -33,9 +37,10 @@ public class CreatePlayListCommandHandler:IRequestHandler<CreatePlayListCommand,
         //Trả về Dto
         return new PlayListDto()
         {
+            Id=newPlaylist.Id,
             Name=request.Name,
-            IsPublic=request.IsPublic,
-            Owner=request.Owner
+            Owner=request.Owner,
+            UrlImage=urlImage
         };
         
 

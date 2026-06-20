@@ -3,10 +3,11 @@ using MediatR;
 using TuneVault.Application.DTOs;
 using TuneVault.Application.UseCases.PlayList.Command;
 using TuneVault.Domain.Interfaces;
+using TuneVault.Domain.Enums;
 
 namespace TuneVault.Application.UseCases.PlayList.Handler;
 
-public class GetPlayListQueryCommand:IRequestHandler<GetPlayListQuery, PlayListDto>
+public class GetPlayListQueryCommand:IRequestHandler<GetPlayListQuery,List<PlayListDto>>
 {
     private readonly IPlayListRepository _playList;
     private readonly IPlayListTrackRepository _playListTrack;
@@ -19,32 +20,20 @@ public class GetPlayListQueryCommand:IRequestHandler<GetPlayListQuery, PlayListD
         _curUser=curUser;
     }
 
-    public async Task<PlayListDto> Handle (GetPlayListQuery request, CancellationToken cancellationToken)
+    public async Task<List<PlayListDto>> Handle (GetPlayListQuery request, CancellationToken cancellationToken)
     {
-        var playList = await _playList.GetPlayListById(request.IdPlayList);
-        if (!playList.IsPublic && playList.Owner != _curUser.UserId)
-        {
-            throw new UnauthorizedAccessException("Không được được vào riêng tư");
-        }
-        var playListTrack =await _playListTrack.GetTracksInPlaylist(request.IdPlayList);
+        var playList = await _playList.GetPlayListForMe(_curUser.UserId);
 
-        return new PlayListDto
+        var result = playList.Select(x=>new PlayListDto
         {
-            Id=request.IdPlayList,
-            IsPublic=playList.IsPublic,
-            Name=playList.Name,
-            Owner=playList.Owner,
-            UrlImage=playList.UrlPlayList,
-            Track=playListTrack.Select(x=>new MediaDto
-            {
-                Id=x.Id,
-                Category=x.Category,
-                Owner=x.Owner,
-                Title=x.Title,
-                UrlImage=x.UrlImageMedia,
-                UrlMedia=x.UrlMediaItem
-            }).ToList()
-        };
+            Id=x.Id,
+            Name=x.Name,
+            Owner=x.Owner,
+            UrlImage=x.UrlImage
+        }).ToList();
+
+        return result;
+
     }
 
 }

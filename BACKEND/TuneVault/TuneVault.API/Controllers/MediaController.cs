@@ -44,6 +44,7 @@ public class MediaController : BaseApiController
         IFormFile mediaFile, 
         IFormFile? coverImage, // Ảnh bìa có thể null nếu người dùng không upload
         [FromForm] string title,
+        [FromForm] string artist,
         [FromForm] string description,
         [FromForm] string category)
     {
@@ -54,6 +55,7 @@ public class MediaController : BaseApiController
         var userId = _currentUserService.UserId;
         var command = new UploadMediaCommand(
             title, 
+            artist,
             userId, // Đã có ownerId chuẩn xác từ service
             description, 
             mediaStyle, 

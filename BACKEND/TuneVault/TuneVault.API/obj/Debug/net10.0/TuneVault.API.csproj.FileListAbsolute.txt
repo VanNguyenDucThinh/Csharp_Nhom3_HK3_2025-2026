@@ -89,3 +89,5 @@ C:\Users\DUC KHAN\Documents\GitHub\Csharp_Nhom3_HK3_2025-2026\BACKEND\TuneVault\
 C:\Users\DUC KHAN\Documents\GitHub\Csharp_Nhom3_HK3_2025-2026\BACKEND\TuneVault\TuneVault.API\obj\Debug\net10.0\TuneVault.API.pdb
 C:\Users\DUC KHAN\Documents\GitHub\Csharp_Nhom3_HK3_2025-2026\BACKEND\TuneVault\TuneVault.API\obj\Debug\net10.0\TuneVault.API.genruntimeconfig.cache
 C:\Users\DUC KHAN\Documents\GitHub\Csharp_Nhom3_HK3_2025-2026\BACKEND\TuneVault\TuneVault.API\obj\Debug\net10.0\ref\TuneVault.API.dll
+C:\Users\DUC KHAN\Documents\GitHub\Csharp_Nhom3_HK3_2025-2026\BACKEND\TuneVault\TuneVault.API\bin\Debug\net10.0\CloudinaryDotNet.dll
+C:\Users\DUC KHAN\Documents\GitHub\Csharp_Nhom3_HK3_2025-2026\BACKEND\TuneVault\TuneVault.API\bin\Debug\net10.0\Newtonsoft.Json.dll

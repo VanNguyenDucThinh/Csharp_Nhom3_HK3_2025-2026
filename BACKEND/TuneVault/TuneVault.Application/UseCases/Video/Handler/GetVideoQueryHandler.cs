@@ -30,7 +30,7 @@ public class GetVideoQueryHandler:IRequestHandler<GetVideoQuery, VideoDto>
         return new VideoDto
         {
             Title=mediaVideo.Title,
-            Artist=mediaVideo.Owner,
+            Artist=mediaVideo.Artist,
             UrlImage=mediaVideo.UrlImageMedia,
             UrlMedia=mediaVideo.UrlMediaItem  
         };

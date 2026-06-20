@@ -38,8 +38,9 @@ public class GetSharedQueryHandler:IRequestHandler<GetSharedQuery, List<SharedIt
         else if(share.PlayList!=null)
             {
                 dto.Title=share.PlayList.Name;
-                dto.UrlImage=share.PlayList.UrlPlayList;
+                dto.UrlImage=share.PlayList.UrlImage;
                 dto.ShareStyle=ShareStyle.Playlist;
+                dto.IdItem=share.PlayList.Id;
                 
             }
             return dto;

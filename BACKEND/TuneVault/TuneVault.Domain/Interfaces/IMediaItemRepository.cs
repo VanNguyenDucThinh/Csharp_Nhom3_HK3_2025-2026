@@ -10,6 +10,7 @@ public interface IMediaItemRepository
     Task<bool> DeleteMediaItem(Guid mediaItemId);//Xóa bài hát theo ID
     Task<MediaItem> GetAudioById(Guid mediaItemId);//Lấy thông tin bài hát theo ID
     Task<MediaItem> GetVideoById(Guid mediaItemId);//Lấy thông tin video theo ID
+    Task<List<MediaItem>> GetAudioByArtist(string nameArtist);//Lấy bài hát theo thông tin nghệ sĩ
     Task<List<MediaItem>> GetMediaItemByTitle(string title,int skip, int take);//Lấy list media
     Task<bool>CountView(Guid MediaItemId);//cộng lượt view
     Task<List<MediaItem>> GetViewHigh(int skip, int take);//Lấy 10 thằng view cao nhất

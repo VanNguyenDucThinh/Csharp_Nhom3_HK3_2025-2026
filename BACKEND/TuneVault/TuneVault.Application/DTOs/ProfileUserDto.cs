@@ -8,6 +8,5 @@ public class ProfileUserDto
     public string Name { get; set; }
     public string AvatarUrl { get; set; }
     public string Bio { get; set; }
-    public bool IsArtist{get;set;}=false;
 
 }
