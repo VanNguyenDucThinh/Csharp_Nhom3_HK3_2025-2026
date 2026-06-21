@@ -32,7 +32,7 @@ public class UserFollowedEventHandler:INotificationHandler<UserFollowedEvent>
             Payload=message,
             Type=TypeNotification.Follow,
             CreatAt=DateTime.UtcNow,
-            IsRead=false
+            IsRead=Read.NotRead
         };
 
         await _notificationRepo.CreateNotification(newNotification);

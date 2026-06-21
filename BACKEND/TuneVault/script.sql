@@ -38,7 +38,8 @@ create table PlayList(
 	[Name] varchar(255) not null,
 	IsPublic INT not null ,
 	CreateDate datetime2 not null ,
-	[Owner] UNIQUEIDENTIFIER not null
+	[Owner] UNIQUEIDENTIFIER not null,
+	UrlImage NVARCHAR(MAX) NULL
 
 	Constraint PlayList_Owner_FKey foreign key([Owner])
 		References UserProfile(Id) on delete cascade
@@ -87,7 +88,8 @@ create table Notification(
 	Id UNIQUEIDENTIFIER PRIMARY KEY DEFAULT NEWSEQUENTIALID(),
 	IdUser UNIQUEIDENTIFIER NOT NULL,
 	[Type] int not null,
-	Payload NVARCHAR(MAX) NOT NULL
+	Payload NVARCHAR(MAX) NOT NULL,
+	IsRead int not null
 
 	constraint notification_IdUser_Fkey foreign key(IdUser)
 		references UserProfile(Id)

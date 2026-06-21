@@ -31,11 +31,11 @@ public class MediaShareEventHandler:INotificationHandler<MediaSharedEvent>
             Type=TypeNotification.MediaShare,
             CreatAt=DateTime.UtcNow,
             IdItem=notification.ItemId,
-            IsRead=false
+            IsRead=Read.NotRead
         };
         await _notificationRepo.CreateNotification(newNotification);
 
-        await _notificationSer.SendNotificationToUser(notification.SenderId, newNotification);
+        await _notificationSer.SendNotificationToUser(notification.ReceiverId, newNotification);
 
     }
 

@@ -33,6 +33,7 @@ public class ShareMediaCommandHandler:IRequestHandler<ShareMediaCommand,ShareMed
         {
             IdSender=_curUser.UserId,
             IdReceiver=request.IdReceiver,
+            
 
         };
         if(request.ShareStyle==ShareStyle.Media)
