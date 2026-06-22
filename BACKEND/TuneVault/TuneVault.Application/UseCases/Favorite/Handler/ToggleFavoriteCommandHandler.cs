@@ -3,6 +3,7 @@ using MediatR;
 using TuneVault.Application.UseCases.Favorite.Command;
 using TuneVault.Application.DTOs;
 using TuneVault.Domain.Interfaces;
+using FavoriteEntity = TuneVault.Domain.Entities.Favorite;
 
 namespace TuneVault.Application.UseCases.Favorite.Handler;
 
@@ -23,13 +24,28 @@ public class ToggleFavoriteCommandHandler:IRequestHandler<ToggleFavoriteCommand,
         if (isFavorite)
         {            
             await _favorite.RemoveFromFavorites(_curUser.UserId,request.IdMediaItem);
-            return new FavoriteDto{IsFavorite=false};
+            return new FavoriteDto{
+                IsFavorite=false,
+                Message="Hủy yêu thích thành công",
+                IsSuccess=true
+                };
 
         }
         else
         {
-            await _favorite.AddToFavorites(_curUser.UserId, request.IdMediaItem);
-            return new FavoriteDto{IsFavorite=true};
+            var newFavorite = new FavoriteEntity
+            {
+                IdUser = _curUser.UserId,
+                IdMediaItem = request.IdMediaItem,
+                FavoritedAt = DateTime.UtcNow
+            };
+            await _favorite.AddToFavorites(newFavorite);
+            return new FavoriteDto{
+                IsFavorite=true,
+                Message="Yêu thích thành công",
+                IsSuccess=true
+            
+            };
         }
     }
 

@@ -9,6 +9,8 @@ public enum Category
     Jazz = 2,
     Classical = 3,
     HipHop = 4,
+    Remix = 5,
+    Buồn = 6
     
 
 }

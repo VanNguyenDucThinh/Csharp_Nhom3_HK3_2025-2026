@@ -30,6 +30,10 @@ public class NotificationController : BaseApiController
     {
         var query = new GetNotificationQuery();
         var result = await Mediator.Send(query);
+        if (result == null)
+        {
+            return NotFound("Không có thông báo");
+        }
         return Ok(ApiResponse<List<NotificationDto>>.Ok(result));
 
     }

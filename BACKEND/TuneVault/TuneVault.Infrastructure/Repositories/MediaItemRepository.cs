@@ -117,7 +117,7 @@ namespace TuneVault.Infrastructure.Repositories
             // Giả định: Danh mục Video trong CSDL của bạn có mã Category là 1
             string sql = @"Select Id, Title, Artist, Description, Category, MediaStyle, UrlImageMedia, ViewCount, UrlMediaItem, Owner, UploadDateMediaItem, IdAlbum
                            from MediaItems
-                           where Id = @Id AND Category = 1"; 
+                           where Id = @Id AND MediaStyle = 1"; 
                            
             using var connection = _connection.CreateConnection();
             var command = new CommandDefinition(sql, new { Id = mediaItemId });

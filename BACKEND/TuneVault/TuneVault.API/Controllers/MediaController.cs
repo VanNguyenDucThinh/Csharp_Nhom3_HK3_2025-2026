@@ -6,6 +6,10 @@ using TuneVault.Application.UseCases.Media.Command;
 using TuneVault.Application.UseCases.Media.Handler;
 using TuneVault.Application.UseCases.Audio.Command;
 using TuneVault.Application.UseCases.Audio.Handler;
+using TuneVault.Application.UseCases.Video.Command;
+using TuneVault.Application.UseCases.Video.Handler;
+using TuneVault.Application.UseCases.Favorite.Command;
+using TuneVault.Application.UseCases.Favorite.Handler;
 using TuneVault.Application.UseCases.SearchAndTrending.Command;
 using TuneVault.Domain.Enums;
 using TuneVault.Domain.Interfaces;
@@ -77,13 +81,12 @@ public class MediaController : BaseApiController
 
     // GET api/media/{id}
     /// <summary>Lấy thông tin chi tiết một media item</summary>
-    [HttpGet("{id:guid}")]
+    [HttpGet("Audio/{id:guid}")]
     [AllowAnonymous]
     [ProducesResponseType(typeof(ApiResponse<AudioMediaDto>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status404NotFound)]
     public async Task<IActionResult> GetById(Guid id)
     {
-        // AudioQuery → AudioQueryHandler: lấy media + artist
         var query = new AudioQuery(id);
         var result = await Mediator.Send(query);
         return Ok(ApiResponse<AudioMediaDto>.Ok(result));
@@ -95,16 +98,16 @@ public class MediaController : BaseApiController
     /// Trả về 200 OK (audio) hoặc 206 Partial Content (video với Range header).
     /// Frontend video player phải gửi Range header để seek được.
     /// </remarks>
-    [HttpGet("{id:guid}/stream")]
+    [HttpGet("Video/{id:guid}")]
     [AllowAnonymous]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status206PartialContent)]
     [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> Stream(Guid id)
+    public async Task<IActionResult> Video(Guid id)
     {
-        // Chờ GetMediaStreamQuery từ Application layer.
-        // Khi có: lấy stream → File(stream, contentType, enableRangeProcessing: true) cho video seek.
-        return StatusCode(501, ApiResponse.Fail("Chờ GetMediaStreamQuery"));
+        var query = new GetVideoQuery(id);
+        var result = await Mediator.Send(query);
+        return Ok(ApiResponse<VideoDto>.Ok(result));
     }
 
     // GET api/media/search?q=keyword
@@ -114,19 +117,13 @@ public class MediaController : BaseApiController
     [ProducesResponseType(typeof(ApiResponse<SearchTrendingDto>), StatusCodes.Status200OK)] // Đổi type trả về thành SearchTrendingDto
     [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> Search(
-        [FromQuery] string? q, 
-        [FromQuery] bool isTrending = false, 
+        [FromQuery] string? q,  
         [FromQuery] int pageNumber = 1, 
         [FromQuery] int pageSize = 10)
     {
-        // Nếu không lấy trending mà cũng không có từ khóa thì mới báo lỗi
-        if (!isTrending && string.IsNullOrWhiteSpace(q))
-            return BadRequest(ApiResponse.Fail("Từ khóa tìm kiếm không được trống"));
-
         var query = new SearchAndTrendingQuery
         {
             Title = q,
-            IsTreading = isTrending,
             PageNumber = pageNumber,
             PageSize = pageSize
         };
@@ -135,18 +132,67 @@ public class MediaController : BaseApiController
 
         return Ok(ApiResponse<SearchTrendingDto>.Ok(result));
     }
-    [HttpGet("test-header")]
-    [AllowAnonymous] // Cố tình thả cửa để ai cũng vào được
-    public IActionResult TestHeader()
+    [HttpGet("trend")]
+    [AllowAnonymous]
+    [ProducesResponseType(typeof(ApiResponse<SearchTrendingDto>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status400BadRequest)]
+    public async Task<IActionResult> Trend( 
+        [FromQuery] int pageNumber = 1, 
+        [FromQuery] int pageSize = 10)
     {
-        // Bắt quả tang xem trong Header có chữ Authorization nào bay lên không
-        var authHeader = Request.Headers["Authorization"].ToString();
+        var query = new GetTrendingCommand
+        {
+            PageNumber = pageNumber,
+            PageSize = pageSize
+        };
+
+        var result = await Mediator.Send(query);
+
+        return Ok(ApiResponse<SearchTrendingDto>.Ok(result));
+    }
+    [HttpPost("favorite/{id:guid}")]
+    [ProducesResponseType(typeof(ApiResponse<FavoriteDto>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> Favorite(Guid id)
+    {
+
+        var command = new ToggleFavoriteCommand(id);
+        var result = await Mediator.Send(command);
+
+        if (!result.IsSuccess)
+            return BadRequest(ApiResponse.Fail(result.Message));
+
+        return Ok(ApiResponse<FavoriteDto>.Ok(result, result.Message));
+    }
+    [HttpPut("unfavorite/{id:guid}")]
+    [ProducesResponseType(typeof(ApiResponse<FavoriteDto>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> UnFavorite(Guid id)
+    {
+
+        var command = new ToggleFavoriteCommand(id);
+        var result = await Mediator.Send(command);
+
+        if (!result.IsSuccess)
+            return BadRequest(ApiResponse.Fail(result.Message));
+
+        return Ok(ApiResponse<FavoriteDto>.Ok(result, result.Message));
+
+    }
+    [HttpGet("ListFavorite")]
+    [ProducesResponseType(typeof(ApiResponse<List<MediaDto>>), StatusCodes.Status200OK)]
+    public async Task<IActionResult> GetFavorite() // Bỏ tham số Guid id đi cho bảo mật
+    {
+        // 1. Đã đổi Command thành Query theo đúng chuẩn CQRS
+        var query = new GetFavoriteCommand(); 
         
-        return Ok(new 
-        { 
-            TrangThai = string.IsNullOrEmpty(authHeader) ? "TRẮNG TAY (Không nhận được Token)" : "ĐÃ NHẬN ĐƯỢC",
-            GiaTriThucTe = authHeader 
-        });
+        // Gửi qua MediatR (Lưu ý: Thường các project dùng _mediator thay vì Mediator viết hoa)
+        var result = await Mediator.Send(query);
+
+        // 2. Sửa lại kiểu trả về là một List<MediaDto>
+        return Ok(ApiResponse<List<MediaDto>>.Ok(result));
     }
 }
 

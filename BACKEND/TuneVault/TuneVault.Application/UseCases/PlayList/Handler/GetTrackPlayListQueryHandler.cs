@@ -29,8 +29,7 @@ public class GetTrackPlayListQueryHandler:IRequestHandler<GetTrackPlayListQuery,
             Artist=x.Artist,
             Title=x.Title,
             Owner=x.Owner,
-            UrlImage=x.UrlImageMedia,
-            UrlMedia=x.UrlMediaItem
+            UrlImage=x.UrlImageMedia
         }).ToList();
 
         return new PlayListDto

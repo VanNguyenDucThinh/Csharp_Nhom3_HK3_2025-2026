@@ -28,39 +28,19 @@ public class SearchAndTrendingQueryHandler:IRequestHandler<SearchAndTrendingQuer
 
         int skip = (request.PageNumber - 1) * request.PageSize;
         int take = request.PageSize;
-
-        if (request.IsTreading)
+        var listMedia = await _mediaItem.GetMediaItemByTitle(request.Title,skip,take);
+        var listMediaByArtist = await _mediaItem.GetAudioByArtist(request.Title);
+        var listPlaylist = await _playList.GetPlayListByTitle(request.Title,skip, take);
+        page.ListMedia=listMedia.Select(x=>new MediaDto
         {
-            var listTrending = await _mediaItem.GetViewHigh(skip,take);
-            page.Trending=listTrending.Select(x=>new MediaDto
-            {
-                Id=x.Id,
-                Category=x.Category,
-                Artist=x.Artist,
-                Owner=x.Owner,
-                Title=x.Title,
-                UrlImage=x.UrlImageMedia,
-                UrlMedia=x.UrlMediaItem
-            }).ToList();
-        }
-        else
-        {
-            var listMedia = await _mediaItem.GetMediaItemByTitle(request.Title,skip,take);
-            var listMediaByArtist = await _mediaItem.GetAudioByArtist(request.Title);
-            var listPlaylist = await _playList.GetPlayListByTitle(request.Title,skip, take);
-            page.ListMedia=listMedia.Select(x=>new MediaDto
-            {
-                Id=x.Id,
-                Category=x.Category,
-                Owner=x.Owner,
-                Title=x.Title,
-                Artist=x.Artist,
-                UrlImage=x.UrlImageMedia,
-                UrlMedia=x.UrlMediaItem
-            }).ToList();
-            var playlistDtos = new List<PlayListDto>();
-
-            // Dùng foreach để map và lấy danh sách Track cho từng Playlist một cách an toàn
+            Id=x.Id,
+            Category=x.Category,
+            Owner=x.Owner,
+            Title=x.Title,
+            Artist=x.Artist,
+            UrlImage=x.UrlImageMedia
+        }).ToList();
+        var playlistDtos = new List<PlayListDto>();
             foreach (var p in listPlaylist)
             {
                 var tracks = await _track.GetTracksInPlaylist(p.Id); 
@@ -70,7 +50,6 @@ public class SearchAndTrendingQueryHandler:IRequestHandler<SearchAndTrendingQuer
                     Id = p.Id,
                     Name = p.Name,
                     Owner = p.Owner,
-                    // Map danh sách Track Entity sang DTO (Giả sử bạn có PlaylistTrackDto)
                     Track = tracks.Select(x=>new MediaDto
                     {
                         Id=x.Id,
@@ -78,8 +57,7 @@ public class SearchAndTrendingQueryHandler:IRequestHandler<SearchAndTrendingQuer
                         Owner=x.Owner,
                         Title=x.Title,
                         Artist=x.Artist,
-                        UrlImage=x.UrlImageMedia,
-                        UrlMedia=x.UrlMediaItem
+                        UrlImage=x.UrlImageMedia
                     }).ToList()
                 });
 
@@ -92,15 +70,9 @@ public class SearchAndTrendingQueryHandler:IRequestHandler<SearchAndTrendingQuer
             Owner=x.Owner,
             Title=x.Title,
             Artist=x.Artist,
-            UrlImage=x.UrlImageMedia,
-            UrlMedia=x.UrlMediaItem
+            UrlImage=x.UrlImageMedia
         }).ToList();
-                
-        {
-            
-        }
-        }
         return page;
-    }
-
+    } 
+        
 }

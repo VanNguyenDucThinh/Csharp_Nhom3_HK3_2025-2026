@@ -21,9 +21,12 @@ public class GetVideoQueryHandler:IRequestHandler<GetVideoQuery, VideoDto>
     }
     public async Task<VideoDto> Handle(GetVideoQuery request, CancellationToken cancellationToken)
     {
+        
         var mediaVideo = await _mediaItem.GetVideoById(request.IdVideo);
-
-
+        if (mediaVideo == null)
+        {
+            throw new Exception("Không tìm thấy video này!"); 
+        }
 
 
         await _mediator.Publish(new SaveHistoryEvent(_curUser.UserId,request.IdVideo),cancellationToken);

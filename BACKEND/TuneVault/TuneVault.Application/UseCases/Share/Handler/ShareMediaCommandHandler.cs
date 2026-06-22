@@ -12,14 +12,16 @@ namespace TuneVault.Application.UseCases.Share.Handler;
 public class ShareMediaCommandHandler:IRequestHandler<ShareMediaCommand,ShareMediaDto>
 {
     private readonly IMediaShareRepository _mediaShare;
+    private readonly IMediaItemRepository _media;
     private readonly ICurentUserService _curUser;
     private readonly IMediator _mediator;
 
-    public ShareMediaCommandHandler(IMediaShareRepository mediaShare,ICurentUserService curUser, IMediator mediator)
+    public ShareMediaCommandHandler(IMediaShareRepository mediaShare,ICurentUserService curUser, IMediator mediator,IMediaItemRepository media)
     {
         _mediaShare=mediaShare;
         _curUser=curUser;
         _mediator=mediator;
+        _media=media;
     }
 
     public async Task<ShareMediaDto> Handle (ShareMediaCommand request, CancellationToken cancellationToken)
@@ -32,21 +34,25 @@ public class ShareMediaCommandHandler:IRequestHandler<ShareMediaCommand,ShareMed
         var ShareMediaNew = new MediaShare
         {
             IdSender=_curUser.UserId,
-            IdReceiver=request.IdReceiver,
-            
-
+            IdReceiver=request.IdReceiver 
         };
+        string message="";
+        var styleMedia = await _media.GetMediaItemById(request.IdItem);
+
         if(request.ShareStyle==ShareStyle.Media)
         {
+            if (styleMedia == null) throw new Exception("Không tìm thấy tệp tin media này!");
             ShareMediaNew.IdMediaItem=request.IdItem;
+            message = (styleMedia.MediaStyle == MediaStyle.Video) ? "Một Video" : "Một bài hát";
         }else if(request.ShareStyle==ShareStyle.Playlist){
             ShareMediaNew.IdPlayList=request.IdItem;
+            message = "Một Playlist";
         }
         await _mediaShare.CreateMediaShare(ShareMediaNew);
         //tạo sự kiện
         var shareEvent = new MediaSharedEvent
         (
-            request.ShareStyle==ShareStyle.Media ? "Một bài hát":"Một Playlist",
+            message,
             _curUser.UserId,
             request.IdReceiver,
             request.IdItem

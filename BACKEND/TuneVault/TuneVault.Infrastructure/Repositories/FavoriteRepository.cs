@@ -32,16 +32,11 @@ namespace TuneVault.Infrastructure.Repositories
             return RowsAffected > 0;
         }
 
-        public Task<bool> AddToFavorites(Guid userId, Guid mediaItemId)
-        {
-            throw new NotImplementedException();
-        }
-
         public async Task<IEnumerable<MediaItem>> GetFavoriteTracks(Guid userId)
         {
             string sql = @"select med.*
                            from Favorite f
-                           inner join MediaItem med
+                           inner join MediaItems med
                            on f.IdMediaItem = med.Id
                            where f.IdUser = @userId";
             using var connection = _connection.CreateConnection();
@@ -52,11 +47,23 @@ namespace TuneVault.Infrastructure.Repositories
             return await connection.QueryAsync<MediaItem>(command);
         }
 
-        public Task<bool> IsFavoriteMedia(Guid userId, Guid mediaItemId)
+        public async Task<bool> IsFavoriteMedia(Guid userId, Guid mediaItemId)
         {
-            throw new NotImplementedException();
+            string sql = @"select count(1) 
+                           from Favorite 
+                           where IdUser = @IdUser and IdMediaItem = @IdMediaItem";
+                           
+            using var connection = _connection.CreateConnection();
+            var command = new CommandDefinition(sql, new
+            {
+                IdUser = userId,
+                IdMediaItem = mediaItemId
+            });
+            
+            int count = await connection.ExecuteScalarAsync<int>(command);
+            
+            return count > 0; 
         }
-
         public async Task<bool> RemoveFromFavorites(Guid userId, Guid mediaItemId)
         {
             string sql = @"delete from Favorite

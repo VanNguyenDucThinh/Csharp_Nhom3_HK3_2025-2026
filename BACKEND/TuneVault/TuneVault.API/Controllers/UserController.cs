@@ -68,8 +68,6 @@ public class UserController : BaseApiController
     [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status404NotFound)]
     public async Task<IActionResult> Follow(Guid id)
     {
-        if (id == CurrentUserId)
-            return BadRequest(ApiResponse.Fail("Không thể tự follow chính mình"));
 
         var command = new UserFollowCommand(id);
         var result = await Mediator.Send(command);

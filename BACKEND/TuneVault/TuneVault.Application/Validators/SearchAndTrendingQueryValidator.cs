@@ -6,6 +6,7 @@ public class SearchAndTredingQueryValidator : AbstractValidator<SearchAndTrendin
 {
     public SearchAndTredingQueryValidator()
     {
+        RuleFor(x=>x.Title).NotEmpty().WithMessage("Không được bỏ trống");
         RuleFor(x => x.PageNumber)
             .GreaterThan(0).WithMessage("PageNumber phải lớn hơn 0.");
         RuleFor(x => x.PageSize)
