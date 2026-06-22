@@ -12,17 +12,10 @@ public abstract class BaseApiController : ControllerBase
     private ISender? _mediator;
     protected ISender Mediator =>
         _mediator ??= HttpContext.RequestServices.GetRequiredService<ISender>();
-
-    /// <summary>
-    /// Lấy UserId (string) từ JWT claim — dùng cho ICurrentUserService
-    /// </summary>
     protected string? CurrentUserIdString =>
         User.FindFirstValue(ClaimTypes.NameIdentifier)
         ?? User.FindFirstValue("sub");
 
-    /// <summary>
-    /// Lấy UserId dạng Guid — dùng khi cần truyền thẳng vào Command/Query
-    /// </summary>
     protected Guid CurrentUserId
     {
         get

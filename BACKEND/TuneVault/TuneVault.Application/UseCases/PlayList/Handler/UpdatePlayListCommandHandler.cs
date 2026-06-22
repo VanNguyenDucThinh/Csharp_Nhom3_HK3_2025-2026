@@ -8,7 +8,7 @@ using TuneVault.Domain.Entities;
 
 namespace TuneVault.Application.UseCases.PlayList.Handler;
 
-public class UpdatePlayListCommandHandler:IRequestHandler<UpdatePlayListCommand,PlayListDto>
+public class UpdatePlayListCommandHandler:IRequestHandler<UpdatePlayListCommand,bool>
 {
     private readonly IPlayListRepository _playList;
     private readonly IFileStorageService _file; 
@@ -21,7 +21,7 @@ public class UpdatePlayListCommandHandler:IRequestHandler<UpdatePlayListCommand,
         _file=file;
     }
 
-    public async Task<PlayListDto> Handle (UpdatePlayListCommand request, CancellationToken cancellationToken)
+    public async Task<bool> Handle (UpdatePlayListCommand request, CancellationToken cancellationToken)
     {
         var playlist=await _playList.GetPlayListById(request.IdPlayList);
         if(playlist.Owner!=_curUser.UserId)
@@ -34,14 +34,7 @@ public class UpdatePlayListCommandHandler:IRequestHandler<UpdatePlayListCommand,
 
         await _playList.UpdatePlayList(playlist);
 
-        return new PlayListDto
-        {
-            Name=request.Name,
-            UrlImage=urlImage,
-            
-            
-
-        };
+        return true;
 
     }
 }

@@ -6,7 +6,7 @@ using TuneVault.Application.Security;
 
 namespace TuneVault.Application.UseCases.PlayList.Command;
 [Authorize]
-public class UpdatePlayListCommand:IRequest<PlayListDto>
+public class UpdatePlayListCommand:IRequest<bool>
 {
     public Guid IdOwner{get; set;}
     public Guid IdPlayList{get; set;}

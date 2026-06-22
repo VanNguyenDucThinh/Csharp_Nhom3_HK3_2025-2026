@@ -13,15 +13,15 @@ namespace TuneVault.API.Controllers
     {
         private readonly ICurentUserService _currentUserService;
 
-    // Inject ICurrentUserService vào Controller
         public HistoryController(ICurentUserService currentUserService)
         {
             _currentUserService = currentUserService;
         }
         [HttpGet]
+        [Authorize]
         public async Task<IActionResult> GetHistory()
         {
-            var command = new GetHistoryQuery(_currentUserService.UserId);
+            var command = new GetHistoryQuery();
             var result = await Mediator.Send(command);
             if (result == null)
             {

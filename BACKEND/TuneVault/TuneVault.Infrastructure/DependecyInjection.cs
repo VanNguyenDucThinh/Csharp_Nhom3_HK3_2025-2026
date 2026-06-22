@@ -37,6 +37,8 @@ namespace TuneVault.Infrastructure
             services.AddScoped<IPlayListTrackRepository, PlayListTrackRepository>();
             services.AddScoped<IUserProfileRepository, UserRepository>();
             services.AddScoped<IFileStorageService, FileStorageService>();
+            services.AddScoped<IAlbumRepository, AlbumRepository>();
+            services.AddScoped<ITrackAlbumRepository, TrackAlbumRepository>();
             services.AddSignalR();
             services.AddHttpContextAccessor();
             services.AddScoped<ICurentUserService, CurrenUserService>();

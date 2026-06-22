@@ -140,18 +140,6 @@ create table Follow(
 );
 Go
 
---table album
-create table Album(
-	IdAlbum UNIQUEIDENTIFIER PRIMARY KEY DEFAULT NEWSEQUENTIALID(),
-	Title nvarchar(max) not null,
-	ReleaseDate datetime2 not null,
-	CoverImageUrl varchar(max) not null,
-	ArtistId UNIQUEIDENTIFIER not null
-
-	constraint Album_ArtistId_Fkey foreign key (ArtistId)
-		references Artist(Id) on delete cascade
-);
-Go
 
 --table RefreshToken
 create table RefreshToken(
@@ -165,5 +153,28 @@ create table RefreshToken(
         references UserProfile(Id) on delete cascade
 );
 Go 
+--table Album
+CREATE TABLE Albums (
+    Id UNIQUEIDENTIFIER PRIMARY KEY,
+    Name NVARCHAR(255) NULL,           
+    NameArtist NVARCHAR(255) NOT NULL,   
+    UrlImage NVARCHAR(MAX) NULL,
+	Owner UNIQUEIDENTIFIER NOT NULL,
+	CONSTRAINT FK_Albums_UserProfile FOREIGN KEY (Owner) 
+        REFERENCES UserProfile(Id) ON DELETE CASCADE,
+
+);
+GO
+--TrackAlbum
+CREATE TABLE TrackAlbums (
+    IdAlbum UNIQUEIDENTIFIER NOT NULL,
+    IdMediaItem UNIQUEIDENTIFIER NOT NULL,
+    PRIMARY KEY (IdAlbum, IdMediaItem),
+    CONSTRAINT FK_TrackAlbums_Albums FOREIGN KEY (IdAlbum) 
+        REFERENCES Albums(Id) ON DELETE CASCADE,
+    CONSTRAINT FK_TrackAlbums_MediaItems FOREIGN KEY (IdMediaItem) 
+        REFERENCES MediaItems(Id) ON DELETE CASCADE
+);
+GO
 CREATE NONCLUSTERED INDEX IX_RefreshToken_Token ON RefreshToken(Token); 
 GO

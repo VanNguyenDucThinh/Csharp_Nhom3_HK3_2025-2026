@@ -15,38 +15,24 @@ using TuneVault.Domain.Enums;
 using TuneVault.Domain.Interfaces;
 namespace TuneVault.API.Controllers;
 
-/// <summary>
-/// B5 — Upload &amp; Streaming Media (1.0đ)
-/// Chức năng 3 — Thư viện Media (upload)
-/// Chức năng 4 — Audio Player (stream + lịch sử phát)
-/// Chức năng 5 — Video Player (stream với Range header)
-/// Chức năng 7 — Tìm kiếm media
-/// </summary>
 public class MediaController : BaseApiController
 {
     private readonly ICurentUserService _currentUserService;
-
-    // Inject ICurrentUserService vào Controller
     public MediaController(ICurentUserService currentUserService)
     {
         _currentUserService = currentUserService;
     }
     private static readonly string[] AllowedAudio = [".mp3", ".wav", ".flac", ".aac", ".ogg"];
     private static readonly string[] AllowedVideo = [".mp4", ".webm", ".mkv"];
-
-    // POST api/media/upload
-    /// <summary>Upload file audio hoặc video kèm ảnh bìa — Chức năng 3 (B5)</summary>
-    /// <remarks>
-    /// Nhận thông tin qua Form-data bao gồm file media chính và ảnh bìa (coverImage) tùy chọn.
-    /// </remarks>
     [Authorize]
     [HttpPost("upload")]
-    [Consumes("multipart/form-data")] // Khai báo rõ ràng kiểu dữ liệu để Swagger UI hiển thị đúng form upload
+    [Authorize]
+    [Consumes("multipart/form-data")]
     [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> UploadFile(
         IFormFile mediaFile, 
-        IFormFile? coverImage, // Ảnh bìa có thể null nếu người dùng không upload
+        IFormFile? coverImage,
         [FromForm] string title,
         [FromForm] string artist,
         [FromForm] string description,
@@ -60,7 +46,7 @@ public class MediaController : BaseApiController
         var command = new UploadMediaCommand(
             title, 
             artist,
-            userId, // Đã có ownerId chuẩn xác từ service
+            userId,
             description, 
             mediaStyle, 
             parsedCategory, 
@@ -72,16 +58,12 @@ public class MediaController : BaseApiController
             coverImage?.OpenReadStream() 
         );
 
-        // Sử dụng Mediator (viết hoa) được thừa kế sẵn từ BaseApiController thay vì _mediator
         var result = await Mediator.Send(command); 
         
-        // Bọc kết quả bằng ApiResponse.Ok để đồng bộ format dữ liệu trả về với toàn bộ hệ thống
         return Ok(ApiResponse.Ok(result, "Tải tệp tin lên hệ thống thành công"));
     }
 
-    // GET api/media/{id}
-    /// <summary>Lấy thông tin chi tiết một media item</summary>
-    [HttpGet("Audio/{id:guid}")]
+    [HttpGet("Audio/{id:guid}")]//Này dùng để gọi khi bấm phát âm thanh
     [AllowAnonymous]
     [ProducesResponseType(typeof(ApiResponse<AudioMediaDto>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status404NotFound)]
@@ -91,14 +73,7 @@ public class MediaController : BaseApiController
         var result = await Mediator.Send(query);
         return Ok(ApiResponse<AudioMediaDto>.Ok(result));
     }
-
-    // GET api/media/{id}/stream
-    /// <summary>Stream audio/video — hỗ trợ Range header cho video seek (B5)</summary>
-    /// <remarks>
-    /// Trả về 200 OK (audio) hoặc 206 Partial Content (video với Range header).
-    /// Frontend video player phải gửi Range header để seek được.
-    /// </remarks>
-    [HttpGet("Video/{id:guid}")]
+    [HttpGet("Video/{id:guid}")]//này dùng gọi để phát video
     [AllowAnonymous]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status206PartialContent)]
@@ -109,48 +84,8 @@ public class MediaController : BaseApiController
         var result = await Mediator.Send(query);
         return Ok(ApiResponse<VideoDto>.Ok(result));
     }
-
-    // GET api/media/search?q=keyword
-    /// <summary>Tìm kiếm media theo tên — Chức năng 7</summary>
-    [HttpGet("search")]
-    [AllowAnonymous]
-    [ProducesResponseType(typeof(ApiResponse<SearchTrendingDto>), StatusCodes.Status200OK)] // Đổi type trả về thành SearchTrendingDto
-    [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status400BadRequest)]
-    public async Task<IActionResult> Search(
-        [FromQuery] string? q,  
-        [FromQuery] int pageNumber = 1, 
-        [FromQuery] int pageSize = 10)
-    {
-        var query = new SearchAndTrendingQuery
-        {
-            Title = q,
-            PageNumber = pageNumber,
-            PageSize = pageSize
-        };
-
-        var result = await Mediator.Send(query);
-
-        return Ok(ApiResponse<SearchTrendingDto>.Ok(result));
-    }
-    [HttpGet("trend")]
-    [AllowAnonymous]
-    [ProducesResponseType(typeof(ApiResponse<SearchTrendingDto>), StatusCodes.Status200OK)]
-    [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status400BadRequest)]
-    public async Task<IActionResult> Trend( 
-        [FromQuery] int pageNumber = 1, 
-        [FromQuery] int pageSize = 10)
-    {
-        var query = new GetTrendingCommand
-        {
-            PageNumber = pageNumber,
-            PageSize = pageSize
-        };
-
-        var result = await Mediator.Send(query);
-
-        return Ok(ApiResponse<SearchTrendingDto>.Ok(result));
-    }
     [HttpPost("favorite/{id:guid}")]
+    [Authorize]
     [ProducesResponseType(typeof(ApiResponse<FavoriteDto>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status404NotFound)]
@@ -166,6 +101,7 @@ public class MediaController : BaseApiController
         return Ok(ApiResponse<FavoriteDto>.Ok(result, result.Message));
     }
     [HttpPut("unfavorite/{id:guid}")]
+    [Authorize]
     [ProducesResponseType(typeof(ApiResponse<FavoriteDto>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status404NotFound)]
@@ -182,16 +118,12 @@ public class MediaController : BaseApiController
 
     }
     [HttpGet("ListFavorite")]
+    [Authorize]
     [ProducesResponseType(typeof(ApiResponse<List<MediaDto>>), StatusCodes.Status200OK)]
-    public async Task<IActionResult> GetFavorite() // Bỏ tham số Guid id đi cho bảo mật
+    public async Task<IActionResult> GetFavorite()
     {
-        // 1. Đã đổi Command thành Query theo đúng chuẩn CQRS
         var query = new GetFavoriteCommand(); 
-        
-        // Gửi qua MediatR (Lưu ý: Thường các project dùng _mediator thay vì Mediator viết hoa)
         var result = await Mediator.Send(query);
-
-        // 2. Sửa lại kiểu trả về là một List<MediaDto>
         return Ok(ApiResponse<List<MediaDto>>.Ok(result));
     }
 }
@@ -199,7 +131,6 @@ public class MediaController : BaseApiController
 
 // ── Request DTOs ──────────────────────────────────────────────────────────
 
-/// <summary>Dữ liệu upload media</summary>
 public record UploadMediaRequest
 {
     [System.ComponentModel.DataAnnotations.Required]
@@ -208,10 +139,7 @@ public record UploadMediaRequest
 
     [System.ComponentModel.DataAnnotations.StringLength(1000)]
     public string? Description { get; init; }
-
-    /// <summary>Thể loại: 0=Pop, 1=Rock, 2=Jazz, v.v. (theo Domain.Enums.Category)</summary>
     public Category Category { get; init; }
-
     [System.ComponentModel.DataAnnotations.Required]
     public IFormFile? File { get; init; }
 }

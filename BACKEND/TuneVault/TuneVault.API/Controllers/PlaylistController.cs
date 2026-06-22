@@ -8,14 +8,8 @@ using TuneVault.Domain.Enums;
 
 namespace TuneVault.API.Controllers;
 
-/// <summary>
-/// Chức năng 6 — Playlist CRUD + quản lý track
-/// </summary>
-[Authorize]
 public class PlaylistController : BaseApiController
 {
-    // GET api/playlist
-    /// <summary>Lấy danh sách playlist của tôi</summary>
     [HttpGet]
     [ProducesResponseType(typeof(ApiResponse<List<PlayListDto>>), StatusCodes.Status200OK)]
     public async Task<IActionResult> GetMyPlaylists()
@@ -26,9 +20,7 @@ public class PlaylistController : BaseApiController
         return Ok(ApiResponse<List<PlayListDto>>.Ok(result, "Lấy PlayList của tôi thành công"));
     }
 
-    // GET api/playlist/{id}
-    /// <summary>Xem chi tiết playlist kèm danh sách track</summary>
-    [HttpGet("{id:guid}")]
+    [HttpGet("{id:guid}")]//khi bấm vào playlist thì hiện ra danh sách 
     [AllowAnonymous]
     [ProducesResponseType(typeof(ApiResponse<PlayListDto>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status404NotFound)]
@@ -45,13 +37,8 @@ public class PlaylistController : BaseApiController
         return Ok(ApiResponse<PlayListDto>.Ok(result, "Lấy chi tiết playlist thành công"));
     }
 
-    // POST api/playlist
-    /// <summary>Tạo playlist mới — Chức năng 6</summary>
-    /// <remarks>
-    /// Gọi CreatePlayListCommand(name, isPublic, owner).
-    /// Owner = CurrentUserId lấy từ JWT.
-    /// </remarks>
     [HttpPost]
+    [Authorize]
     [ProducesResponseType(typeof(ApiResponse<PlayListDto>), StatusCodes.Status201Created)]
     [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> Create([FromForm] CreatePlaylistRequest request)
@@ -72,9 +59,8 @@ public class PlaylistController : BaseApiController
             ApiResponse<PlayListDto>.Ok(result, "Tạo playlist thành công"));
     }
 
-    // PUT api/playlist/{id}
-    /// <summary>Cập nhật playlist — chỉ chủ sở hữu</summary>
     [HttpPut("{id:guid}")]
+    [Authorize]
     [ProducesResponseType(typeof(ApiResponse<PlayListDto>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status403Forbidden)]
     [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status404NotFound)]
@@ -86,17 +72,16 @@ public class PlaylistController : BaseApiController
         var command = new UpdatePlayListCommand(CurrentUserId, id, request.Name, request.IsPublic, fileName, fileContentType, fileStream);
         var result = await Mediator.Send(command);
 
-        if (result == null)
+        if (!result)
         {
             return NotFound(ApiResponse.Fail("Playlist không tồn tại"));
         }
 
-        return Ok(ApiResponse<PlayListDto>.Ok(result, "Cập nhật playlist thành công"));
+        return Ok(ApiResponse.Ok(result, "Cập nhật playlist thành công"));
     }
 
-    // DELETE api/playlist/{id}
-    /// <summary>Xóa playlist — chỉ chủ sở hữu</summary>
     [HttpDelete("{id:guid}")]
+    [Authorize]
     [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status403Forbidden)]
     [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status404NotFound)]
@@ -112,13 +97,8 @@ public class PlaylistController : BaseApiController
 
     }
 
-    // POST api/playlist/{id}/tracks
-    /// <summary>Thêm track vào playlist — Chức năng 6</summary>
-    /// <remarks>
-    /// Gọi AddTrackToPlaylistCommand(idTrack, idPlayList).
-    /// Handler kiểm tra: chủ playlist, track tồn tại, chưa có trong playlist.
-    /// </remarks>
     [HttpPost("{id:guid}/tracks")]
+    [Authorize]
     [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status403Forbidden)]
     [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status404NotFound)]
@@ -133,9 +113,8 @@ public class PlaylistController : BaseApiController
             : BadRequest(ApiResponse.Fail("Không thể thêm track"));
     }
 
-    // DELETE api/playlist/{id}/tracks/{mediaId}
-    /// <summary>Xóa track khỏi playlist — Chức năng 6</summary>
     [HttpDelete("{id:guid}/tracks/{mediaId:guid}")]
+    [Authorize]
     [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status403Forbidden)]
     [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status404NotFound)]
@@ -151,7 +130,6 @@ public class PlaylistController : BaseApiController
     }
 }
 
-//Request DTOs 
 
 public record CreatePlaylistRequest{
     [System.ComponentModel.DataAnnotations.Required]

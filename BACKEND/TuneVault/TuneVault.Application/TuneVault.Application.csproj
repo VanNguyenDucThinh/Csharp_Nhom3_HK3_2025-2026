@@ -9,6 +9,8 @@
   <ItemGroup>
     <Folder Include="Security\" />
     <Folder Include="UseCases\Album\" />
+    <Folder Include="UseCases\Album\Command\" />
+    <Folder Include="UseCases\Album\Handler\" />
     <Folder Include="UseCases\Favorite\" />
     <Folder Include="UseCases\Favorite\Command\" />
     <Folder Include="UseCases\Favorite\Handler\" />
