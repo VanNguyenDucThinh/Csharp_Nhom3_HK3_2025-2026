@@ -12,7 +12,7 @@ import type {
   ProfileUserDto,
   UpdateProfileRequest,
   FollowDto,
-} from '../types/User.ts'
+} from '../types/user.ts'
 
 import type {
   MediaDto,
@@ -49,6 +49,7 @@ import type {
   ApiResponse,
   ApiResponseNoData,
 } from '../types/ApiResponse.ts'
+import { data } from 'react-router-dom'
 
 // ============================================================
 // HELPER: Chuyển lỗi axios thành thông báo tiếng Việt dễ đọc
@@ -73,6 +74,14 @@ function getApiErrorMessage(error: unknown): string {
   if (axiosError.response?.data?.message) {
     return axiosError.response.data.message
   }
+
+  // THÊM: Nếu backend trả về { success: false } nhưng không có message
+  if (data && typeof data === 'object' && 'success' in data)
+    return 'Yêu cầu không thành công. Vui lòng thử lại!'
+
+if (axiosError.response?.data?.errors && Array.isArray(axiosError.response.data.errors)) {
+  return axiosError.response.data.errors.join(', ')
+}
 
   // Nếu backend trả về mảng lỗi validate (ví dụ đăng ký thiếu field)
   if (axiosError.response?.data?.errors && axiosError.response.data.errors.length > 0) {
@@ -255,13 +264,27 @@ const apiClient = {
     },
 
     // GET api/media/Video/{id}
+    // Lưu ý: endpoint này chủ yếu dùng để lấy URL stream cho thẻ <video>.
+    // Backend có thể trả JSON (ApiResponse<VideoDto>) HOẶC binary stream (206).
+    // Hàm này chỉ xử lý trường hợp JSON. Nếu cần stream, dùng trực tiếp URL.
     getVideo: async (id: string): Promise<VideoDto> => {
       try {
         const response = await axiosInstance.get<ApiResponse<VideoDto>>(
-          `/media/Video/${id}`
+          `/media/Video/${id}`,
+          {
+            // Không gửi Range header — chỉ lấy thông tin JSON
+            headers: { 'Accept': 'application/json' }
+          }
         )
         return unwrapApiResponse(response, 'Không thể lấy thông tin video')
       } catch (error) {
+        // Nếu lỗi parse JSON (backend trả binary), trả về object tối thiểu
+        // để component vẫn hiển thị được video player
+        const axiosError = error as { code?: string; message?: string }
+        if (axiosError.message?.includes('JSON') || axiosError.code === 'ERR_BAD_RESPONSE') {
+          console.warn('Video endpoint trả binary, component nên dùng URL trực tiếp')
+          throw new Error('Không thể đọc thông tin video. Vui lòng thử lại!')
+        }
         throw new Error(getApiErrorMessage(error))
       }
     },

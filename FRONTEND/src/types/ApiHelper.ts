@@ -24,10 +24,16 @@ export function getErrorMessage(error: unknown): string {
     if (error.response) {
       // Cố gắng đọc field "message" mà backend đã trả về trong ApiResponse,
       // vì đây là thông báo CỤ THỂ NHẤT (ví dụ: "Email đã được sử dụng").
-      const data = error.response.data as ApiResponse<unknown> | undefined;
-      if (data?.message) {
-        return data.message;
-      }
+      const rawData = error.response.data
+
+      // TRƯỜNG HỢP 1b: Backend trả về KHÔNG PHẢI JSON (ví dụ HTML error page, plain text)
+      // Tại sao cần? Vì khi backend .NET bị lỗi chưa catch, nó có thể trả về
+      // trang HTML mặc định thay vì ApiResponse JSON. typeof kiểm tra nhanh chóng.
+      if (typeof rawData === 'string') return rawData // Trả về nguyên văn để người dùng thấy nội dung lỗi
+
+      const data = rawData as ApiResponse<unknown> | undefined;
+
+      if (data?.message) return data.message;
 
       // Nếu backend không trả message rõ ràng, dùng thông báo chung kèm mã lỗi,
       // để người dùng (hoặc bạn lúc debug) biết hướng tìm lỗi.
@@ -44,4 +50,16 @@ export function getErrorMessage(error: unknown): string {
   // TRƯỜNG HỢP 3: Lỗi không liên quan tới việc gọi API (hiếm gặp, ví dụ lỗi
   // logic JavaScript khác). Vẫn trả về 1 thông báo an toàn, không để app crash.
   return "Đã xảy ra lỗi không xác định. Vui lòng thử lại.";
+}
+
+// Thêm vào CUỐI file ApiHelper.ts:
+export function unwrapApiResponse<T>(
+  response: { data: ApiResponse<T> },
+  defaultMessage: string
+): T {
+  const apiResponse = response.data
+  if (!apiResponse.success || !apiResponse.data) {
+    throw new Error(apiResponse.message || defaultMessage)
+  }
+  return apiResponse.data as T
 }
