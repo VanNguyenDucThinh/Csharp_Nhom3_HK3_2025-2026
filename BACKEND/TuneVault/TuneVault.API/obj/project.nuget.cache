@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "p1nPi/rWN+w=",
+  "dgSpecHash": "R7bgFYF3QpI=",
   "success": true,
-  "projectFilePath": "c:\\Users\\ACER\\Downloads\\Csharp_Nhom3_HK3_2025-2026\\BACKEND\\TuneVault\\TuneVault.API\\TuneVault.API.csproj",
+  "projectFilePath": "C:\\Users\\ACER\\Downloads\\Csharp_Nhom3_HK3_2025-2026\\BACKEND\\TuneVault\\TuneVault.API\\TuneVault.API.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\ACER\\.nuget\\packages\\bcrypt.net-next\\4.2.0\\bcrypt.net-next.4.2.0.nupkg.sha512",
     "C:\\Users\\ACER\\.nuget\\packages\\cloudinarydotnet\\1.29.2\\cloudinarydotnet.1.29.2.nupkg.sha512",

@@ -4,7 +4,7 @@
     "target": "esnext",
     "lib": ["ES2023", "DOM"],
     "module": "nodenext",
-    // "types": ["vite/client"],
+    "types": ["vite/client"],
     "skipLibCheck": true,
 
     /* NodeNext mode */
@@ -19,7 +19,10 @@
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "erasableSyntaxOnly": false,
-    "noFallthroughCasesInSwitch": true
+    "noFallthroughCasesInSwitch": true,
+
+    //Điều này sẽ bắt buộc bạn phải dùng đúng casing trong import, tránh lỗi tiềm ẩn.
+    "forceConsistentCasingInFileNames": true
   },
-  "include": ["src"]
+  "include": ["src", "vite-env.d.ts"]
 }

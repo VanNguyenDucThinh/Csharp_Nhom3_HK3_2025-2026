@@ -18,7 +18,10 @@
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "erasableSyntaxOnly": true,
-    "noFallthroughCasesInSwitch": true
+    "noFallthroughCasesInSwitch": true,
+
+    //Điều này sẽ bắt buộc bạn phải dùng đúng casing trong import, tránh lỗi tiềm ẩn.
+    "forceConsistentCasingInFileNames": true
   },
   "include": ["vite.config.ts"]
 }

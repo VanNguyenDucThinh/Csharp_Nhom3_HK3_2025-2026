@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "TQxfnkgMjSU=",
+  "dgSpecHash": "7VTTPL5cU0Y=",
   "success": true,
-  "projectFilePath": "c:\\Users\\ACER\\Downloads\\Csharp_Nhom3_HK3_2025-2026\\BACKEND\\TuneVault\\TuneVault.Domain\\TuneVault.Domain.csproj",
+  "projectFilePath": "C:\\Users\\ACER\\Downloads\\Csharp_Nhom3_HK3_2025-2026\\BACKEND\\TuneVault\\TuneVault.Domain\\TuneVault.Domain.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\ACER\\.nuget\\packages\\mediatr\\14.1.0\\mediatr.14.1.0.nupkg.sha512",
     "C:\\Users\\ACER\\.nuget\\packages\\mediatr.contracts\\2.0.1\\mediatr.contracts.2.0.1.nupkg.sha512",

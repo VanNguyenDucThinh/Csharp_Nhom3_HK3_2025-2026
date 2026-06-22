@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "vQaB7QLN/f8=",
+  "dgSpecHash": "XX5prK1A0CE=",
   "success": true,
-  "projectFilePath": "c:\\Users\\ACER\\Downloads\\Csharp_Nhom3_HK3_2025-2026\\BACKEND\\TuneVault\\TuneVault.Infrastructure\\TuneVault.Infrastructure.csproj",
+  "projectFilePath": "C:\\Users\\ACER\\Downloads\\Csharp_Nhom3_HK3_2025-2026\\BACKEND\\TuneVault\\TuneVault.Infrastructure\\TuneVault.Infrastructure.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\ACER\\.nuget\\packages\\bcrypt.net-next\\4.2.0\\bcrypt.net-next.4.2.0.nupkg.sha512",
     "C:\\Users\\ACER\\.nuget\\packages\\cloudinarydotnet\\1.29.2\\cloudinarydotnet.1.29.2.nupkg.sha512",
@@ -37,9 +37,9 @@
       "code": "NU1510",
       "level": "Warning",
       "message": "PackageReference Microsoft.AspNetCore.Identity will not be pruned. Consider removing this package from your dependencies, as it is likely unnecessary.",
-      "projectPath": "c:\\Users\\ACER\\Downloads\\Csharp_Nhom3_HK3_2025-2026\\BACKEND\\TuneVault\\TuneVault.Infrastructure\\TuneVault.Infrastructure.csproj",
+      "projectPath": "C:\\Users\\ACER\\Downloads\\Csharp_Nhom3_HK3_2025-2026\\BACKEND\\TuneVault\\TuneVault.Infrastructure\\TuneVault.Infrastructure.csproj",
       "warningLevel": 1,
-      "filePath": "c:\\Users\\ACER\\Downloads\\Csharp_Nhom3_HK3_2025-2026\\BACKEND\\TuneVault\\TuneVault.Infrastructure\\TuneVault.Infrastructure.csproj",
+      "filePath": "C:\\Users\\ACER\\Downloads\\Csharp_Nhom3_HK3_2025-2026\\BACKEND\\TuneVault\\TuneVault.Infrastructure\\TuneVault.Infrastructure.csproj",
       "libraryId": "Microsoft.AspNetCore.Identity",
       "targetGraphs": [
         "net10.0"
@@ -49,9 +49,9 @@
       "code": "NU1510",
       "level": "Warning",
       "message": "PackageReference Microsoft.Extensions.Configuration will not be pruned. Consider removing this package from your dependencies, as it is likely unnecessary.",
-      "projectPath": "c:\\Users\\ACER\\Downloads\\Csharp_Nhom3_HK3_2025-2026\\BACKEND\\TuneVault\\TuneVault.Infrastructure\\TuneVault.Infrastructure.csproj",
+      "projectPath": "C:\\Users\\ACER\\Downloads\\Csharp_Nhom3_HK3_2025-2026\\BACKEND\\TuneVault\\TuneVault.Infrastructure\\TuneVault.Infrastructure.csproj",
       "warningLevel": 1,
-      "filePath": "c:\\Users\\ACER\\Downloads\\Csharp_Nhom3_HK3_2025-2026\\BACKEND\\TuneVault\\TuneVault.Infrastructure\\TuneVault.Infrastructure.csproj",
+      "filePath": "C:\\Users\\ACER\\Downloads\\Csharp_Nhom3_HK3_2025-2026\\BACKEND\\TuneVault\\TuneVault.Infrastructure\\TuneVault.Infrastructure.csproj",
       "libraryId": "Microsoft.Extensions.Configuration",
       "targetGraphs": [
         "net10.0"
