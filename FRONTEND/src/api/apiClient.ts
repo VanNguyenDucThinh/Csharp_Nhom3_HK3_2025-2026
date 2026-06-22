@@ -1,162 +1,171 @@
 // src/api/apiClient.ts
 import axiosInstance from './axiosInstance'
 
-// =============================================
-// INTERFACES — khớp với DTO từ Backend C#
-// =============================================
+// Import types đã khớp với backend
+import type {
+  LoginRequest,
+  RegisterRequest,
+  AuthResponse,
+} from '../types/auth'
 
-export interface User {
-  id: string
-  username: string
-  email: string
-  bio?: string
-  avatarUrl?: string
-}
+import type {
+  ProfileUserDto,
+  FollowDto,
+} from '../types/user'
 
-export interface MediaItem {
-  id: number
-  title: string
-  artist: string
-  type: 'audio' | 'video'
-  fileUrl: string
-  thumbnailUrl?: string
-  description?: string
-  duration: number
-  ownerId: string
-  createdAt: string
-}
+import type {
+  MediaDto,
+  AudioMediaDto,
+  SearchTrendingDto,
+} from '../types/media'
 
-export interface Playlist {
-  id: number
-  name: string
-  isPublic: boolean
-  ownerId: string
-  tracks: MediaItem[]
-  createdAt: string
-}
+import type {
+  PlayListDto,
+} from '../types/playlist'
 
-export interface MediaShare {
-  id: number
-  mediaItem: MediaItem
-  sender: User
-  sharedAt: string
-}
+import type {
+  ShareMediaDto,
+  SharedItemDto,
+  ShareStyle,
+} from '../types/share'
 
-export interface Notification {
-  id: number
-  type: string
-  message: string
-  isRead: boolean
-  createdAt: string
-}
+import type {
+  NotificationDto,
+  Read,
+} from '../types/notification'
 
-export interface LoginRequest {
-  username: string
-  password: string
-}
-
-export interface RegisterRequest {
-  username: string
-  email: string
-  password: string
-}
-
-export interface AuthResponse {
-  token: string
-  user: User
-}
-
-// Hiển thị lỗi giống MessageBox trong trình duyệt bằng alert.
-export function showApiError(message: string, error: unknown): void {
-  const detail = error instanceof Error ? error.message : String(error)
-  window.alert(`${message}\nChi tiết: ${detail}`)
-}
+import type {
+  ApiResponse,
+  ApiResponseNoData,
+} from '../types/api'
 
 // =============================================
 // API CLIENT — tất cả các hàm gọi backend
+// Đã điều chỉnh endpoint + interface khớp với Backend C# thật
 // =============================================
 
 const apiClient = {
 
-  // --- Auth ---
+  // --- Auth (api/auth) ---
   auth: {
+    // POST api/auth/login
     login: (data: LoginRequest) =>
-      axiosInstance.post<AuthResponse>('/auth/login', data).then(r => r.data),
+      axiosInstance.post<ApiResponse<AuthResponse>>('/auth/login', data)
+        .then(response => response.data.data),   // Unwrap ApiResponse để lấy AuthResponse thực tế
+
+    // POST api/auth/register
     register: (data: RegisterRequest) =>
-      axiosInstance.post<AuthResponse>('/auth/register', data).then(r => r.data),
+      axiosInstance.post<ApiResponse<AuthResponse>>('/auth/register', data)
+        .then(response => response.data.data),   // Unwrap ApiResponse
+
+    // POST api/auth/logout
     logout: () =>
-      axiosInstance.post('/auth/logout').then(r => r.data),
+      axiosInstance.post<ApiResponseNoData>('/auth/logout')
+        .then(response => response.data),
   },
 
-  // --- User Profile ---
+  // --- User Profile (api/user) ---
   profile: {
-    getMe: () =>
-      axiosInstance.get<User>('/profile/me').then(r => r.data),
-    update: (data: Partial<User>) =>
-      axiosInstance.put<User>('/profile/me', data).then(r => r.data),
+    // GET api/user/profile
+    getMe: (): Promise<ApiResponse<ProfileUserDto>> =>
+      axiosInstance.get('/user/profile'),
+
+    // GET api/user/{id}
     getById: (id: string) =>
-      axiosInstance.get<User>(`/profile/${id}`).then(r => r.data),
+      axiosInstance.get<ApiResponse<ProfileUserDto>>(`/user/${id}`),
+
+    // PUT api/user/profile
+    update: (formData: FormData) =>
+      axiosInstance.put<ApiResponse<ProfileUserDto>>('/user/profile', formData, {
+        headers: { 'Content-Type': 'multipart/form-data' },
+      }),
   },
 
-  // --- Media (Audio + Video) ---
+  // --- Media (api/media) ---
   media: {
-    getAll: () =>
-      axiosInstance.get<MediaItem[]>('/media').then(r => r.data),
-    getById: (id: number) =>
-      axiosInstance.get<MediaItem>(`/media/${id}`).then(r => r.data),
+    // POST api/media/upload
     upload: (formData: FormData) =>
-      axiosInstance.post<MediaItem>('/media/upload', formData, {
-        headers: { 'Content-Type': 'multipart/form-data' }
-      }).then(r => r.data),
-    search: (query: string) =>
-      axiosInstance.get<MediaItem[]>(`/media/search?q=${encodeURIComponent(query)}`).then(r => r.data),
-    getStreamUrl: (id: number) => `${axiosInstance.defaults.baseURL}/media/${id}/stream`,
-    recordPlay: (id: number) =>
-      axiosInstance.post(`/media/${id}/play`).then(r => r.data),
-    toggleFavorite: (id: number) =>
-      axiosInstance.post(`/media/${id}/favorite`).then(r => r.data),
+      axiosInstance.post<ApiResponse<object>>('/media/upload', formData, {
+        headers: { 'Content-Type': 'multipart/form-data' },
+      }),
+
+    // GET api/media/{id}
+    getById: (id: string) =>
+      axiosInstance.get<ApiResponse<AudioMediaDto>>(`/media/${id}`),
+
+    // GET api/media/{id}/stream
+    getStreamUrl: (id: string) =>
+      `${axiosInstance.defaults.baseURL}/media/${id}/stream`,
+
+    // GET api/media/search?q=...&isTrending=...
+    search: (query: string, isTrending: boolean = false, pageNumber: number = 1, pageSize: number = 10) =>
+      axiosInstance.get<ApiResponse<SearchTrendingDto>>('/media/search', {
+        params: { q: query, isTrending, pageNumber, pageSize },
+      }),
   },
 
-  // --- Playlist ---
-  playlists: {
-    getAll: () =>
-      axiosInstance.get<Playlist[]>('/playlists').then(r => r.data),
-    getById: (id: number) =>
-      axiosInstance.get<Playlist>(`/playlists/${id}`).then(r => r.data),
-    create: (data: { name: string; isPublic: boolean }) =>
-      axiosInstance.post<Playlist>('/playlists', data).then(r => r.data),
-    addTrack: (playlistId: number, mediaId: number) =>
-      axiosInstance.post(`/playlists/${playlistId}/tracks`, { mediaId }).then(r => r.data),
-    removeTrack: (playlistId: number, mediaId: number) =>
-      axiosInstance.delete(`/playlists/${playlistId}/tracks/${mediaId}`).then(r => r.data),
-    delete: (id: number) =>
-      axiosInstance.delete(`/playlists/${id}`).then(r => r.data),
+  // --- Playlist (api/playlist) — CHÚ Ý: không có 's' ở cuối như frontend cũ
+  playlist: {
+    // GET api/playlist
+    getMyPlaylists: () =>
+      axiosInstance.get<ApiResponse<PlayListDto[]>>('/playlist'),
+
+    // GET api/playlist/{id}
+    getById: (id: string) =>
+      axiosInstance.get<ApiResponse<PlayListDto>>(`/playlist/${id}`),
+
+    // POST api/playlist (multipart/form-data)
+    create: (formData: FormData) =>
+      axiosInstance.post<ApiResponse<PlayListDto>>('/playlist', formData, {
+        headers: { 'Content-Type': 'multipart/form-data' },
+      }),
+
+    // PUT api/playlist/{id}
+    update: (id: string, formData: FormData) =>
+      axiosInstance.put<ApiResponse<PlayListDto>>(`/playlist/${id}`, formData, {
+        headers: { 'Content-Type': 'multipart/form-data' },
+      }),
+
+    // DELETE api/playlist/{id}
+    delete: (id: string) =>
+      axiosInstance.delete<ApiResponseNoData>(`/playlist/${id}`),
+
+    // POST api/playlist/{id}/tracks
+    addTrack: (playlistId: string, mediaId: string) =>
+      axiosInstance.post<ApiResponseNoData>(
+        `/playlist/${playlistId}/tracks`,
+        { mediaId }   // Body: { MediaId: Guid }
+      ),
+
+    // DELETE api/playlist/{id}/tracks/{mediaId}
+    removeTrack: (playlistId: string, mediaId: string) =>
+      axiosInstance.delete<ApiResponseNoData>(`/playlist/${playlistId}/tracks/${mediaId}`),
   },
 
-  // --- Share Media ---
+  // --- Share (api/share) ---
   share: {
-    send: (receiverId: string, mediaId: number) =>
-      axiosInstance.post('/share', { receiverId, mediaId }).then(r => r.data),
-    getSharedWithMe: () =>
-      axiosInstance.get<MediaShare[]>('/share/inbox').then(r => r.data),
-    getSharedByMe: () =>
-      axiosInstance.get<MediaShare[]>('/share/sent').then(r => r.data),
+    // POST api/share
+    send: (receiverUserId: string, itemId: string, shareStyle: ShareStyle) =>
+      axiosInstance.post<ApiResponse<ShareMediaDto>>('/share', {
+        receiverUserId,   // Backend dùng ReceiverUserId (có chữ User)
+        itemId,           // Backend dùng ItemId (không phải MediaId)
+        shareStyle,
+      }),
+
+    // GET api/share/received
+    getReceived: () =>
+      axiosInstance.get<ApiResponse<SharedItemDto[]>>('/share/received'),
   },
 
-  // --- Notifications ---
-  notifications: {
+  // --- Notifications (api/notification) — CHÚ Ý: không có 's' ở cuối
+  notification: {
+    // GET api/notification
     getAll: () =>
-      axiosInstance.get<Notification[]>('/notifications').then(r => r.data),
-    markAsRead: (id: number) =>
-      axiosInstance.patch(`/notifications/${id}/read`).then(r => r.data),
-    markAllAsRead: () =>
-      axiosInstance.patch('/notifications/read-all').then(r => r.data),
-  },
+      axiosInstance.get<ApiResponse<NotificationDto[]>>('/notification'),
 
-  // --- Play History ---
-  history: {
-    getRecent: () =>
-      axiosInstance.get<MediaItem[]>('/history').then(r => r.data),
+    // PUT api/notification/{id}/read
+    markAsRead: (id: string) =>
+      axiosInstance.put<ApiResponseNoData>(`/notification/${id}/read`),
   },
 }
 
