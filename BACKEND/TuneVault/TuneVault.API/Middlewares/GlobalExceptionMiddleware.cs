@@ -1,8 +1,9 @@
 using System.Net;
 using System.Text.Json;
+using System.Collections.Generic;
 using FluentValidation;
 using TuneVault.API.Common;
-
+using TuneVault.Application.CreateException;
 namespace TuneVault.API.Middlewares;
 
 /// <summary>
@@ -47,6 +48,14 @@ public class GlobalExceptionMiddleware
 
         switch (exception)
         {
+            case NotFoundException nfe:
+                statusCode = (int)HttpStatusCode.NotFound;
+                response = ApiResponse.Fail(nfe.Message);
+                break;
+            case BadRequestException bre:
+                statusCode = (int)HttpStatusCode.BadRequest;
+                response = ApiResponse.Fail(bre.Message);
+                break;
             // FluentValidation — ném bởi ValidationBehavior trong Application layer
             case ValidationException ve:
                 statusCode = (int)HttpStatusCode.BadRequest;
@@ -65,8 +74,6 @@ public class GlobalExceptionMiddleware
                 response = ApiResponse.Fail("Yêu cầu bị hủy");
                 break;
 
-            // Exception("...") từ các Handler (NotFoundException, v.v.)
-            // Sau khi Application layer tạo custom exception thì thêm case ở đây
             default:
                 statusCode = (int)HttpStatusCode.InternalServerError;
                 response = ApiResponse.Fail("Đã xảy ra lỗi, vui lòng thử lại sau");

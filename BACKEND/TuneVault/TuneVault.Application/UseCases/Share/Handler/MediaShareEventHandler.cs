@@ -33,7 +33,12 @@ public class MediaShareEventHandler:INotificationHandler<MediaSharedEvent>
             IdItem=notification.ItemId,
             IsRead=Read.NotRead
         };
-        await _notificationRepo.CreateNotification(newNotification);
+        var isSuccess=await _notificationRepo.CreateNotification(newNotification);
+        if (!isSuccess)
+        {
+            throw new Exception("Tạo thông báo bị lỗi");
+        }
+
 
         await _notificationSer.SendNotificationToUser(notification.ReceiverId, newNotification);
 

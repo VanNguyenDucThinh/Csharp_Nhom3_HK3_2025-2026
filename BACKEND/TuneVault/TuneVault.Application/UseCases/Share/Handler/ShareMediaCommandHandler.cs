@@ -48,7 +48,11 @@ public class ShareMediaCommandHandler:IRequestHandler<ShareMediaCommand,ShareMed
             ShareMediaNew.IdPlayList=request.IdItem;
             message = "Một Playlist";
         }
-        await _mediaShare.CreateMediaShare(ShareMediaNew);
+        var isSuccess=await _mediaShare.CreateMediaShare(ShareMediaNew);
+        if (!isSuccess)
+        {
+            throw new Exception("Tạo thông báo bị lỗi");
+        }
         //tạo sự kiện
         var shareEvent = new MediaSharedEvent
         (

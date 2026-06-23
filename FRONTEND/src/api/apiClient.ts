@@ -1,5 +1,6 @@
 // src/api/apiClient.ts
 import axiosInstance from './axiosInstance.ts'
+import { getApiErrorMessage, unwrapApiResponse } from '../types/ApiHelper.ts'
 
 // Import types khớp với backend DTOs
 import type {
@@ -57,68 +58,6 @@ import { data } from 'react-router-dom'
 // (có code, message, response, status...). Ta muốn component
 // chỉ nhận 1 chuỗi thông báo đơn giản, không phải xử lý object.
 // ============================================================
-function getApiErrorMessage(error: unknown): string {
-  const axiosError = error as {
-    code?: string
-    message?: string
-    response?: {
-      status?: number
-      data?: {
-        message?: string
-        errors?: string[]
-      }
-    }
-  }
-
-  // Ưu tiên lỗi từ backend (đã được backend định nghĩa sẵn bằng tiếng Việt)
-  if (axiosError.response?.data?.message) {
-    return axiosError.response.data.message
-  }
-
-  // THÊM: Nếu backend trả về { success: false } nhưng không có message
-  if (data && typeof data === 'object' && 'success' in data)
-    return 'Yêu cầu không thành công. Vui lòng thử lại!'
-
-if (axiosError.response?.data?.errors && Array.isArray(axiosError.response.data.errors)) {
-  return axiosError.response.data.errors.join(', ')
-}
-
-  // Nếu backend trả về mảng lỗi validate (ví dụ đăng ký thiếu field)
-  if (axiosError.response?.data?.errors && axiosError.response.data.errors.length > 0) {
-    return axiosError.response.data.errors.join(', ')
-  }
-
-  // Lỗi timeout hoặc mất kết nối mạng
-  if (axiosError.code === 'ECONNABORTED' || axiosError.message?.includes('timeout')) {
-    return 'Hệ thống phản hồi quá lâu. Vui lòng kiểm tra kết nối mạng và thử lại!'
-  }
-
-  // Lỗi không kết nối được server (backend chưa chạy)
-  if (!axiosError.response) {
-    return 'Không thể kết nối đến máy chủ. Vui lòng kiểm tra backend đã chạy chưa!'
-  }
-
-  // Xử lý theo mã HTTP status
-  const status = axiosError.response.status
-  switch (status) {
-    case 400:
-      return 'Dữ liệu gửi lên không hợp lệ. Vui lòng kiểm tra lại thông tin!'
-    case 401:
-      return 'Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại!'
-    case 403:
-      return 'Bạn không có quyền thực hiện thao tác này!'
-    case 404:
-      return 'Không tìm thấy dữ liệu yêu cầu!'
-    case 409:
-      return 'Dữ liệu đã tồn tại trên hệ thống!'
-    case 500:
-      return 'Lỗi máy chủ. Vui lòng thử lại sau!'
-    case 503:
-      return 'Hệ thống đang bảo trì. Vui lòng thử lại sau!'
-    default:
-      return `Lỗi không xác định (mã ${status}). Vui lòng thử lại!`
-  }
-}
 
 // ============================================================
 // HELPER: Kiểm tra ApiResponse.success và trả về data
@@ -126,20 +65,6 @@ if (axiosError.response?.data?.errors && Array.isArray(axiosError.response.data.
 // Ta muốn hàm service trả về "ruột" (data) thay vì cả cái hộp.
 // Nếu success = false thì throw luôn, không trả về data rác.
 // ============================================================
-function unwrapApiResponse<T>(
-  response: { data: ApiResponse<T> },
-  defaultMessage: string
-): T {
-  const apiResponse = response.data
-
-  // Backend báo thất bại → throw để service layer xử lý
-  if (!apiResponse.success) {
-    throw new Error(apiResponse.message || defaultMessage)
-  }
-
-  // Trả về data thực tế (đã loại bỏ vỏ ApiResponse)
-  return apiResponse.data as T
-}
 
 // ============================================================
 // API CLIENT — TẤT CẢ hàm gọi backend
@@ -280,11 +205,15 @@ const apiClient = {
       } catch (error) {
         // Nếu lỗi parse JSON (backend trả binary), trả về object tối thiểu
         // để component vẫn hiển thị được video player
+        // Bắt lỗi đặc biệt: backend trả binary stream thay vì JSON
         const axiosError = error as { code?: string; message?: string }
-        if (axiosError.message?.includes('JSON') || axiosError.code === 'ERR_BAD_RESPONSE') {
-          console.warn('Video endpoint trả binary, component nên dùng URL trực tiếp')
-          throw new Error('Không thể đọc thông tin video. Vui lòng thử lại!')
-        }
+        
+        if (axiosError.code === 'ERR_BAD_RESPONSE' ||
+            axiosError.message?.includes('JSON')   ||
+            axiosError.message?.includes('Unexpected token'))
+          // Component nên dùng URL stream trực tiếp, không gọi API này
+          throw new Error('Định dạng video không hợp lệ. Vui lòng thử lại!')
+        
         throw new Error(getApiErrorMessage(error))
       }
     },

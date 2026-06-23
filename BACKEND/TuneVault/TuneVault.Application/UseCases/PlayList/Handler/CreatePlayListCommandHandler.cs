@@ -33,7 +33,11 @@ public class CreatePlayListCommandHandler:IRequestHandler<CreatePlayListCommand,
 
         };
         //Thêm vào database
-        await _playlist.CreatePlayList(newPlaylist);
+        var isSuccess=await _playlist.CreatePlayList(newPlaylist);
+        if (!isSuccess)
+        {
+            throw new Exception("Không thể tạo Playlist");
+        }
         //Trả về Dto
         return new PlayListDto()
         {

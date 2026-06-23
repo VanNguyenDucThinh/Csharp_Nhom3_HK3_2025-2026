@@ -82,4 +82,16 @@ public class AlbumRepository : IAlbumRepository
     
         return result.ToList();
     }
+
+    public async Task<bool> CheckTrackAlbum(Guid idAlbum, Guid track)
+    {
+        string sql = @"SELECT COUNT(1) 
+                       FROM TrackAlbums 
+                       WHERE AlbumId = @IdAlbum AND MediaId = @IdMedia";
+                       
+        using var connection = _connection.CreateConnection();
+        var count = await connection.ExecuteScalarAsync<int>(sql, new { IdAlbum = idAlbum, IdMedia = track });
+        
+        return count > 0;
+    }
 }

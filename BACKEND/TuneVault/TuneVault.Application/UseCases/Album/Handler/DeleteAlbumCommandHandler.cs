@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using MediatR;
 using TuneVault.Application.UseCases.Album.Command;
 using TuneVault.Domain.Interfaces;
+using TuneVault.Application.CreateException;
 
 namespace TuneVault.Application.UseCases.Album.Handler;
 
@@ -24,12 +25,12 @@ public class DeleteAlbumCommandHandler : IRequestHandler<DeleteAlbumCommand, boo
 
         if (album == null)
         {
-            throw new Exception("Album không tồn tại hoặc đã bị xóa trước đó.");
+            throw new NotFoundException("Album không tồn tại hoặc đã bị xóa trước đó.");
         }
 
         if (album.Owner != _curUser.UserId)
         {
-            throw new Exception("Bạn không có quyền xóa Album này.");
+            throw new UnauthorizedAccessException("Bạn không có quyền xóa Album này.");
         }
 
         var isSuccess = await _album.DeleteAlbum(request.Id);

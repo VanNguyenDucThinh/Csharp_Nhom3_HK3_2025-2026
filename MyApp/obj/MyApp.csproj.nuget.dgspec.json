@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "c:\\Users\\ACER\\Downloads\\Csharp_Nhom3_HK3_2025-2026\\MyApp\\MyApp.csproj": {}
+    "C:\\Users\\ACER\\Downloads\\Csharp_Nhom3_HK3_2025-2026\\MyApp\\MyApp.csproj": {}
   },
   "projects": {
-    "c:\\Users\\ACER\\Downloads\\Csharp_Nhom3_HK3_2025-2026\\MyApp\\MyApp.csproj": {
+    "C:\\Users\\ACER\\Downloads\\Csharp_Nhom3_HK3_2025-2026\\MyApp\\MyApp.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "c:\\Users\\ACER\\Downloads\\Csharp_Nhom3_HK3_2025-2026\\MyApp\\MyApp.csproj",
+        "projectUniqueName": "C:\\Users\\ACER\\Downloads\\Csharp_Nhom3_HK3_2025-2026\\MyApp\\MyApp.csproj",
         "projectName": "MyApp",
-        "projectPath": "c:\\Users\\ACER\\Downloads\\Csharp_Nhom3_HK3_2025-2026\\MyApp\\MyApp.csproj",
+        "projectPath": "C:\\Users\\ACER\\Downloads\\Csharp_Nhom3_HK3_2025-2026\\MyApp\\MyApp.csproj",
         "packagesPath": "C:\\Users\\ACER\\.nuget\\packages\\",
-        "outputPath": "c:\\Users\\ACER\\Downloads\\Csharp_Nhom3_HK3_2025-2026\\MyApp\\obj\\",
+        "outputPath": "C:\\Users\\ACER\\Downloads\\Csharp_Nhom3_HK3_2025-2026\\MyApp\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "C:\\Users\\ACER\\AppData\\Roaming\\NuGet\\NuGet.Config"

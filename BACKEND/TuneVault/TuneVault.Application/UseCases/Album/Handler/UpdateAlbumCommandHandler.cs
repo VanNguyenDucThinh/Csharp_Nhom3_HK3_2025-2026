@@ -26,7 +26,7 @@ public class UpdateAlbumCommandHandler:IRequestHandler<UpdateAlbumCommand, bool>
         var album = await _album.GetAlbum(request.Id);
         if (album.Owner != _curUser.UserId)
         {
-            throw new Exception("Không phải thể sửa Album này");
+            throw new UnauthorizedAccessException("Không phải thể sửa Album này");
         }
         album.Name = request.Name;
         album.NameArtist = request.NameArtist;

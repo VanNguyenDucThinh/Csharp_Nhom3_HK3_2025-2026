@@ -23,7 +23,7 @@ public class RemoveTrackFromPlaylistCommandHandler:IRequestHandler<RemoveTrackFr
         var playList = await _playList.GetPlayListById(request.IdPlayList);
         if(playList.Owner!=_curUser.UserId)
         {
-            throw new Exception("Không thể xóa track của người khác");
+            throw new UnauthorizedAccessException("Không thể xóa track của người khác");
         }
         await _playListTrack.RemoveTrackFromPlaylist(request.IdPlayList,request.IdTrack);
         return true;

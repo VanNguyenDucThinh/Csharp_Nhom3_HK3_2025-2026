@@ -1,7 +1,7 @@
 // src/pages/Login.tsx
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import authService from '../authService'
+import apiClient from '../api/apiClient.ts'
 
 // Chế độ mock — tắt đi khi backend sẵn sàng.
 const USE_MOCK = true
@@ -33,7 +33,7 @@ export default function Login() {
         localStorage.setItem('user', JSON.stringify({ id: '1', username, email: email || `${username}@test.com` }))
         navigate('/')
       } else {
-        await authService.login({ username, password })
+        await apiClient.auth.login({ email, password })
         navigate('/')
       }
     } catch {
@@ -55,7 +55,7 @@ export default function Login() {
         localStorage.setItem('user', JSON.stringify({ id: '1', username, email }))
         navigate('/')
       } else {
-        await authService.register({ username, email, password })
+        await apiClient.auth.register({ username, email, password })
         navigate('/')
       }
     } catch {

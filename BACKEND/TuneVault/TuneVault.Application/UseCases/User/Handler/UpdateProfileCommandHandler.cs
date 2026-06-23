@@ -33,7 +33,11 @@ public class UpdateProfileCommandHandler: IRequestHandler<UpdateProfileCommand, 
         user.AvatarUrl=urlAvatar;
         user.Bio=request.Bio;
         //Lưu lại DataBase
-        await _userProfile.UpdateUserProfile(user);
+        var isSuccess=await _userProfile.UpdateUserProfile(user);
+        if (!isSuccess)
+        {
+            throw new Exception("Update user bị lỗi");
+        }
         //Đóng gói trả về cho react
         return new ProfileUserDto
         {

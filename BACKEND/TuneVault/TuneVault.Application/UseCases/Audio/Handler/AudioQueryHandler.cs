@@ -5,6 +5,7 @@ using TuneVault.Application.UseCases.Audio.Command;
 using TuneVault.Domain.Interfaces;
 using TuneVault.Domain.Entities;
 using TuneVault.Domain.Events;
+using TuneVault.Application.CreateException;
 namespace TuneVault.Application.UseCases.Audio.Handler;
 
 public class AudioQueryHandler:IRequestHandler<AudioQuery,AudioMediaDto>
@@ -26,7 +27,7 @@ public class AudioQueryHandler:IRequestHandler<AudioQuery,AudioMediaDto>
         var audio = await _mediaItem.GetAudioById(request.Id);
         if(audio==null)
         {
-            throw new Exception("Không có bài hát này");
+            throw new NotFoundException("Không có bài hát này");
         }
         await _mediator.Publish(new SaveHistoryEvent(_curUser.UserId,request.Id));
 

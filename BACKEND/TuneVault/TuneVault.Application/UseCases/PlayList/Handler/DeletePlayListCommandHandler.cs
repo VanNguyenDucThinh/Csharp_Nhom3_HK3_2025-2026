@@ -20,7 +20,7 @@ public class DeletePlayListCommandHandler:IRequestHandler<DeletePlayListComman, 
         var playList = await _playList.GetPlayListById(request.IdPlaylist);
         if (playList.Owner != _curUser.UserId)
         {
-            throw new Exception("Không được xóa của người khác");
+            throw new UnauthorizedAccessException("Không được xóa của người khác");
         }
         await _playList.DeletePlayList(request.IdPlaylist);
         return true;

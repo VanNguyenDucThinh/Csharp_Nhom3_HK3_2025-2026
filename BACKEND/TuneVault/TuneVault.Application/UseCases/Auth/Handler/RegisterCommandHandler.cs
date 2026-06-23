@@ -6,6 +6,7 @@ using TuneVault.Application.DTOs;
 using TuneVault.Domain.Interfaces;
 using TuneVault.Domain.Entities;
 using TuneVault.Domain.Events;
+using TuneVault.Application.CreateException;
 
 namespace TuneVault.Application.UseCases.Auth.Handler;
 
@@ -28,7 +29,7 @@ public class RegisterCommandHandler : IRequestHandler<RegisterCommand, AuthRespo
         //Kiem tra email đã tồn tại chưa
         if (await _userProfile.IsEmailTakenAsync(request.Email))
         {
-            throw new Exception("Email đã tồn tại");
+            throw new BadRequestException("Email đã tồn tại");
         }
         //Tạo mới user profile
         var userProfile = new UserProfile
@@ -40,11 +41,14 @@ public class RegisterCommandHandler : IRequestHandler<RegisterCommand, AuthRespo
             
         };
         //Lưu user profile vào database
-        await _userProfile.CreateUserProfile(userProfile);
-        //Sự kiện đăng ký thành công
+        var isSuccess=await _userProfile.CreateUserProfile(userProfile);
+        if (!isSuccess)
+        {
+            throw new Exception("Đăng ký thất bại! Vui lòng thử lại");
+        }
         await _mediator.Publish(new UserRegisteredEvent(userProfile.Id, userProfile.Email, userProfile.Name));
         var token =  _token.GenerateJwt(userProfile.Id, request.Name, request.Email);
-        //Trả về thông tin người dùng và token (JWT)
+
         return new AuthResponseDto
         {
             Id = userProfile.Id,

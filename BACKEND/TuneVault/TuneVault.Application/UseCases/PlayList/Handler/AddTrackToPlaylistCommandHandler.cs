@@ -3,6 +3,7 @@ using MediatR;
 using TuneVault.Application.UseCases.PlayList.Command;
 using TuneVault.Domain.Interfaces;
 using TuneVault.Domain.Entities;
+using TuneVault.Application.CreateException;
 
 namespace TuneVault.Application.UseCases.PlayList.Handler;
 
@@ -29,7 +30,7 @@ public class AddTrackToPlaylistCommandHandler:IRequestHandler<AddTrackToPlaylist
         var playlist = await _playList.GetPlayListById(request.IdPlayList);
         if(playlist == null)
         {
-            throw new KeyNotFoundException("Không tìm thấy Playlist này");
+            throw new NotFoundException("Không tìm thấy Playlist này");
         }
         if(playlist.Owner!=currentUserId)
         {
@@ -40,13 +41,13 @@ public class AddTrackToPlaylistCommandHandler:IRequestHandler<AddTrackToPlaylist
         var media = await _mediaItem.GetAudioById(request.IdTrack);
         if(media==null)
         {
-            throw new Exception("Không có bài hát này");
+            throw new NotFoundException("Không có bài hát này");
         }
         //Kiểm tra bài hát này có trong playlist chưa
         var isTrackExist = await _playListTrack.Exists(request.IdPlayList,request.IdTrack);
         if(isTrackExist)
         {
-            throw new Exception("Bài này đã có trong playlist");
+            throw new BadRequestException("Bài này đã có trong playlist");
         }
         //Thêm track vào playlist
         var addTrack = new PlayListTrack

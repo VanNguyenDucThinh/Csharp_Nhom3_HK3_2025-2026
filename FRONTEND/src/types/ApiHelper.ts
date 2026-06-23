@@ -14,7 +14,7 @@
 import axios from "axios";
 import type { ApiResponse } from "./ApiResponse.ts";
 
-export function getErrorMessage(error: unknown): string {
+export function getApiErrorMessage(error: unknown): string {
   // axios.isAxiosError(...) giúp kiểm tra CHẮC CHẮN đây là lỗi do axios
   // tạo ra (lỗi mạng/lỗi HTTP), để tránh nhầm với lỗi JavaScript thông thường.
   if (axios.isAxiosError(error)) {
@@ -52,7 +52,6 @@ export function getErrorMessage(error: unknown): string {
   return "Đã xảy ra lỗi không xác định. Vui lòng thử lại.";
 }
 
-// Thêm vào CUỐI file ApiHelper.ts:
 export function unwrapApiResponse<T>(
   response: { data: ApiResponse<T> },
   defaultMessage: string

@@ -5,7 +5,7 @@ using MediatR;
 using TuneVault.Application.DTOs;
 using TuneVault.Application.UseCases.Album.Command;
 using TuneVault.Domain.Interfaces;
-
+using TuneVault.Application.CreateException;
 namespace TuneVault.Application.UseCases.Album.Handler;
 
 public class GetAlbumCommandHandler : IRequestHandler<GetAlbumCommand, AlbumDto>
@@ -23,7 +23,7 @@ public class GetAlbumCommandHandler : IRequestHandler<GetAlbumCommand, AlbumDto>
 
         if (album == null)
         {
-            throw new Exception("Album không tồn tại.");
+            throw new NotFoundException("Album không tồn tại.");
         }
 
         return new AlbumDto
