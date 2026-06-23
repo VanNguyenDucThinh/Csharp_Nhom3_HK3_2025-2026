@@ -2,7 +2,7 @@
 // Đây là file lưu trữ. Khi Backend làm xong, copy toàn bộ file này vào file Login.tsx để sử dụng
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import authService from '../authService.ts'
+import apiClient from "../api/apiClient.ts";
 
 export default function Login() {
   const navigate = useNavigate()
@@ -14,10 +14,10 @@ export default function Login() {
   const [error, setError] = useState('')
 
   const handleLogin = async () => {
-    if (!username || !password) { setError('Vui lòng điền đầy đủ thông tin.'); return }
+    if (!email || !password) { setError('Vui lòng điền đầy đủ thông tin.'); return }
     setLoading(true); setError('')
     try {
-      await authService.login({ email, password })
+      await apiClient.auth.login({ email, password });
       navigate('/')
     } catch {
       setError('Tên đăng nhập hoặc mật khẩu không đúng.')
@@ -30,7 +30,7 @@ export default function Login() {
     if (!username || !email || !password) { setError('Vui lòng điền đầy đủ thông tin.'); return }
     setLoading(true); setError('')
     try {
-      await authService.register({ name: username, email, password })
+      await apiClient.auth.register({ name: username, email, password })
       navigate('/')
     } catch {
       setError('Đăng ký thất bại. Tên đăng nhập hoặc email đã tồn tại.')
@@ -58,7 +58,7 @@ export default function Login() {
 
         {/* Form */}
         <div style={styles.form}>
-          <input style={styles.input} type="text" placeholder="Tên đăng nhập" value={username} onChange={e => setUsername(e.target.value)} />
+          <input style={styles.input} type="text" placeholder="Tên đăng ký" value={username} onChange={e => setUsername(e.target.value)} />
 
           {tab === 'register' && (
             <input style={styles.input} type="email" placeholder="Email" value={email} onChange={e => setEmail(e.target.value)} />

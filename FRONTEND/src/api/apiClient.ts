@@ -73,7 +73,7 @@ const apiClient = {
       try {
         // Gọi API, backend trả về ApiResponse<AuthResponseDto>
         const response = await axiosInstance.post<ApiResponse<AuthResponseDto>>(
-          "/auth/register",
+          "/Auth/register",
           data,
         );
         // unwrapApiResponse sẽ kiểm tra success và lấy data ra
@@ -88,7 +88,7 @@ const apiClient = {
     login: async (data: LoginRequest): Promise<AuthResponseDto> => {
       try {
         const response = await axiosInstance.post<ApiResponse<AuthResponseDto>>(
-          "/auth/login",
+          "/Auth/login",
           data,
         );
         return unwrapApiResponse(response, "Đăng nhập thất bại");
@@ -100,7 +100,7 @@ const apiClient = {
     // POST api/auth/logout
     logout: async (): Promise<void> => {
       try {
-        await axiosInstance.post("/auth/logout");
+        await axiosInstance.post("/Auth/logout");
       } catch (error) {
         // Logout thất bại không nghiêm trọng lắm, chỉ cần xóa local data
         // Nên ta log warning thay vì throw, không làm gián đoạn UX
