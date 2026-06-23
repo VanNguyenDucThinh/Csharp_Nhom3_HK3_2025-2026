@@ -4,6 +4,7 @@ using TuneVault.Application.DTOs;
 using TuneVault.Application.UseCases.Auth.Command;
 using TuneVault.Domain.Events;
 using TuneVault.Domain.Interfaces;
+using TuneVault.Application.CreateException;
 
 namespace TuneVault.Application.UseCases.Auth.Handler;
 
@@ -25,13 +26,13 @@ public class LoginCommandHandler : IRequestHandler<LoginCommand, AuthResponseDto
         //Kiểm tra email tồn tại chưa
         if(!userProfile)
         {
-            throw new Exception("Email hoặc mật khẩu không đúng");
+            throw new BadRequestException("Email hoặc mật khẩu không đúng");
         }
         //Kiểm tra mật khẩu
         bool isPasswordValid = BCrypt.Net.BCrypt.Verify(request.Password, userProfilePassword.Password);
         if (!isPasswordValid)
         {
-            throw new Exception("Email hoặc mật khẩu không đúng");
+            throw new BadRequestException("Email hoặc mật khẩu không đúng");
         }
         var token = _token.GenerateJwt(userProfilePassword.Id, userProfilePassword.Name, userProfilePassword.Email);
         //Đăng nhập thành công, trả về thông tin người dùng và token (JWT)

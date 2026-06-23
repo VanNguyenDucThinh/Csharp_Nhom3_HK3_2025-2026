@@ -4,8 +4,11 @@ using System.Threading.Tasks;
 using MediatR;
 using TuneVault.Application.UseCases.Album.Command;
 using TuneVault.Domain.Interfaces;
+using TuneVault.Application.CreateException;
 
 namespace TuneVault.Application.UseCases.Album.Handler;
+
+// Simple BadRequestException used by handlers when a request is invalid
 
 public class AddTrackAlbumCommandHandler : IRequestHandler<AddTrackAlbumCommand, bool>
 {
@@ -29,27 +32,33 @@ public class AddTrackAlbumCommandHandler : IRequestHandler<AddTrackAlbumCommand,
     public async Task<bool> Handle(AddTrackAlbumCommand request, CancellationToken cancellationToken)
     {
         var album = await _album.GetAlbum(request.IdAlbum);
+        var isTrack = await _album.CheckTrackAlbum(request.IdAlbum,request.IdMedia);
 
         if (album == null)
         {
-            throw new Exception("Album không tồn tại.");
+            throw new NotFoundException("Album không tồn tại.");
         }
 
         if (album.Owner != _curUser.UserId)
         {
-            throw new Exception("Bạn không có quyền thêm nhạc vào Album này.");
+            throw new UnauthorizedAccessException("Bạn không có quyền thêm nhạc vào Album này.");
         }
 
         var media = await _mediaItem.GetMediaItemById(request.IdMedia);
 
         if (media == null)
         {
-            throw new Exception("Bài hát không tồn tại.");
+            throw new NotFoundException("Bài hát không tồn tại.");
         }
+        if (isTrack)
+        {
+            throw new BadRequestException("Bài hát này đã có sẵn trong Album.");
+        }
+
 
         if (media.Owner != _curUser.UserId)
         {
-            throw new Exception("Bạn chỉ được phép thêm nhạc do chính mình tải lên.");
+            throw new UnauthorizedAccessException("Bạn chỉ được phép thêm nhạc do chính mình tải lên.");
         }
 
         var isSuccess = await _trackAlbum.AddTrackAlbum(request.IdAlbum, request.IdMedia);

@@ -46,7 +46,11 @@ public class UploadMediaCommandHandler : IRequestHandler<UploadMediaCommand, boo
             UrlImageMedia=urlImage
         };
         //Lưu mediaItem vào database
-        await _mediaRepository.CreateMediaItem(mediaItem);
+        var isSuccess=await _mediaRepository.CreateMediaItem(mediaItem);
+        if (!isSuccess)
+        {
+            throw new Exception("Không tạo được media");
+        }
         //Trả về thông tin media đã được tải lên
         return true;
 

@@ -10,5 +10,6 @@ public interface IAlbumRepository
     Task<bool> UpdateAlbum(Album album);
     Task<Album> GetAlbum(Guid id);
     Task<List<Album>> GetAlbumByTitle(string title, int skip, int take);
+    Task<bool> CheckTrackAlbum(Guid idAlbum, Guid track);
 
 }

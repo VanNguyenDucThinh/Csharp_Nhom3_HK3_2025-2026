@@ -26,13 +26,17 @@ public class UpdatePlayListCommandHandler:IRequestHandler<UpdatePlayListCommand,
         var playlist=await _playList.GetPlayListById(request.IdPlayList);
         if(playlist.Owner!=_curUser.UserId)
         {
-            throw new Exception("Không thể sửa playlist của người khác");
+            throw new UnauthorizedAccessException("Không thể sửa playlist của người khác");
         }
         playlist.Name=request.Name;
         playlist.IsPublic=request.IsPublic;
         var urlImage = await _file.UploadFileAsync(request.FileStream, request.FileName, "image_files", request.ContentType);
 
-        await _playList.UpdatePlayList(playlist);
+        var isSuccess=await _playList.UpdatePlayList(playlist);
+        if (!isSuccess)
+        {
+            throw new Exception("Chỉnh sửa thất bại");
+        }
 
         return true;
 
