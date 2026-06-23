@@ -1,15 +1,16 @@
 // src/AppRoutes.tsx
 import { Routes, Route, Navigate } from "react-router-dom";
-import MainLayout from "./components/layout/MainLayout";
-import Login from "./pages/Login";
-import Home from "./pages/Home";
-import Search from "./pages/Search";
-import Library from "./pages/Library";
-import PlaylistDetail from "./pages/PlaylistDetail";
-import Profile from "./pages/Profile";
-import Notifications from "./pages/Notifications";
-import ShareInbox from "./pages/ShareInbox";
-import Upload from "./pages/Upload";
+import MainLayout from "./components/layout/MainLayout.tsx";
+import Login from "./pages/Login.tsx";
+import Home from "./pages/Home.tsx";
+import Search from "./pages/Search.tsx";
+import Library from "./pages/Library.tsx";
+import FavoriteSongs from "./pages/FavoriteSongs.tsx";
+import PlaylistDetail from "./pages/PlaylistDetail.tsx";
+import Profile from "./pages/Profile.tsx";
+import Notifications from "./pages/Notifications.tsx";
+import ShareInbox from "./pages/ShareInbox.tsx";
+import Upload from "./pages/Upload.tsx";
 
 function isAuthenticated(): boolean {
   return !!localStorage.getItem("token");
@@ -35,6 +36,7 @@ export default function AppRoutes() {
         <Route index element={<Home />} />
         <Route path="search" element={<Search />} />
         <Route path="library" element={<Library />} />
+        <Route path="favorites" element={<FavoriteSongs />} />
         <Route path="upload" element={<Upload />} />
         <Route path="playlist/:id" element={<PlaylistDetail />} />
         <Route path="profile" element={<Profile />} />

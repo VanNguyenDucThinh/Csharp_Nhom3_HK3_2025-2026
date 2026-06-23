@@ -2,7 +2,7 @@
 // Đây là file lưu trữ. Khi Backend làm xong, copy toàn bộ file này vào file Login.tsx để sử dụng
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import authService from '../authService'
+import authService from '../authService.ts'
 
 export default function Login() {
   const navigate = useNavigate()
@@ -17,7 +17,7 @@ export default function Login() {
     if (!username || !password) { setError('Vui lòng điền đầy đủ thông tin.'); return }
     setLoading(true); setError('')
     try {
-      await authService.login({ username, password })
+      await authService.login({ email, password })
       navigate('/')
     } catch {
       setError('Tên đăng nhập hoặc mật khẩu không đúng.')
@@ -30,7 +30,7 @@ export default function Login() {
     if (!username || !email || !password) { setError('Vui lòng điền đầy đủ thông tin.'); return }
     setLoading(true); setError('')
     try {
-      await authService.register({ username, email, password })
+      await authService.register({ name: username, email, password })
       navigate('/')
     } catch {
       setError('Đăng ký thất bại. Tên đăng nhập hoặc email đã tồn tại.')

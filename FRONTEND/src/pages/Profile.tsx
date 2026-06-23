@@ -1,7 +1,8 @@
 // src/pages/Profile.tsx
 import { useEffect, useState } from 'react'
-import apiClient, { showApiError, type User } from '../api/apiClient'
-import authService from '../authService'
+import apiClient, { showApiError } from '../api/apiClient.ts'
+import type { ProfileUserDto as User } from '../types/User.ts'
+import authService from '../authService.ts'
 import { useNavigate } from 'react-router-dom'
 
 export default function Profile() {
@@ -18,8 +19,12 @@ export default function Profile() {
       } catch (err) {
         // Backend lỗi không được làm crash trang; vẫn báo lỗi cho user biết.
         const localUser = authService.getCurrentUser()
-        setUser(localUser)
-        showApiError('Không tải được hồ sơ. Ứng dụng đang dùng dữ liệu đã lưu.', err)
+        setUser(
+          localUser
+            ? { id: localUser.id, name: localUser.name, avatarUrl: '', bio: '' }
+            : null
+        )
+        showApiError(err)
       } finally {
         setLoading(false)
       }
@@ -45,8 +50,8 @@ export default function Profile() {
         </div>
         <div>
           <p style={styles.label}>Hồ sơ</p>
-          <h1 style={styles.name}>{user?.username ?? 'Người dùng'}</h1>
-          <p style={styles.email}>{user?.email}</p>
+          <h1 style={styles.name}>{user?.name ?? 'Người dùng'}</h1>
+          <p style={styles.email}>{authService.getCurrentUser()?.email ?? ''}</p>
         </div>
       </div>
 

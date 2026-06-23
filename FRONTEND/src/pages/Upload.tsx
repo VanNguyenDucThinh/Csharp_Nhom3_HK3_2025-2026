@@ -2,9 +2,9 @@
 // Trang upload media — bắt buộc theo đề (F1: Media Players + Upload)
 import { useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
-import apiClient, { showApiError } from "../api/apiClient";
+import apiClient, { showApiError } from "../api/apiClient.ts";
 
-const USE_MOCK = true;
+const USE_MOCK = false;
 const ACCEPTED_AUDIO = [".mp3", ".wav", ".flac", ".aac", ".ogg"];
 const ACCEPTED_VIDEO = [".mp4", ".webm", ".mkv", ".avi"];
 
@@ -72,8 +72,8 @@ export default function Upload() {
       setSuccess(true);
     } catch (err) {
       // Nếu backend upload lỗi, vẫn hiện alert để user biết nguyên nhân chung.
-      showApiError('Upload thất bại. Backend chưa phản hồi hoặc mạng có vấn đề.', err)
-      setError("Upload thất bại. Vui lòng thử lại.")
+      showApiError(err);
+      setError("Upload thất bại. Vui lòng thử lại.");
     } finally {
       setUploading(false);
     }

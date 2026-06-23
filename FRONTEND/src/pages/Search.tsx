@@ -1,6 +1,8 @@
 // src/pages/Search.tsx
 import { useState } from 'react'
-import apiClient, { showApiError, type MediaItem } from '../api/apiClient'
+import apiClient, { showApiError } from '../api/apiClient.ts'
+import type { MediaDto as MediaItem } from '../types/Media.ts'
+import { Category } from '../types/Media.ts'
 
 export default function Search() {
   const [query, setQuery] = useState('')
@@ -14,10 +16,10 @@ export default function Search() {
     setSearched(true)
     try {
       const data = await apiClient.media.search(query)
-      setResults(data)
+      setResults(data.listMedia ?? [])
     } catch (err) {
       // Nếu API lỗi, thông báo cho user và giữ kết quả cũ rỗng.
-      showApiError('Không tìm kiếm được. Vui lòng kiểm tra kết nối mạng.', err)
+      showApiError(err)
       setResults([])
     } finally {
       setLoading(false)
@@ -71,12 +73,12 @@ export default function Search() {
                   <td style={styles.td}>{idx + 1}</td>
                   <td style={styles.td}>
                     <div style={styles.trackName}>
-                      <span style={styles.typeIcon}>{item.type === 'video' ? '🎬' : '🎵'}</span>
+                      <span style={styles.typeIcon}>🎵</span>
                       {item.title}
                     </div>
                   </td>
                   <td style={{ ...styles.td, color: '#b3b3b3' }}>{item.artist}</td>
-                  <td style={{ ...styles.td, color: '#b3b3b3', textTransform: 'capitalize' }}>{item.type}</td>
+                  <td style={{ ...styles.td, color: '#b3b3b3' }}>{Category[item.category]}</td>
                 </tr>
               ))}
             </tbody>

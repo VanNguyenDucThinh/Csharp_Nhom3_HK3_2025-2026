@@ -1,11 +1,11 @@
 // src/components/layout/MainLayout.tsx
 import { useEffect, useState } from 'react'
 import { Outlet, useNavigate, useLocation } from 'react-router-dom'
-import Sidebar from './Sidebar'
-import PlayerBar from './PlayerBar'
-import RightPanel from './RightPanel'
-import FriendActivity from './FriendActivity'
-import TopHeader from './TopHeader'
+import Sidebar from './Sidebar.tsx'
+import PlayerBar from './PlayerBar.tsx'
+import RightPanel from './RightPanel.tsx'
+import FriendActivity from './FriendActivity.tsx'
+import TopHeader from './TopHeader.tsx'
 
 // Icon thu gọn/mở rộng sidebar (mũi tên)
 function CollapseIcon({ direction }: { direction: 'left' | 'right' }) {

@@ -3,20 +3,20 @@
 // MỤC ĐÍCH: Định nghĩa dữ liệu liên quan tới Media (bài hát / video).
 // Tương ứng Controller "Media" trong backend.
 
-
-// Import PlayListDto từ file playlist.types.ts vì kết quả tìm kiếm/trending
-// có thể chứa danh sách playlist. Dùng "import type" vì ta CHỈ dùng PlayListDto
-// để khai báo KIỂU dữ liệu, không dùng để chạy code thật (TypeScript sẽ tự
-// xoá dòng import này khi build ra JavaScript, không làm nặng file build).
+// Import AlbumDto và PlayListDto vì kết quả tìm kiếm/trending có thể chứa
+// danh sách playlist và danh sách album.
+import type { AlbumDto } from "./Album.ts";
 import type { PlayListDto } from "./Playlist.ts";
 
-// Enum Category từ C# (Category = 0..4)
+// Enum Category từ C#
 export enum Category {
   Pop = 0,
   Rock = 1,
   Jazz = 2,
   Classical = 3,
   HipHop = 4,
+  Remix = 5,
+  Buon = 6,
 }
 
 // DTO chính cho Media
@@ -25,13 +25,12 @@ export enum Category {
  * Đây KHÔNG phải dữ liệu chi tiết để phát nhạc (xem AudioMediaDto / VideoDto).
  */
 export interface MediaDto {
-  id: string;         // Guid -> string
+  id: string; // Guid -> string
   title: string;
   artist: string;
-  urlMedia: string;   // Backend dùng UrlMedia (PascalCase)
-  urlImage: string;   // Backend dùng UrlImage
+  urlMedia: string; // Backend dùng UrlMedia (PascalCase)
+  urlImage: string; // Backend dùng UrlImage
 
- 
   // category: số nguyên đại diện cho LOẠI media (ví dụ: nhạc, video...).
   //
   // TODO (QUAN TRỌNG - cần hỏi backend dev):
@@ -45,22 +44,22 @@ export interface MediaDto {
   // dễ hiểu hơn nhiều so với "category === 0").
   category: Category;
 
-  owner: string;      // Guid của người upload -> string
+  owner: string; // Guid của người upload -> string
 }
 
 // DTO dùng cho GetById (AudioMediaDto) — thiếu một số trường so với MediaDto
 /*
  * Thông tin chi tiết để PHÁT 1 bài hát (Audio).
  * Dùng cho: GET /api/media/Audio/{id}
-*/
+ */
 export interface AudioMediaDto {
   title: string;
   artist: string;
 
   // Đánh dấu "?" vì backend khai báo các field này là nullable (có thể null)
   // bên C# (dùng dấu "?" sau kiểu, ví dụ "string? urlImage").
-  urlImage?: string;  // Có thể null
-  urlMedia?: string;  // Có thể null; đường link file âm thanh thật để frontend phát
+  urlImage?: string; // Có thể null
+  urlMedia?: string; // Có thể null; đường link file âm thanh thật để frontend phát
 }
 
 /**
@@ -89,15 +88,16 @@ export interface VideoDto {
  * danh sách phù hợp với loại tìm kiếm, danh sách khác để trống.
  */
 export interface SearchTrendingDto {
-          listMedia?: MediaDto[];        // Kết quả tìm kiếm
-       listPlayList?: PlayListDto[];    // Playlist liên quan: chi tiết PlayListDto xem ở file src/types/playlist.ts
-  listMediaByArtist?: MediaDto[];       // Cùng artist
-           trending?: MediaDto[];       // Media đang thịnh hành
+  listMedia?: MediaDto[]; // Kết quả tìm kiếm
+  listPlayList?: PlayListDto[]; // Playlist liên quan: chi tiết PlayListDto xem ở file src/types/playlist.ts
+  listMediaByArtist?: MediaDto[]; // Cùng artist
+  listAlbum?: AlbumDto[]; // Album liên quan
+  trending?: MediaDto[]; // Media đang thịnh hành
 
-           // Hai field dưới đây dùng để làm PHÂN TRANG (pagination) ở giao diện,
-           // ví dụ hiển thị "Trang 2/10" hoặc nút "Xem thêm".
-          currentPage: number;
-        totalResults: number;
+  // Hai field dưới đây dùng để làm PHÂN TRANG (pagination) ở giao diện,
+  // ví dụ hiển thị "Trang 2/10" hoặc nút "Xem thêm".
+  currentPage: number;
+  totalResults: number;
 }
 
 /*

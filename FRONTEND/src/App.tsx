@@ -1,6 +1,6 @@
 // src/App.tsx
 import { BrowserRouter } from 'react-router-dom'
-import AppRoutes from './AppRoutes'
+import AppRoutes from './AppRoutes.tsx'
 
 function App() {
   return (

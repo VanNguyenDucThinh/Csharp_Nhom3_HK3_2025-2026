@@ -1,6 +1,8 @@
 // src/pages/Notifications.tsx
 import { useEffect, useState } from 'react'
-import apiClient, { showApiError, type Notification } from '../api/apiClient'
+import apiClient, { showApiError } from '../api/apiClient.ts'
+import { Read } from '../types/Notification.ts'
+import type { NotificationDto as Notification } from '../types/Notification.ts'
 
 export default function Notifications() {
   const [notifications, setNotifications] = useState<Notification[]>([])
@@ -11,11 +13,11 @@ export default function Notifications() {
       setLoading(true)
       try {
         // Gọi API thông báo trong try-catch để backend lỗi không làm crash app.
-        const data = await apiClient.notifications.getAll()
+        const data = await apiClient.notification.getAll()
         setNotifications(data)
       } catch (err) {
         // Nếu backend sập hoặc mất mạng, hiện MessageBox dạng alert.
-        showApiError('Không tải được thông báo. Vui lòng kiểm tra kết nối mạng.', err)
+        showApiError(err)
       } finally {
         setLoading(false)
       }
@@ -25,15 +27,16 @@ export default function Notifications() {
 
   const markAllRead = async () => {
     try {
-      await apiClient.notifications.markAllAsRead()
-      setNotifications(prev => prev.map(n => ({ ...n, isRead: true })))
+      const unread = notifications.filter(n => n.isRead !== Read.Read)
+      await Promise.all(unread.map(n => apiClient.notification.markAsRead(n.id)))
+      setNotifications(prev => prev.map(n => ({ ...n, isRead: Read.Read })))
     } catch (err) {
       // Nếu đánh dấu đã đọc thất bại, vẫn giữ thông báo và báo lỗi cho user.
-      showApiError('Không đánh dấu được thông báo đã đọc. Vui lòng thử lại.', err)
+      showApiError(err)
     }
   }
 
-  const unreadCount = notifications.filter(n => !n.isRead).length
+  const unreadCount = notifications.filter(n => n.isRead !== Read.Read).length
 
   if (loading) return <div style={{ padding: 40, color: '#b3b3b3' }}>Đang tải...</div>
 
@@ -57,8 +60,7 @@ export default function Notifications() {
               <div key={n.id} style={{ ...styles.item, ...(n.isRead ? {} : styles.unread) }}>
                 <div style={styles.dot}>{n.isRead ? '○' : '●'}</div>
                 <div style={styles.content}>
-                  <p style={styles.message}>{n.message}</p>
-                  <p style={styles.time}>{new Date(n.createdAt).toLocaleString('vi-VN')}</p>
+                  <p style={styles.message}>{n.payload}</p>
                 </div>
               </div>
             ))}
