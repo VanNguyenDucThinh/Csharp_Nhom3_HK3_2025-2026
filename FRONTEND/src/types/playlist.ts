@@ -34,7 +34,8 @@ export interface PlayListDto {
  */
 export interface CreateOrUpdatePlaylistRequest {
   name?: string;
-  urlImage?: string; // ảnh bìa, có thể là file upload
+  file?: File; // ✅ thêm field file để upload ảnh // IFormFile từ backend → trong FormData dùng key "File"
+  isPublic: number;  // PlayListStatus: 0 = Private, 1 = Public (theo backend enum)
 }
  
 /**

@@ -13,25 +13,16 @@ namespace TuneVault.API.Controllers
     {
         private readonly ICurentUserService _currentUserService;
 
-        public HistoryController(ICurentUserService currentUserService)
-        {
-            _currentUserService = currentUserService;
-        }
+        public HistoryController(ICurentUserService currentUserService){_currentUserService = currentUserService;}
+
         [HttpGet]
         [Authorize]
+
         public async Task<IActionResult> GetHistory()
         {
             var command = new GetHistoryQuery();
             var result = await Mediator.Send(command);
-            if (result == null)
-            {
-                return NotFound("Không tìm thấy lịch sử nghe nhạc."); 
-            }
-
-            return Ok(result);
+            return Ok(new ApiResponse<HistoryMediaDto[]>(result.ToArray()));
         }
-        
-
-
     }
 }

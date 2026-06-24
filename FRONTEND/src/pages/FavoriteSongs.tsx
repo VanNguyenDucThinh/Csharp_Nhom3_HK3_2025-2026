@@ -53,10 +53,6 @@ export default function FavoriteSongs() {
         <h1 className="text-3xl font-semibold text-white">
           Danh sách bài hát yêu thích
         </h1>
-        <p className="mt-2 text-sm text-zinc-400">
-          Dữ liệu lấy từ backend và hiển thị theo trạng thái loading / success /
-          error.
-        </p>
       </header>
 
       {/* 1) Loading */}

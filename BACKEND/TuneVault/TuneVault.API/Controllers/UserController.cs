@@ -16,7 +16,7 @@ public class UserController : BaseApiController
     {
         var query = new GetProfileQuery(CurrentUserId);
         var result = await Mediator.Send(query);
-        return Ok(result);
+        return Ok(new ApiResponse<ProfileUserDto>(result));
     }
     [HttpGet("{id:guid}")]
     [AllowAnonymous]
@@ -26,7 +26,7 @@ public class UserController : BaseApiController
     {
         var query = new GetProfileQuery(id);
         var result = await Mediator.Send(query);
-        return Ok(result);
+        return Ok(new ApiResponse<ProfileUserDto>(result));
     }
     [HttpPut("profile")]
     [Authorize]

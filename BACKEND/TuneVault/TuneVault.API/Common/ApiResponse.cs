@@ -11,6 +11,18 @@ public class ApiResponse<T>
     public T? Data { get; set; }
     public IEnumerable<string>? Errors { get; set; }
 
+    // Constructor mặc định
+    public ApiResponse() { }
+
+
+    // Constructor nhận data
+    public ApiResponse(T data)
+    {
+        Success = true;
+        Data = data;
+    }
+
+    // Constructor nhận data + message
     public static ApiResponse<T> Ok(T data, string? message = null) => new()
     {
         Success = true,

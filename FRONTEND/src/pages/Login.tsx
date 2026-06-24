@@ -8,8 +8,6 @@ import { useState, type FormEvent } from "react";
 import { useNavigate } from "react-router-dom";
 import apiClient from "../api/apiClient.ts";
 
-const USE_MOCK = false;
-
 export default function Login() {
   const navigate = useNavigate();
   const [tab, setTab] = useState<"login" | "register">("login");

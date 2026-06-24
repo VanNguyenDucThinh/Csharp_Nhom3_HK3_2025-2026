@@ -73,7 +73,7 @@ const apiClient = {
       try {
         // Gọi API, backend trả về ApiResponse<AuthResponseDto>
         const response = await axiosInstance.post<ApiResponse<AuthResponseDto>>(
-          "/Auth/register",
+          "/auth/register",
           data,
         );
         // unwrapApiResponse sẽ kiểm tra success và lấy data ra
@@ -88,7 +88,7 @@ const apiClient = {
     login: async (data: LoginRequest): Promise<AuthResponseDto> => {
       try {
         const response = await axiosInstance.post<ApiResponse<AuthResponseDto>>(
-          "/Auth/login",
+          "/auth/login",
           data,
         );
         return unwrapApiResponse(response, "Đăng nhập thất bại");
@@ -115,7 +115,7 @@ const apiClient = {
     getMe: async (): Promise<ProfileUserDto> => {
       try {
         const response =
-          await axiosInstance.get<ApiResponse<ProfileUserDto>>("/user/profile");
+          await axiosInstance.get<ApiResponse<ProfileUserDto>>("/User/profile");
         return unwrapApiResponse(response, "Không thể lấy thông tin profile");
       } catch (error) {
         throw new Error(getApiErrorMessage(error));
@@ -141,7 +141,7 @@ const apiClient = {
     update: async (formData: FormData): Promise<ProfileUserDto> => {
       try {
         const response = await axiosInstance.put<ApiResponse<ProfileUserDto>>(
-          "/User/profile",
+          "/user/profile",
           formData,
           { headers: { "Content-Type": "multipart/form-data" } },
         );
@@ -158,7 +158,7 @@ const apiClient = {
     upload: async (formData: FormData): Promise<unknown> => {
       try {
         const response = await axiosInstance.post<ApiResponse<unknown>>(
-          "/Media/upload",
+          "/media/upload",
           formData,
           { headers: { "Content-Type": "multipart/form-data" } },
         );
@@ -447,14 +447,48 @@ const apiClient = {
     // GET api/history
     getRecent: async (): Promise<HistoryMediaDto[]> => {
       try {
-        const response =
-          await axiosInstance.get<ApiResponse<HistoryMediaDto[]>>("/history");
-        return unwrapApiResponse(response, "Không thể lấy lịch sử phát");
+        const response = await axiosInstance.get<ApiResponse<HistoryMediaDto[]>>("/history");
+        return unwrapApiResponse(response, 'Không tìm thấy lịch sử phát');
       } catch (error) {
         throw new Error(getApiErrorMessage(error));
       }
     },
   },
+
+  // --- USER FOLLOW (api/user) ---
+  // Backend: POST api/user/{id}/follow  |  DELETE api/user/{id}/follow
+  // Trả về: ApiResponse<FollowDto>
+  // Tại sao cần unwrapApiResponse? Vì backend bọc dữ liệu trong ApiResponse,
+  // ta chỉ cần lấy "ruột" (FollowDto) ra, đồng thời kiểm tra success = true.
+  follow: {
+    // Theo dõi người dùng: POST /api/user/{id}/follow
+    add: async (id: string): Promise<FollowDto> => {
+      try {
+        const response = await axiosInstance.post<ApiResponse<FollowDto>>(
+          `/user/${id}/follow`,
+        );
+        // unwrapApiResponse kiểm tra success, nếu false thì throw luôn
+        return unwrapApiResponse(response, "Theo dõi thất bại");
+      } catch (error) {
+        throw new Error(getApiErrorMessage(error));
+      }
+    },
+
+    // Bỏ theo dõi người dùng: DELETE /api/user/{id}/follow
+    // Lưu ý: Backend dùng CÙNG 1 command (UserFollowCommand) cho POST và DELETE,
+    // command này là "toggle" — gọi lại khi đang follow sẽ tự unfollow.
+    remove: async (id: string): Promise<FollowDto> => {
+      try {
+        const response = await axiosInstance.delete<ApiResponse<FollowDto>>(
+          `/user/${id}/follow`,
+        );
+        return unwrapApiResponse(response, "Bỏ theo dõi thất bại");
+      } catch (error) {
+        throw new Error(getApiErrorMessage(error));
+      }
+    },
+  },
+
 };
 
 // ============================================================
