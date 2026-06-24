@@ -4,6 +4,8 @@ using TuneVault.API.Middlewares;
 using TuneVault.Application;
 using TuneVault.Infrastructure;
 using TuneVault.Infrastructure.Services.JWT;
+using Microsoft.Extensions.FileProviders;
+using System.IO;
 
 var builder = WebApplication.CreateBuilder(args);
 ;
@@ -43,7 +45,21 @@ if (app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 
 // 4. Static files (phục vụ file upload từ wwwroot/uploads)
-app.UseStaticFiles();
+var mediaFolderPath = Path.Combine(Directory.GetCurrentDirectory(), "media_files");
+
+// IN RA MÀN HÌNH ĐỂ BẠN THẤY CHÍNH XÁC ĐƯỜNG DẪN:
+Console.WriteLine($"\n[CẢNH BÁO DEBUG] SERVER ĐANG TÌM NHẠC TẠI THƯ MỤC: {mediaFolderPath}\n");
+
+if (!Directory.Exists(mediaFolderPath))
+{
+    Directory.CreateDirectory(mediaFolderPath);
+}
+
+app.UseStaticFiles(new StaticFileOptions
+{
+    FileProvider = new PhysicalFileProvider(mediaFolderPath),
+    RequestPath = "/media_files"
+});
 
 // 5. CORS — phải trước Authentication
 app.UseCors("CorsPolicy");

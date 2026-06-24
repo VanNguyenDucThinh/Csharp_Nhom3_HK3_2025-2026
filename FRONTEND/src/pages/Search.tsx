@@ -3,12 +3,16 @@ import { useState } from 'react'
 import apiClient, { showApiError } from '../api/apiClient.ts'
 import type { MediaDto as MediaItem } from '../types/Media.ts'
 import { Category } from '../types/Media.ts'
+import { usePlayer } from './PlayerContext.tsx' // Kết nối tới trạm trung tâm (Global State)
 
 export default function Search() {
   const [query, setQuery] = useState('')
   const [results, setResults] = useState<MediaItem[]>([])
   const [loading, setLoading] = useState(false)
   const [searched, setSearched] = useState(false)
+
+  // Lấy cái "micro" (hàm playTrack) từ trạm trung tâm để báo cho AudioPlayer biết
+  const { playTrack } = usePlayer()
 
   const handleSearch = async () => {
     if (!query.trim()) return
@@ -28,6 +32,26 @@ export default function Search() {
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter') handleSearch()
+  }
+
+  // Hàm này sẽ chạy khi bạn bấm vào một bài hát trong danh sách
+  const handlePlayTrack = async (id: string) => {
+    try {
+      const response = await apiClient.media.getById(id)
+      
+      // BÓC VỎ DỮ LIỆU Ở ĐÂY:
+      // Kiểm tra xem backend có bọc dữ liệu trong biến 'data' không
+      // Ép kiểu (response as any) để lách qua trình kiểm tra của TypeScript
+    const realTrackData = (response as any).data ? (response as any).data : response;
+    console.log("3. Search.tsx đã lấy được nhạc:", realTrackData);
+
+      // Truyền đúng phần nhân dữ liệu sang cho thanh Player
+      playTrack(realTrackData)
+      
+    } catch (error) {
+      showApiError(error)
+      alert("Không thể tải bài nhạc này. Vui lòng thử lại.")
+    }
   }
 
   return (
@@ -69,7 +93,12 @@ export default function Search() {
             </thead>
             <tbody>
               {results.map((item, idx) => (
-                <tr key={item.id} style={styles.row}>
+                <tr 
+                  key={item.id} 
+                  style={styles.row}
+                  // Gắn sự kiện onClick vào đây!
+                  onClick={() => handlePlayTrack(item.id)}
+                >
                   <td style={styles.td}>{idx + 1}</td>
                   <td style={styles.td}>
                     <div style={styles.trackName}>

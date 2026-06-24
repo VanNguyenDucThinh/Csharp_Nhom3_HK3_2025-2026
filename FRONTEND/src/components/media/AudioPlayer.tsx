@@ -1,77 +1,111 @@
 // src/components/media/AudioPlayer.tsx
-import { useRef, useState, useEffect } from 'react'
+import { useRef, useState, useEffect } from 'react';
+import { usePlayer } from '../../pages/PlayerContext.tsx'; // Kết nối với trạm phát sóng
 
-interface Props {
-  src: string
-  title?: string
-  artist?: string
-  coverUrl?: string
-  autoPlay?: boolean
-}
+export default function AudioPlayer() {
+  // Lấy thông tin bài hát hiện tại từ Global State
+  const { currentTrack } = usePlayer();
+  console.log("0. [AudioPlayer] Đang bắt sóng, currentTrack hiện tại là:", currentTrack);
 
-export default function AudioPlayer({ src, title = 'Không có tiêu đề', artist = 'Nghệ sĩ chưa rõ', coverUrl, autoPlay = false }: Props) {
-  const audioRef = useRef<HTMLAudioElement>(null)
-  const [isPlaying, setIsPlaying] = useState(false)
-  const [currentTime, setCurrentTime] = useState(0)
-  const [duration, setDuration] = useState(0)
-  const [volume, setVolume] = useState(0.8)
+  const audioRef = useRef<HTMLAudioElement>(null);
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [currentTime, setCurrentTime] = useState(0);
+  const [duration, setDuration] = useState(0);
+  const [volume, setVolume] = useState(0.8);
 
   const formatTime = (secs: number) => {
-    if (!secs || isNaN(secs)) return '0:00'
-    const m = Math.floor(secs / 60)
-    const s = Math.floor(secs % 60)
-    return `${m}:${s < 10 ? '0' : ''}${s}`
-  }
+    if (!secs || isNaN(secs)) return '0:00';
+    const m = Math.floor(secs / 60);
+    const s = Math.floor(secs % 60);
+    return `${m}:${s < 10 ? '0' : ''}${s}`;
+  };
 
+  // Lắng nghe sự kiện của thẻ audio
   useEffect(() => {
-    const audio = audioRef.current
-    if (!audio) return
-    const onLoaded = () => setDuration(audio.duration)
-    const onTimeUpdate = () => setCurrentTime(audio.currentTime)
-    const onEnded = () => setIsPlaying(false)
-    audio.addEventListener('loadedmetadata', onLoaded)
-    audio.addEventListener('timeupdate', onTimeUpdate)
-    audio.addEventListener('ended', onEnded)
+    const audio = audioRef.current;
+    if (!audio) return;
+    const onLoaded = () => setDuration(audio.duration);
+    const onTimeUpdate = () => setCurrentTime(audio.currentTime);
+    const onEnded = () => setIsPlaying(false);
+    
+    audio.addEventListener('loadedmetadata', onLoaded);
+    audio.addEventListener('timeupdate', onTimeUpdate);
+    audio.addEventListener('ended', onEnded);
+    
     return () => {
-      audio.removeEventListener('loadedmetadata', onLoaded)
-      audio.removeEventListener('timeupdate', onTimeUpdate)
-      audio.removeEventListener('ended', onEnded)
-    }
-  }, [src])
+      audio.removeEventListener('loadedmetadata', onLoaded);
+      audio.removeEventListener('timeupdate', onTimeUpdate);
+      audio.removeEventListener('ended', onEnded);
+    };
+  }, [currentTrack]); // Reset lại event khi đổi bài
 
+  // Xử lý thay đổi âm lượng
   useEffect(() => {
-    if (audioRef.current) audioRef.current.volume = volume
-  }, [volume])
+    if (audioRef.current) audioRef.current.volume = volume;
+  }, [volume]);
+
+  // Tự động Tải, Phát nhạc và đổi nút sang "⏸" khi có bài hát mới được truyền vào
+  useEffect(() => {
+    if (currentTrack && audioRef.current) {
+      // Ép thẻ audio nạp lại nguồn src mới vừa được cập nhật đầy đủ domain tuyệt đối
+      audioRef.current.load();
+      
+      audioRef.current.play().then(() => {
+        setIsPlaying(true);
+      }).catch((e) => console.log("Lỗi trình duyệt chặn autoplay:", e));
+    }
+  }, [currentTrack]);
 
   const togglePlay = () => {
-    if (!audioRef.current) return
+    if (!audioRef.current) return;
     if (isPlaying) {
-      audioRef.current.pause()
+      audioRef.current.pause();
     } else {
-      audioRef.current.play()
+      audioRef.current.play();
     }
-    setIsPlaying(!isPlaying)
-  }
+    setIsPlaying(!isPlaying);
+  };
 
   const handleSeek = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const val = Number(e.target.value)
-    if (audioRef.current) audioRef.current.currentTime = val
-    setCurrentTime(val)
-  }
+    const val = Number(e.target.value);
+    if (audioRef.current) audioRef.current.currentTime = val;
+    setCurrentTime(val);
+  };
 
+  // Nếu chưa có bài hát nào được chọn, hiển thị giao diện trống
+  if (!currentTrack) {
+    return (
+      <div style={styles.wrapper}>
+        <div style={{ margin: '0 auto', color: '#b3b3b3', fontSize: 14 }}>
+          Hãy chọn một bài hát để phát
+        </div>
+      </div>
+    );
+  }
+  // Khai báo domain của Backend để xử lý đường dẫn tương đối (Relative Path)
+  const BACKEND_DOMAIN = "http://localhost:5124";
+  console.log("1. Dữ liệu bài hát nhận được:", currentTrack);
+  
+  // Ghép nối chuỗi hoàn chỉnh để trỏ đúng về cổng của Server API (.NET)
+  const fullAudioSrc = currentTrack.urlMedia?.startsWith("http")
+    ? currentTrack.urlMedia
+    : `${BACKEND_DOMAIN}/${currentTrack.urlMedia}`;
+
+  // Giao diện khi có bài hát
   return (
     <div style={styles.wrapper}>
-      <audio ref={audioRef} src={src} autoPlay={autoPlay} />
+      {/* Nguồn nhạc thực tế đã được xử lý đường dẫn tuyệt đối */}
+      <audio ref={audioRef} src={fullAudioSrc} />
 
       {/* Cover + Info */}
       <div style={styles.info}>
-        {coverUrl
-          ? <img src={coverUrl} alt="cover" style={styles.cover} />
+        {currentTrack.urlImage
+          ? <img src={currentTrack.urlImage} alt="cover" style={styles.cover} />
           : <div style={styles.coverPlaceholder}>🎵</div>
         }
         <div>
-          <div style={styles.title}>{title}</div>
-          <div style={styles.artist}>{artist}</div>
+          <div style={styles.title}>{currentTrack.title}</div>
+          <div style={styles.artist}>{currentTrack.artist || 'Nghệ sĩ chưa rõ'}</div>
         </div>
       </div>
 
@@ -106,7 +140,7 @@ export default function AudioPlayer({ src, title = 'Không có tiêu đề', art
         />
       </div>
     </div>
-  )
+  );
 }
 
 const styles: Record<string, React.CSSProperties> = {
@@ -121,4 +155,4 @@ const styles: Record<string, React.CSSProperties> = {
   slider: { flex: 1, accentColor: '#1DB954', cursor: 'pointer' },
   time: { fontSize: 11, color: '#b3b3b3', fontFamily: 'monospace', minWidth: 35 },
   volume: { display: 'flex', alignItems: 'center', gap: 6 },
-}
+};

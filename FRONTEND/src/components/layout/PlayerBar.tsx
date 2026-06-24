@@ -1,7 +1,8 @@
 // src/components/layout/PlayerBar.tsx
 import { useState, useRef, useEffect } from 'react'
+import { usePlayer } from '../../pages/PlayerContext.tsx' // Đảm bảo đường dẫn này đúng với dự án của bạn
 
-// Icon play/t pause
+// Icon play/pause
 const PlayIcon = () => <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><polygon points="5,3 19,12 5,21" /></svg>
 const PauseIcon = () => (
   <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
@@ -21,7 +22,7 @@ const NextIcon = () => (
   </svg>
 )
 
-// Icon âm lượng - có 2 trạng thái: bật và tắt
+// Icon âm lượng
 const VolumeIcon = () => (
   <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
     <path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02z"/>
@@ -33,7 +34,7 @@ const MutedVolumeIcon = () => (
   </svg>
 )
 
-// Icon chức năng phát nhạc
+// Icon chức năng
 const ShuffleIcon = () => (
   <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
     <path d="M10.59 9.17L5.41 4 4 5.41l5.17 5.17 1.42-1.41zM14.5 4l2.04 2.04L4 18.59 5.41 20 17.96 7.46 20 9.5V4h-5.5zm.33 9.41l-1.41 1.41 3.13 3.13L14.5 20H20v-5.5l-2.04 2.04-3.13-3.13z"/>
@@ -46,11 +47,20 @@ const RepeatIcon = () => (
 )
 
 export default function PlayerBar() {
+  // === TÍCH HỢP CONTEXT ĐỂ NHẬN NHẠC TỪ BACKEND ===
+  const { currentTrack } = usePlayer()
+  const BACKEND_DOMAIN = "http://localhost:5124"
+  
+  // Xử lý link nhạc
+  const fullAudioSrc = currentTrack?.urlMedia
+    ? (currentTrack.urlMedia.startsWith("http") ? encodeURI(currentTrack.urlMedia) : `${BACKEND_DOMAIN}/${encodeURI(currentTrack.urlMedia)}`)
+    : ""
+
   const [isPlaying, setIsPlaying] = useState(false)
   const [currentTime, setCurrentTime] = useState(0)
   const [duration, setDuration] = useState(0)
-  const [volume, setVolume] = useState(1) // Âm lượng mặc định max để khớp Spotify.
-  const [lastVolume, setLastVolume] = useState(1) // Lưu âm lượng trước khi tắt tiếng để khôi phục khi cần.
+  const [volume, setVolume] = useState(1)
+  const [lastVolume, setLastVolume] = useState(1)
   const [isDraggingVolume, setIsDraggingVolume] = useState(false)
   const [liked, setLiked] = useState(false)
   const [shuffle, setShuffle] = useState(false)
@@ -59,9 +69,7 @@ export default function PlayerBar() {
   const volumeRef = useRef<HTMLDivElement>(null)
   const isDraggingVolumeRef = useRef(false)
 
-  const sampleAudioUrl = 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3'
-
-  // Định dạng thời gian bài hát thành dạng mm:ss để hiển thị dễ đọc.
+  // Định dạng thời gian
   const formatTime = (secs: number) => {
     if (!secs || isNaN(secs)) return '00:00'
     const m = Math.floor(secs / 60)
@@ -69,7 +77,7 @@ export default function PlayerBar() {
     return `${m < 10 ? '0' : ''}${m}:${s < 10 ? '0' : ''}${s}`
   }
 
-  // Lắng nghe sự kiện audio để cập nhật thời gian phát thực tế.
+  // Lắng nghe sự kiện audio
   useEffect(() => {
     const audio = audioRef.current
     if (!audio) return
@@ -86,38 +94,46 @@ export default function PlayerBar() {
     }
   }, [])
 
-  // Áp dụng âm lượng cho audio element mỗi khi state volume thay đổi.
+  // TỰ ĐỘNG PHÁT KHI CÓ BÀI HÁT MỚI
+  useEffect(() => {
+    if (currentTrack && audioRef.current) {
+      audioRef.current.play().then(() => {
+        setIsPlaying(true);
+      }).catch(err => {
+        console.error("Lỗi tự động phát (có thể do trình duyệt chặn):", err);
+        setIsPlaying(false);
+      });
+    }
+  }, [currentTrack])
+
+  // Áp dụng âm lượng
   useEffect(() => {
     if (audioRef.current) audioRef.current.volume = volume
   }, [volume])
 
-  // Chuyển đổi trạng thái play/pause khi người dùng bấm nút phát.
   const togglePlay = () => {
-    if (!audioRef.current) return
+    if (!audioRef.current || !currentTrack) return // Không có nhạc thì không cho play
     if (isPlaying) audioRef.current.pause()
     else audioRef.current.play().catch(console.error)
     setIsPlaying(!isPlaying)
   }
 
-  // Bật/tắt âm thanh: nếu đang có tiếng thì tắt, nếu đang muted thì trở lại max.
   const toggleMute = () => {
     if (volume > 0) {
       setLastVolume(volume)
       setVolume(0)
     } else {
-      setLastVolume(1)
-      setVolume(1)
+      setLastVolume(lastVolume === 0 ? 1 : lastVolume)
+      setVolume(lastVolume === 0 ? 1 : lastVolume)
     }
   }
 
-  // Cập nhật âm lượng khi kéo thanh hoặc bấm vào track.
   const handleVolumeChange = (value: number) => {
     const safeValue = Math.min(Math.max(value, 0), 1)
     if (safeValue > 0) setLastVolume(safeValue)
     setVolume(safeValue)
   }
 
-  // Tính tọa độ chuột trong thanh volume rồi đổi thành phần trăm 0-1.
   const updateVolumeFromPointer = (clientX: number) => {
     const element = volumeRef.current
     if (!element) return
@@ -126,7 +142,6 @@ export default function PlayerBar() {
     handleVolumeChange(ratio)
   }
 
-  // Khi người dùng bấm vào thanh volume, cập nhật ngay giá trị và cho phép kéo tiếp.
   const handleVolumePointerDown = (event: React.PointerEvent<HTMLDivElement>) => {
     isDraggingVolumeRef.current = true
     setIsDraggingVolume(true)
@@ -134,36 +149,36 @@ export default function PlayerBar() {
     event.currentTarget.setPointerCapture(event.pointerId)
   }
 
-  // Khi người dùng kéo chuột trên thanh volume, cập nhật âm lượng theo vị trí mới.
   const handleVolumePointerMove = (event: React.PointerEvent<HTMLDivElement>) => {
     if (!isDraggingVolumeRef.current) return
     updateVolumeFromPointer(event.clientX)
   }
 
-  // Khi thả chuột, kết thúc trạng thái kéo để thanh trở lại màu trắng nếu chưa hover.
   const handleVolumePointerUp = (event: React.PointerEvent<HTMLDivElement>) => {
     isDraggingVolumeRef.current = false
     setIsDraggingVolume(false)
     try {
       event.currentTarget.releasePointerCapture(event.pointerId)
-    } catch {
-      // Một số trình duyệt có thể đã tự thả pointer, bỏ qua lỗi nhỏ này.
-    }
+    } catch {}
   }
 
-  // Tính phần trăm tiến trình bài hát để vẽ thanh progress.
   const progressPercent = duration ? (currentTime / duration) * 100 : 0
 
   return (
     <div style={styles.container}>
-      <audio ref={audioRef} src={sampleAudioUrl} />
+      {/* Nguồn nhạc bây giờ là fullAudioSrc linh động */}
+      <audio ref={audioRef} src={fullAudioSrc} />
 
-      {/* Phần 1: Thông tin bài hát + nút yêu thích */}
+      {/* Phần 1: Thông tin bài hát (Load từ currentTrack) */}
       <div style={styles.trackSection}>
-        <img src="https://picsum.photos/seed/tune/48/48" alt="cover" style={styles.cover} />
+        <img 
+          src={currentTrack?.urlImage ? `${BACKEND_DOMAIN}/${currentTrack.urlImage}` : "https://picsum.photos/seed/tune/48/48"} 
+          alt="cover" 
+          style={styles.cover} 
+        />
         <div style={styles.trackText}>
-          <div style={styles.trackTitle}>SoundHelix Song 1</div>
-          <div style={styles.trackArtist}>Bản Nhạc Thử Nghiệm</div>
+          <div style={styles.trackTitle}>{currentTrack?.title || "Chưa có bài hát"}</div>
+          <div style={styles.trackArtist}>{currentTrack?.artist || "Hãy chọn một bài"}</div>
         </div>
         <button
           className="btn-icon"
@@ -213,7 +228,7 @@ export default function PlayerBar() {
         </div>
       </div>
 
-      {/* Phần 3: Âm lượng Spotify-style */}
+      {/* Phần 3: Âm lượng */}
       <div style={styles.volumeSection}>
         <button
           className="btn-icon"

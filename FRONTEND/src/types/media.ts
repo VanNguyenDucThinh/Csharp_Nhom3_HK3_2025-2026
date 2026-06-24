@@ -27,6 +27,7 @@ export interface MediaDto {
   id: string;        // Guid -> string
   title: string;
   artist: string;
+  urlMedia: string;  // Đường dẫn file (PascalCase từ backend)
   urlImage: string;  // Đường dẫn ảnh đại diện
   category: Category; // Thể loại nhạc (Pop, Rock, Remix...)
   owner: string;     // Guid của người upload -> string
@@ -63,7 +64,7 @@ export interface SearchTrendingDto {
   listPlayList?: PlayListDto[];
   listMediaByArtist?: MediaDto[];
   listAlbum?: AlbumDto[];
-  listTrending?: MediaDto[];
+  trending?: MediaDto[];
 
   // Phục vụ cho tính năng phân trang (Pagination) trên UI
   currentPage: number;

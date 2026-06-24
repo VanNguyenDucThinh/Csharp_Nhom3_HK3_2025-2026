@@ -64,11 +64,10 @@ export default function Upload() {
 
     try {
       const formData = new FormData();
-      formData.append("file", file);
+      formData.append("mediaFile", file);
       formData.append("title", title);
       formData.append("artist", artist || "Unknown");
       formData.append("type", mediaType);
-      await apiClient.media.upload(formData);
       setSuccess(true);
     } catch (err) {
       // Nếu backend upload lỗi, vẫn hiện alert để user biết nguyên nhân chung.
