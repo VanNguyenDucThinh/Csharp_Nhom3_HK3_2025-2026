@@ -247,7 +247,7 @@ const styles: Record<string, React.CSSProperties> = {
   previewIcon: { width: 56, height: 56, borderRadius: 14, backgroundColor: "#1DB954", color: "#000", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 28, fontWeight: 800, flexShrink: 0 },
   previewTitle: { color: "#fff", fontSize: 18, fontWeight: 800, marginBottom: 4 },
   previewDesc: { color: "#b3b3b3", fontSize: 13 },
-  overlay: { position: "relative", zIndex: 2, display: "flex", alignItems: "center", justifyContent: "center", width: "100%", padding: 24, backgroundColor: "rgba(0,0,0,0.46)", backdropFilter: "blur(8px)" },
+  overlay: { position: "fixed", top: 0, left: 0, zIndex: 100, display: "flex", alignItems: "center", justifyContent: "center", width: "100vw", height: "100vh", padding: 24, backgroundColor: "transparent", backdropFilter: "blur(2px)" },
   card: { backgroundColor: "#ffffff", color: "#121212", padding: "44px 36px", borderRadius: 18, width: 420, display: "flex", flexDirection: "column", boxShadow: "0 24px 80px rgba(0,0,0,0.45)" },
   logo: { color: "#1DB954", fontSize: 34, fontWeight: 800, textAlign: "center", margin: "0 0 8px" },
   sub: { color: "#535353", fontSize: 14, textAlign: "center", marginBottom: 24 },
