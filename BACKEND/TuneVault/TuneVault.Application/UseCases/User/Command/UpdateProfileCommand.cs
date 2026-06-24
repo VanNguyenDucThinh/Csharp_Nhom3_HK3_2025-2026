@@ -21,5 +21,4 @@ public class UpdateProfileCommand: IRequest<ProfileUserDto>
         ContentType=contentType;
         FileStream=fileStream;
     }
-
 }

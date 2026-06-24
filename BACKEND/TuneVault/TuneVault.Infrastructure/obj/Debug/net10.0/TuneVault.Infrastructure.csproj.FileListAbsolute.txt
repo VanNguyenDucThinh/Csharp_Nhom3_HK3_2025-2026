@@ -17,24 +17,6 @@ C:\Users\DUC KHAN\Documents\GitHub\Csharp_Nhom3_HK3_2025-2026\BACKEND\TuneVault\
 C:\Users\DUC KHAN\Documents\GitHub\Csharp_Nhom3_HK3_2025-2026\BACKEND\TuneVault\TuneVault.Infrastructure\obj\Debug\net10.0\TuneVault.Infrastructure.pdb
 C:\Users\DUC KHAN\Documents\GitHub\Csharp_Nhom3_HK3_2025-2026\BACKEND\TuneVault\TuneVault.Infrastructure\obj\Debug\net10.0\ref\TuneVault.Infrastructure.dll
 <<<<<<< Updated upstream
-C:\Users\Van Nguyen Duc Thinh\Documents\GitHub\Csharp_Nhom3_HK3_2025-2026\BACKEND\TuneVault\TuneVault.Infrastructure\bin\Debug\net10.0\TuneVault.Infrastructure.deps.json
-C:\Users\Van Nguyen Duc Thinh\Documents\GitHub\Csharp_Nhom3_HK3_2025-2026\BACKEND\TuneVault\TuneVault.Infrastructure\bin\Debug\net10.0\TuneVault.Infrastructure.dll
-C:\Users\Van Nguyen Duc Thinh\Documents\GitHub\Csharp_Nhom3_HK3_2025-2026\BACKEND\TuneVault\TuneVault.Infrastructure\bin\Debug\net10.0\TuneVault.Infrastructure.pdb
-C:\Users\Van Nguyen Duc Thinh\Documents\GitHub\Csharp_Nhom3_HK3_2025-2026\BACKEND\TuneVault\TuneVault.Infrastructure\bin\Debug\net10.0\TuneVault.Application.dll
-C:\Users\Van Nguyen Duc Thinh\Documents\GitHub\Csharp_Nhom3_HK3_2025-2026\BACKEND\TuneVault\TuneVault.Infrastructure\bin\Debug\net10.0\TuneVault.Domain.dll
-C:\Users\Van Nguyen Duc Thinh\Documents\GitHub\Csharp_Nhom3_HK3_2025-2026\BACKEND\TuneVault\TuneVault.Infrastructure\bin\Debug\net10.0\TuneVault.Application.pdb
-C:\Users\Van Nguyen Duc Thinh\Documents\GitHub\Csharp_Nhom3_HK3_2025-2026\BACKEND\TuneVault\TuneVault.Infrastructure\bin\Debug\net10.0\TuneVault.Domain.pdb
-C:\Users\Van Nguyen Duc Thinh\Documents\GitHub\Csharp_Nhom3_HK3_2025-2026\BACKEND\TuneVault\TuneVault.Infrastructure\obj\Debug\net10.0\TuneVault.Infrastructure.csproj.AssemblyReference.cache
-C:\Users\Van Nguyen Duc Thinh\Documents\GitHub\Csharp_Nhom3_HK3_2025-2026\BACKEND\TuneVault\TuneVault.Infrastructure\obj\Debug\net10.0\TuneVault.Infrastructure.GeneratedMSBuildEditorConfig.editorconfig
-C:\Users\Van Nguyen Duc Thinh\Documents\GitHub\Csharp_Nhom3_HK3_2025-2026\BACKEND\TuneVault\TuneVault.Infrastructure\obj\Debug\net10.0\TuneVault.Infrastructure.AssemblyInfoInputs.cache
-C:\Users\Van Nguyen Duc Thinh\Documents\GitHub\Csharp_Nhom3_HK3_2025-2026\BACKEND\TuneVault\TuneVault.Infrastructure\obj\Debug\net10.0\TuneVault.Infrastructure.AssemblyInfo.cs
-C:\Users\Van Nguyen Duc Thinh\Documents\GitHub\Csharp_Nhom3_HK3_2025-2026\BACKEND\TuneVault\TuneVault.Infrastructure\obj\Debug\net10.0\TuneVault.Infrastructure.csproj.CoreCompileInputs.cache
-C:\Users\Van Nguyen Duc Thinh\Documents\GitHub\Csharp_Nhom3_HK3_2025-2026\BACKEND\TuneVault\TuneVault.Infrastructure\obj\Debug\net10.0\TuneVault.Infrastructure.sourcelink.json
-C:\Users\Van Nguyen Duc Thinh\Documents\GitHub\Csharp_Nhom3_HK3_2025-2026\BACKEND\TuneVault\TuneVault.Infrastructure\obj\Debug\net10.0\TuneVaul.F19165C9.Up2Date
-C:\Users\Van Nguyen Duc Thinh\Documents\GitHub\Csharp_Nhom3_HK3_2025-2026\BACKEND\TuneVault\TuneVault.Infrastructure\obj\Debug\net10.0\TuneVault.Infrastructure.dll
-C:\Users\Van Nguyen Duc Thinh\Documents\GitHub\Csharp_Nhom3_HK3_2025-2026\BACKEND\TuneVault\TuneVault.Infrastructure\obj\Debug\net10.0\refint\TuneVault.Infrastructure.dll
-C:\Users\Van Nguyen Duc Thinh\Documents\GitHub\Csharp_Nhom3_HK3_2025-2026\BACKEND\TuneVault\TuneVault.Infrastructure\obj\Debug\net10.0\TuneVault.Infrastructure.pdb
-C:\Users\Van Nguyen Duc Thinh\Documents\GitHub\Csharp_Nhom3_HK3_2025-2026\BACKEND\TuneVault\TuneVault.Infrastructure\obj\Debug\net10.0\ref\TuneVault.Infrastructure.dll
 =======
 >>>>>>> Stashed changes
 C:\Users\ACER\Downloads\Csharp_Nhom3_HK3_2025-2026\BACKEND\TuneVault\TuneVault.Infrastructure\bin\Debug\net10.0\TuneVault.Infrastructure.deps.json
@@ -55,3 +37,21 @@ C:\Users\ACER\Downloads\Csharp_Nhom3_HK3_2025-2026\BACKEND\TuneVault\TuneVault.I
 C:\Users\ACER\Downloads\Csharp_Nhom3_HK3_2025-2026\BACKEND\TuneVault\TuneVault.Infrastructure\obj\Debug\net10.0\refint\TuneVault.Infrastructure.dll
 C:\Users\ACER\Downloads\Csharp_Nhom3_HK3_2025-2026\BACKEND\TuneVault\TuneVault.Infrastructure\obj\Debug\net10.0\TuneVault.Infrastructure.pdb
 C:\Users\ACER\Downloads\Csharp_Nhom3_HK3_2025-2026\BACKEND\TuneVault\TuneVault.Infrastructure\obj\Debug\net10.0\ref\TuneVault.Infrastructure.dll
+C:\Users\Van Nguyen Duc Thinh\Documents\GitHub\Csharp_Nhom3_HK3_2025-2026\BACKEND\TuneVault\TuneVault.Infrastructure\bin\Debug\net10.0\TuneVault.Infrastructure.deps.json
+C:\Users\Van Nguyen Duc Thinh\Documents\GitHub\Csharp_Nhom3_HK3_2025-2026\BACKEND\TuneVault\TuneVault.Infrastructure\bin\Debug\net10.0\TuneVault.Infrastructure.dll
+C:\Users\Van Nguyen Duc Thinh\Documents\GitHub\Csharp_Nhom3_HK3_2025-2026\BACKEND\TuneVault\TuneVault.Infrastructure\bin\Debug\net10.0\TuneVault.Infrastructure.pdb
+C:\Users\Van Nguyen Duc Thinh\Documents\GitHub\Csharp_Nhom3_HK3_2025-2026\BACKEND\TuneVault\TuneVault.Infrastructure\bin\Debug\net10.0\TuneVault.Application.dll
+C:\Users\Van Nguyen Duc Thinh\Documents\GitHub\Csharp_Nhom3_HK3_2025-2026\BACKEND\TuneVault\TuneVault.Infrastructure\bin\Debug\net10.0\TuneVault.Domain.dll
+C:\Users\Van Nguyen Duc Thinh\Documents\GitHub\Csharp_Nhom3_HK3_2025-2026\BACKEND\TuneVault\TuneVault.Infrastructure\bin\Debug\net10.0\TuneVault.Application.pdb
+C:\Users\Van Nguyen Duc Thinh\Documents\GitHub\Csharp_Nhom3_HK3_2025-2026\BACKEND\TuneVault\TuneVault.Infrastructure\bin\Debug\net10.0\TuneVault.Domain.pdb
+C:\Users\Van Nguyen Duc Thinh\Documents\GitHub\Csharp_Nhom3_HK3_2025-2026\BACKEND\TuneVault\TuneVault.Infrastructure\obj\Debug\net10.0\TuneVault.Infrastructure.csproj.AssemblyReference.cache
+C:\Users\Van Nguyen Duc Thinh\Documents\GitHub\Csharp_Nhom3_HK3_2025-2026\BACKEND\TuneVault\TuneVault.Infrastructure\obj\Debug\net10.0\TuneVault.Infrastructure.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\Van Nguyen Duc Thinh\Documents\GitHub\Csharp_Nhom3_HK3_2025-2026\BACKEND\TuneVault\TuneVault.Infrastructure\obj\Debug\net10.0\TuneVault.Infrastructure.AssemblyInfoInputs.cache
+C:\Users\Van Nguyen Duc Thinh\Documents\GitHub\Csharp_Nhom3_HK3_2025-2026\BACKEND\TuneVault\TuneVault.Infrastructure\obj\Debug\net10.0\TuneVault.Infrastructure.AssemblyInfo.cs
+C:\Users\Van Nguyen Duc Thinh\Documents\GitHub\Csharp_Nhom3_HK3_2025-2026\BACKEND\TuneVault\TuneVault.Infrastructure\obj\Debug\net10.0\TuneVault.Infrastructure.csproj.CoreCompileInputs.cache
+C:\Users\Van Nguyen Duc Thinh\Documents\GitHub\Csharp_Nhom3_HK3_2025-2026\BACKEND\TuneVault\TuneVault.Infrastructure\obj\Debug\net10.0\TuneVault.Infrastructure.sourcelink.json
+C:\Users\Van Nguyen Duc Thinh\Documents\GitHub\Csharp_Nhom3_HK3_2025-2026\BACKEND\TuneVault\TuneVault.Infrastructure\obj\Debug\net10.0\TuneVaul.F19165C9.Up2Date
+C:\Users\Van Nguyen Duc Thinh\Documents\GitHub\Csharp_Nhom3_HK3_2025-2026\BACKEND\TuneVault\TuneVault.Infrastructure\obj\Debug\net10.0\TuneVault.Infrastructure.dll
+C:\Users\Van Nguyen Duc Thinh\Documents\GitHub\Csharp_Nhom3_HK3_2025-2026\BACKEND\TuneVault\TuneVault.Infrastructure\obj\Debug\net10.0\refint\TuneVault.Infrastructure.dll
+C:\Users\Van Nguyen Duc Thinh\Documents\GitHub\Csharp_Nhom3_HK3_2025-2026\BACKEND\TuneVault\TuneVault.Infrastructure\obj\Debug\net10.0\TuneVault.Infrastructure.pdb
+C:\Users\Van Nguyen Duc Thinh\Documents\GitHub\Csharp_Nhom3_HK3_2025-2026\BACKEND\TuneVault\TuneVault.Infrastructure\obj\Debug\net10.0\ref\TuneVault.Infrastructure.dll

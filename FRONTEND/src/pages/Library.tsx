@@ -33,7 +33,7 @@ export default function Library() {
         ]);
         setPlaylists(pls);
         // trend() trả về SearchTrendingDto, dùng field 'trending'
-        const mediaList: MediaItem[] = trendData.trending || [];
+        const mediaList: MediaItem[] = trendData.listTrending || [];
         setUploads(mediaList);
       } catch (err) {
         // Nếu backend thư viện lỗi, vẫn giữ giao diện và thông báo lỗi cho user.
