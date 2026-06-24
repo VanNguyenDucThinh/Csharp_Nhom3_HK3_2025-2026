@@ -17,10 +17,14 @@ export default function Login() {
     if (!email || !password) { setError('Vui lòng điền đầy đủ thông tin.'); return }
     setLoading(true); setError('')
     try {
+<<<<<<< Updated upstream
       await apiClient.auth.login({ email, password });
+=======
+      await apiClient.auth.login({ email, password })
+>>>>>>> Stashed changes
       navigate('/')
     } catch {
-      setError('Tên đăng nhập hoặc mật khẩu không đúng.')
+      setError('Email hoặc mật khẩu không đúng.')
     } finally {
       setLoading(false)
     }
@@ -58,10 +62,14 @@ export default function Login() {
 
         {/* Form */}
         <div style={styles.form}>
+<<<<<<< Updated upstream
           <input style={styles.input} type="text" placeholder="Tên đăng ký" value={username} onChange={e => setUsername(e.target.value)} />
+=======
+          <input style={styles.input} type="email" placeholder="Email" value={email} onChange={e => setEmail(e.target.value)} />
+>>>>>>> Stashed changes
 
           {tab === 'register' && (
-            <input style={styles.input} type="email" placeholder="Email" value={email} onChange={e => setEmail(e.target.value)} />
+            <input style={styles.input} type="text" placeholder="Tên đăng nhập" value={username} onChange={e => setUsername(e.target.value)} />
           )}
 
           <input style={styles.input} type="password" placeholder="Mật khẩu" value={password} onChange={e => setPassword(e.target.value)}

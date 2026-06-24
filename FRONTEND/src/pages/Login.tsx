@@ -41,7 +41,11 @@ export default function Login() {
 
   // ── Xử lý Đăng nhập ────────────────────────────────────────
   const handleLogin = async () => {
+<<<<<<< Updated upstream
     if (!loginEmail || !loginPassword) {
+=======
+    if (!email || !password) {
+>>>>>>> Stashed changes
       setError("Vui lòng điền đầy đủ thông tin.");
       return;
     }
@@ -83,6 +87,12 @@ export default function Login() {
       } else {
         setError("Tên đăng nhập hoặc mật khẩu không đúng.");
       }
+<<<<<<< Updated upstream
+=======
+    } catch {
+      // Lỗi đăng nhập được hiển thị ngay trong form, không dùng MessageBox/alert.
+      setError("Email hoặc mật khẩu không đúng.");
+>>>>>>> Stashed changes
     } finally {
       setLoading(false);
     }
@@ -167,6 +177,7 @@ export default function Login() {
               Mỗi tab có form riêng, input riêng, biến riêng.
               Không bao giờ bị "lẫn" input của tab này sang tab kia. */}
           <div style={styles.form}>
+<<<<<<< Updated upstream
             {tab === "login" ? (
               // ── FORM ĐĂNG NHẬP ──────────────────────────────────
               <>
@@ -220,6 +231,39 @@ export default function Login() {
             )}
 
             {error && <div style={styles.error}>⚠️ {error}</div>}
+=======
+            <input
+              style={styles.input}
+              type="email"
+              placeholder="Email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+            />
+
+            {tab === "register" && (
+              <input
+                style={styles.input}
+                type="text"
+                placeholder="Tên đăng nhập"
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
+              />
+            )}
+
+            <input
+              style={styles.input}
+              type="password"
+              placeholder="Mật khẩu"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              onKeyDown={(e) =>
+                e.key === "Enter" &&
+                (tab === "login" ? handleLogin() : handleRegister())
+              }
+            />
+
+            {error && <div style={styles.error}>{error}</div>}
+>>>>>>> Stashed changes
 
             <button
               style={{ ...styles.btn, ...(loading ? styles.btnDisabled : {}) }}

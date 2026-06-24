@@ -141,7 +141,7 @@ const apiClient = {
     update: async (formData: FormData): Promise<ProfileUserDto> => {
       try {
         const response = await axiosInstance.put<ApiResponse<ProfileUserDto>>(
-          "/user/profile",
+          "/User/profile",
           formData,
           { headers: { "Content-Type": "multipart/form-data" } },
         );
@@ -158,7 +158,7 @@ const apiClient = {
     upload: async (formData: FormData): Promise<unknown> => {
       try {
         const response = await axiosInstance.post<ApiResponse<unknown>>(
-          "/media/upload",
+          "/Media/upload",
           formData,
           { headers: { "Content-Type": "multipart/form-data" } },
         );
