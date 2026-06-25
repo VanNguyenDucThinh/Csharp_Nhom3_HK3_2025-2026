@@ -29,7 +29,8 @@ public class GetPlayListQueryCommand:IRequestHandler<GetPlayListQuery,List<PlayL
             Id=x.Id,
             Name=x.Name,
             Owner=x.Owner,
-            UrlImage=x.UrlImage
+            UrlImage=x.UrlImage,
+            IsPublic = x.IsPublic,
         }).ToList();
 
         return result;

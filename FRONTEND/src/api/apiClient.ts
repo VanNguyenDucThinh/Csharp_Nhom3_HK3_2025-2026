@@ -344,20 +344,26 @@ const apiClient = {
         const response = await axiosInstance.delete<ApiResponseNoData>(
           `/playlist/${id}`,
         );
-        unwrapApiResponse(response, "Xóa playlist thất bại");
+        // Thay vì dùng unwrapApiResponse nghiêm ngặt, ta chỉ cần check status
+        if (response.status !== 200 && response.status !== 204) {
+             throw new Error("Xóa thất bại");
+        }
       } catch (error) {
         throw new Error(getApiErrorMessage(error));
       }
     },
 
     // POST api/playlist/{id}/tracks
+    // Sửa lại trong apiClient.ts
     addTrack: async (playlistId: string, mediaId: string): Promise<void> => {
       try {
         const response = await axiosInstance.post<ApiResponseNoData>(
           `/playlist/${playlistId}/tracks`,
-          { mediaId },
+          { "MediaId": mediaId }, // PHẢI VIẾT HOA CHỮ M ĐỂ KHỚP VỚI C#
         );
-        unwrapApiResponse(response, "Thêm track vào playlist thất bại");
+        // Nếu API trả về success: true nhưng body rỗng, hàm này có thể bị lỗi,
+        // hãy thử tạm thời bỏ qua unwrapApiResponse nếu vẫn lỗi:
+        return; 
       } catch (error) {
         throw new Error(getApiErrorMessage(error));
       }

@@ -24,138 +24,86 @@ function buildImageUrl(url?: string): string {
 // Hiển thị danh sách tất cả media đang trending (= tất cả bài đã upload),
 // cho phép người dùng chọn 1 bài để thêm vào playlist hiện tại.
 // ============================================================
+// ============================================================
+// SUB-COMPONENT: Modal chọn bài hát (Bảng tìm kiếm)
+// ============================================================
 function ModalChonBaiHat({
   playlistId,
-  danhSachDaThem, // Danh sách id bài đã có trong playlist → không cho thêm trùng
+  danhSachDaThem,
   onClose,
   onThemThanhCong,
+  danhSachMedia,
 }: {
+  danhSachMedia: MediaDto[];
   playlistId: string;
   danhSachDaThem: string[];
   onClose: () => void;
   onThemThanhCong: (track: MediaDto) => void;
 }) {
-  const [danhSachMedia, setDanhSachMedia] = useState<MediaDto[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [dangThem, setDangThem] = useState<string | null>(null); // id bài đang xử lý
-  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
   const [tuKhoa, setTuKhoa] = useState("");
+  const [dangThem, setDangThem] = useState<string | null>(null);
 
-  // Tải danh sách tất cả media khi modal mở
-  useEffect(() => {
-    const load = async () => {
-      try {
-        const ketQua = await apiClient.media.trend(1, 100);
-        setDanhSachMedia(ketQua.listTrending ?? []);
-      } catch {
-        setError("Không tải được danh sách bài hát.");
-      } finally {
-        setLoading(false);
-      }
-    };
-    load();
-  }, []);
-
-  // Lọc theo từ khóa tìm kiếm (phía client, không gọi API thêm)
-  const danhSachHienThi = danhSachMedia.filter((m) => {
-    const tuKhoaThap = tuKhoa.toLowerCase();
-    return (
-      m.title.toLowerCase().includes(tuKhoaThap) ||
-      m.artist.toLowerCase().includes(tuKhoaThap)
-    );
-  });
+  const danhSachTimKiem = danhSachMedia.filter(track => 
+    track.title.toLowerCase().includes(tuKhoa.toLowerCase()) || 
+    track.artist.toLowerCase().includes(tuKhoa.toLowerCase())
+  );
 
   const handleThem = async (track: MediaDto) => {
     setDangThem(track.id);
-    setError("");
     try {
-      // POST /api/playlist/{playlistId}/tracks — body: { mediaId }
       await apiClient.playlist.addTrack(playlistId, track.id);
-      // Thông báo cho component cha cập nhật danh sách ngay không cần reload
       onThemThanhCong(track);
     } catch (err) {
-      if (err instanceof Error) {
-        setError(err.message);
-      } else {
-        setError("Thêm bài hát thất bại. Vui lòng thử lại.");
-      }
+      // SỬA Ở ĐÂY: In ra lỗi thật sự từ response
+      console.log("CHI TIẾT LỖI TỪ BACKEND:", err); 
+      alert("Lỗi: " + (err instanceof Error ? err.message : "Thêm thất bại"));
     } finally {
       setDangThem(null);
     }
   };
 
   return (
-    // Click ra ngoài modal → đóng
     <div style={modalStyles.overlay} onClick={onClose}>
       <div style={modalStyles.box} onClick={(e) => e.stopPropagation()}>
         <div style={modalStyles.header}>
           <h2 style={modalStyles.title}>Thêm bài hát vào playlist</h2>
-          <button style={modalStyles.closeBtn} onClick={onClose}>
-            ✕
-          </button>
+          <button style={modalStyles.closeBtn} onClick={onClose}>✕</button>
         </div>
 
-        {/* Ô tìm kiếm lọc danh sách ngay trên client */}
         <input
           style={modalStyles.searchInput}
-          placeholder="🔍 Tìm theo tên bài hoặc nghệ sĩ..."
+          placeholder=" Tìm theo tên bài hoặc nghệ sĩ..."
           value={tuKhoa}
           onChange={(e) => setTuKhoa(e.target.value)}
           autoFocus
         />
 
-        {error && <p style={modalStyles.errorText}>⚠️ {error}</p>}
-
         <div style={modalStyles.list}>
           {loading ? (
-            <p style={modalStyles.emptyText}>Đang tải...</p>
-          ) : danhSachHienThi.length === 0 ? (
-            <p style={modalStyles.emptyText}>
-              {tuKhoa
-                ? "Không tìm thấy bài hát phù hợp."
-                : "Chưa có bài hát nào."}
-            </p>
+            <p style={modalStyles.emptyText}>Đang tìm kiếm...</p>
+          ) : tuKhoa && danhSachTimKiem.length === 0 ? (
+            <p style={modalStyles.emptyText}>Không tìm thấy bài hát nào.</p>
           ) : (
-            danhSachHienThi.map((track) => {
+            danhSachTimKiem.map((track) => {
               const daTonTai = danhSachDaThem.includes(track.id);
-              const dangXuLy = dangThem === track.id;
-
               return (
                 <div key={track.id} style={modalStyles.item}>
-                  {/* Ảnh bìa bài hát */}
                   <div style={modalStyles.itemCover}>
                     {track.urlImage ? (
-                      <img
-                        src={buildImageUrl(track.urlImage)}
-                        alt={track.title}
-                        style={{
-                          width: "100%",
-                          height: "100%",
-                          objectFit: "cover",
-                          borderRadius: 4,
-                        }}
-                      />
-                    ) : (
-                      <span style={{ fontSize: 20 }}>🎵</span>
-                    )}
+                      <img src={buildImageUrl(track.urlImage)} style={{width: "100%", height: "100%", objectFit: "cover"}} />
+                    ) : (<span>🎵</span>)}
                   </div>
-
-                  {/* Tên và nghệ sĩ */}
                   <div style={{ flex: 1, minWidth: 0 }}>
                     <div style={modalStyles.itemTitle}>{track.title}</div>
                     <div style={modalStyles.itemSub}>{track.artist}</div>
                   </div>
-
-                  {/* Nút thêm — disabled nếu đã có trong playlist */}
                   <button
-                    style={{
-                      ...modalStyles.addBtn,
-                      ...(daTonTai ? modalStyles.addBtnDisabled : {}),
-                    }}
-                    onClick={() => !daTonTai && !dangXuLy && handleThem(track)}
-                    disabled={daTonTai || dangXuLy}
+                    style={{ ...modalStyles.addBtn, ...(daTonTai ? modalStyles.addBtnDisabled : {}) }}
+                    onClick={() => !daTonTai && handleThem(track)}
+                    disabled={daTonTai || dangThem === track.id}
                   >
-                    {dangXuLy ? "..." : daTonTai ? "✓ Đã có" : "+ Thêm"}
+                    {dangThem === track.id ? "..." : daTonTai ? "✓ Đã có" : "+ Thêm"}
                   </button>
                 </div>
               );
@@ -183,7 +131,7 @@ export default function PlaylistDetail() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [hienModal, setHienModal] = useState(false);
-  
+  const [allMedia, setAllMedia] = useState<MediaDto[]>([]);
   const [hienModalUpload, setHienModalUpload] = useState(false); // State điều khiển modal upload trực tiếp vào playlist
 
   const [dangXoa, setDangXoa] = useState<string | null>(null); // id bài đang xóa
@@ -210,6 +158,7 @@ export default function PlaylistDetail() {
   };
 
   useEffect(() => {
+    apiClient.media.trend(1, 100).then(res => setAllMedia(res.listTrending || []));
     loadPlaylist();
   }, [id]);
 
@@ -269,6 +218,7 @@ export default function PlaylistDetail() {
       artist: track.artist,
       urlMedia: track.urlMedia,
       urlImage: track.urlImage,
+      mediaStyle: track.mediaStyle
     });
   };
 
@@ -471,14 +421,11 @@ export default function PlaylistDetail() {
       {/* ── Modal chọn bài hát ───────────────────────────── */}
       {hienModal && (
         <ModalChonBaiHat
+          danhSachMedia={allMedia} // Bạn cần có state chứa list bài hát này
           playlistId={id!}
-          // Truyền danh sách id đã có để Modal disable nút "Thêm" với những bài đó
           danhSachDaThem={playlist.track.map((t) => t.id)}
           onClose={() => setHienModal(false)}
-          onThemThanhCong={(track) => {
-            handleThemThanhCong(track);
-            // Không đóng modal ngay — cho phép thêm nhiều bài liên tiếp
-          }}
+          onThemThanhCong={handleThemThanhCong}
         />
       )}
 

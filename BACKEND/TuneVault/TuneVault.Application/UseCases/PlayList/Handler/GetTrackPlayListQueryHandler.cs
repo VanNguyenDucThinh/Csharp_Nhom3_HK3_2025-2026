@@ -29,7 +29,8 @@ public class GetTrackPlayListQueryHandler:IRequestHandler<GetTrackPlayListQuery,
             Artist=x.Artist,
             Title=x.Title,
             Owner=x.Owner,
-            UrlImage=x.UrlImageMedia
+            UrlImage=x.UrlImageMedia,
+            mediaStyle=x.MediaStyle
         }).ToList();
 
         return new PlayListDto
@@ -37,7 +38,8 @@ public class GetTrackPlayListQueryHandler:IRequestHandler<GetTrackPlayListQuery,
             Id=playListInfo.Id,
             Name=playListInfo.Name,
             Owner=playListInfo.Owner,
-            Track=trackList
+            Track=trackList,
+            IsPublic=playListInfo.IsPublic,
         };
         
     }

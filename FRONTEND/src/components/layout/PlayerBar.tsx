@@ -1,3 +1,4 @@
+// src/components/layout/PlayerBar.tsx
 import { useState, useRef, useEffect } from 'react'
 import { usePlayer } from '../../pages/PlayerContext.tsx' // Đảm bảo đường dẫn này đúng với dự án của bạn
 
@@ -46,9 +47,13 @@ const RepeatIcon = () => (
 )
 
 export default function PlayerBar() {
+
   // === TÍCH HỢP CONTEXT ĐỂ NHẬN NHẠC TỪ BACKEND ===
   const { currentTrack } = usePlayer()
   const BACKEND_DOMAIN = "http://localhost:5124"
+  if (currentTrack?.mediaStyle === 1) {
+    return null;
+  }
   
   // Xử lý link nhạc
   const fullAudioSrc = currentTrack?.urlMedia
@@ -166,7 +171,7 @@ export default function PlayerBar() {
   return (
     <div style={styles.container}>
       {/* Nguồn nhạc bây giờ là fullAudioSrc linh động */}
-      <audio ref={audioRef} src={fullAudioSrc} />
+      <audio ref={audioRef} src={fullAudioSrc || undefined}/>
 
       {/* Phần 1: Thông tin bài hát (Load từ currentTrack) */}
       <div style={styles.trackSection}>

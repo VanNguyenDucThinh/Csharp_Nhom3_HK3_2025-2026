@@ -1,4 +1,3 @@
-// SỬA TẠI ĐÂY: Thay vì import từ 'vite', ta import từ 'vitest/config'
 import { defineConfig } from 'vitest/config'
 import react from '@vitejs/plugin-react'
 
@@ -6,15 +5,24 @@ import react from '@vitejs/plugin-react'
 export default defineConfig({
   plugins: [react()],
 
-  // CẤU HÌNH KIỂM THỬ (TESTING CONFIGURATION):
-  // Lúc này thuộc tính 'test' đã được TypeScript công nhận và không còn báo lỗi nữa
+  // 1. CẤU HÌNH SERVER & PROXY (Vượt rào CORS cho lệnh DELETE)
+  // Bất kỳ API nào gọi vào '/api' sẽ được Vite ngầm chuyển sang port 5124 của C#
+  server: {
+    proxy: {
+      '/api': {
+        target: 'http://localhost:5124',
+        changeOrigin: true,
+        secure: false,
+      }
+    }
+  },
+
+  // 2. CẤU HÌNH KIỂM THỬ (Giữ nguyên của bạn)
   test: {
-    // LOẠI TRỪ THƯ MỤC (EXCLUDE):
-    // Bắt buộc loại trừ các thư mục này để hệ thống KHÔNG quét snapshot vào, tránh treo máy 45 phút
     exclude: [
-      '**/node_modules/**', // Thư mục chứa các thư viện tải về (rất nặng)
-      '**/dist/**',         // Thư mục chứa sản phẩm sau khi build
-      '**/.cypress/**'      // Thư mục của các công cụ test khác nếu có
+      '**/node_modules/**', 
+      '**/dist/**',         
+      '**/.cypress/**'      
     ]
   }
 })

@@ -22,6 +22,7 @@ export interface PlayListDto {
   urlImage?: string;  // Có thể null
   owner: string;      // Guid -> string (id của user sở hữu playlist)
   track: MediaDto[];  // track: Danh sách bài hát trong playlist
+  isPublic: "Public" | "Private" | string;
 }
 
 /**
@@ -34,7 +35,7 @@ export interface PlayListDto {
  */
 export interface CreateOrUpdatePlaylistRequest {
   name?: string;
-  file?: File; // ✅ thêm field file để upload ảnh // IFormFile từ backend → trong FormData dùng key "File"
+  file?: File; // thêm field file để upload ảnh // IFormFile từ backend → trong FormData dùng key "File"
   isPublic: number;  // PlayListStatus: 0 = Private, 1 = Public (theo backend enum)
 }
  

@@ -35,8 +35,8 @@ public class GetVideoQueryHandler:IRequestHandler<GetVideoQuery, VideoDto>
             Title=mediaVideo.Title,
             Artist=mediaVideo.Artist,
             UrlImage=mediaVideo.UrlImageMedia,
-            UrlMedia=mediaVideo.UrlMediaItem  
+            UrlMedia=mediaVideo.UrlMediaItem,
+            Id=mediaVideo.Id
         };
     }
-
 }

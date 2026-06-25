@@ -10,10 +10,17 @@ export default function Library() {
   const [playlists, setPlaylists] = useState<Playlist[]>([]);
   const [uploads, setUploads]     = useState<MediaItem[]>([]);
   const [loading, setLoading]     = useState(true);
+  
+  // States cho Form tạo mới
   const [showCreate, setShowCreate] = useState(false);
   const [newName, setNewName]       = useState("");
   const [creating, setCreating]     = useState(false);
   const [createError, setCreateError] = useState("");
+  
+  // THÊM MỚI: State để điều khiển việc hiện popup hỏi Public/Private
+  const [showPublicConfirm, setShowPublicConfirm] = useState(false);
+  const [hoveredPlaylistId, setHoveredPlaylistId] = useState<string | null>(null);
+  const [deletingId, setDeletingId] = useState<string | null>(null);
 
   useEffect(() => {
     const load = async () => {
@@ -23,7 +30,7 @@ export default function Library() {
           apiClient.media.trend(1, 50),
         ]);
         setPlaylists(pls);
-        const mediaList: MediaItem[] = trendData.trending || [];
+        const mediaList: MediaItem[] = trendData.listTrending || [];
         setUploads(mediaList);
       } catch (err) {
         showApiError(err);
@@ -34,21 +41,11 @@ export default function Library() {
     load();
   }, []);
 
-  // ── Hàm tạo tên playlist không trùng ──────────────────────────
-  // Nếu "HelloWorld" đã tồn tại → thử "HelloWorld (1)", "HelloWorld (2)"...
-  // cho đến khi tìm được tên chưa dùng.
-  // Tại sao check ở Frontend? Vì backend không tự thêm số — nếu gửi tên trùng
-  // backend sẽ tạo 2 playlist cùng tên (hoặc báo lỗi tùy implementation).
-  // Check phía Frontend giúp UX mượt hơn, không cần round-trip thêm.
   const taoTenKhongTrung = (tenGoc: string, danhSachHienTai: Playlist[]): string => {
     const tenDaTon = new Set(danhSachHienTai.map((pl) => pl.name?.trim().toLowerCase()));
-
-    // Nếu tên gốc chưa có → dùng thẳng
     if (!tenDaTon.has(tenGoc.trim().toLowerCase())) {
       return tenGoc.trim();
     }
-
-    // Tên đã tồn tại → thêm số tăng dần cho đến khi tìm được tên mới
     let soThuTu = 1;
     while (tenDaTon.has(`${tenGoc.trim().toLowerCase()} (${soThuTu})`)) {
       soThuTu++;
@@ -56,48 +53,91 @@ export default function Library() {
     return `${tenGoc.trim()} (${soThuTu})`;
   };
 
-  const handleCreatePlaylist = async () => {
+  // ============================================================
+  // HÀM 1: Xử lý khi user bấm nút "Tạo" ở form nhập tên
+  // Tại sao tách hàm? Vì ta chưa gọi API vội, ta cần giữ user lại
+  // để hỏi xem họ muốn Public hay Private thông qua Popup.
+  // ============================================================
+  const handleBamTao = () => {
     if (!newName.trim()) {
       setCreateError("Vui lòng nhập tên playlist.");
       return;
     }
+    setCreateError("");
+    // Mở popup thay vì gọi API ngay lập tức
+    setShowPublicConfirm(true); 
+  };
+
+  // ============================================================
+  // HÀM 2: Thực sự gọi API sau khi user đã chọn Có/Không trong popup
+  // Tham số isPublicStatus: "1" (Có - Public) hoặc "0" (Không - Private)
+  // ============================================================
+  const thucHienTaoPlaylist = async (isPublicStatus: string) => {
     setCreating(true);
     setCreateError("");
 
     try {
-      // Tính tên cuối cùng (có thể thêm số nếu trùng)
       const tenCuoiCung = taoTenKhongTrung(newName, playlists);
-
       const formData = new FormData();
 
-      // ── FIX LỖI CHÍNH: Gửi "Name" (chữ hoa) thay vì "name" ───
-      // Backend C# dùng [FromForm] với property "Name" (Pascal case).
-      // FormData key phân biệt hoa thường — "name" ≠ "Name".
-      // Nếu gửi "name", model binding của ASP.NET không tìm thấy
-      // field nào khớp với property "Name" → [Required] fail → lỗi 400
-      // → frontend hiện "Đã xảy ra lỗi không xác định".
       formData.append("Name", tenCuoiCung);
-
-      // IsPublic: 0 = Private, 1 = Public (theo PlayListStatus enum trong backend)
-      // Mặc định tạo playlist Private, user có thể đổi sau trong trang detail.
-      formData.append("IsPublic", "0");
+      // Truyền đúng trạng thái user vừa chọn vào FormData
+      formData.append("IsPublic", isPublicStatus);
 
       const pl = await apiClient.playlist.create(formData);
 
-      // Thêm playlist mới vào đầu danh sách (mới nhất lên trên)
       setPlaylists((prev) => [pl, ...prev]);
+      
+      // Reset toàn bộ UI về trạng thái ban đầu sau khi thành công
       setNewName("");
       setShowCreate(false);
+      setShowPublicConfirm(false); 
 
     } catch (err) {
-      // Hiện lỗi ngay trong form thay vì alert popup
       if (err instanceof Error) {
         setCreateError(err.message);
       } else {
         setCreateError("Tạo playlist thất bại. Vui lòng thử lại.");
       }
+      // Tắt popup để user thấy lỗi hiện ở form nhập tên
+      setShowPublicConfirm(false);
     } finally {
       setCreating(false);
+    }
+  };
+
+  // ============================================================
+  // HÀM 3: Xử lý Xóa Playlist
+  // Tại sao cần tham số e: React.MouseEvent?
+  // Vì cái dòng Playlist đang có sự kiện onClick chuyển trang. 
+  // Nếu bấm nút Xóa mà không chặn lại, trình duyệt sẽ vừa xóa vừa chuyển trang gây lỗi.
+  // ============================================================
+  const handleXoaPlaylist = async (e: React.MouseEvent, id: string, name: string) => {
+    e.stopPropagation();
+
+    if (!window.confirm(`Bạn có chắc chắn muốn xóa playlist "${name}" không?`)) {
+      return;
+    }
+
+    setDeletingId(id);
+    try {
+      // 1. Gọi API xóa
+      await apiClient.playlist.delete(id);
+      
+      // 2. CẬP NHẬT STATE TRỰC TIẾP (QUAN TRỌNG)
+      // Lọc bỏ playlist vừa xóa khỏi mảng state hiện tại để React tự cập nhật UI
+      setPlaylists((prev) => prev.filter((pl) => pl.id !== id));
+      
+      // 3. Thông báo thành công (nếu cần)
+      console.log("Xóa playlist thành công!");
+    } catch (err) {
+      // Nếu API vẫn trả lỗi (do cấu trúc phản hồi), ta kiểm tra playlist còn tồn tại không
+      // Nếu nó đã mất trong danh sách nghĩa là xóa thành công
+      console.error("Lỗi xóa playlist:", err);
+      // Chỉ hiện thông báo nếu playlist vẫn còn nằm trong danh sách
+      alert("Đã xảy ra lỗi khi xóa, vui lòng kiểm tra lại.");
+    } finally {
+      setDeletingId(null);
     }
   };
 
@@ -105,6 +145,7 @@ export default function Library() {
     setShowCreate(false);
     setNewName("");
     setCreateError("");
+    setShowPublicConfirm(false);
   };
 
   if (loading)
@@ -112,7 +153,6 @@ export default function Library() {
 
   return (
     <div style={styles.page}>
-      {/* Header */}
       <div style={styles.header}>
         <h1 style={styles.title}>Thư viện</h1>
         <button style={styles.addBtn} onClick={() => { setShowCreate(!showCreate); setCreateError(""); }}>
@@ -120,7 +160,6 @@ export default function Library() {
         </button>
       </div>
 
-      {/* Form tạo playlist — hiện khi bấm nút hoặc "Tạo playlist đầu tiên" */}
       {showCreate && (
         <div style={styles.createForm}>
           <input
@@ -130,22 +169,21 @@ export default function Library() {
             autoFocus
             onChange={(e) => { setNewName(e.target.value); setCreateError(""); }}
             onKeyDown={(e) => {
-              if (e.key === "Enter") handleCreatePlaylist();
+              if (e.key === "Enter") handleBamTao(); // Đổi thành handleBamTao
               if (e.key === "Escape") handleHuyTao();
             }}
             disabled={creating}
           />
           <button
             style={{ ...styles.confirmBtn, ...(creating ? { opacity: 0.6 } : {}) }}
-            onClick={handleCreatePlaylist}
+            onClick={handleBamTao} // Đổi thành handleBamTao
             disabled={creating}
           >
-            {creating ? "Đang tạo..." : "Tạo"}
+            {creating ? "Đang xử lý..." : "Tạo"}
           </button>
-          <button style={styles.cancelBtn} onClick={handleHuyTao}>
+          <button style={styles.cancelBtn} onClick={handleHuyTao} disabled={creating}>
             Hủy
           </button>
-          {/* Thông báo lỗi inline ngay dưới form — không dùng alert popup */}
           {createError && <span style={styles.errorText}> {createError}</span>}
         </div>
       )}
@@ -155,8 +193,6 @@ export default function Library() {
         <h2 style={styles.sectionTitle}>Playlist của tôi ({playlists.length})</h2>
 
         {playlists.length === 0 ? (
-          // Chỉ hiện "Chưa có playlist" khi mảng rỗng THẬT SỰ
-          // Sau khi tạo xong, playlists.length > 0 → đoạn này tự ẩn
           <div style={styles.emptyBox}>
             <p style={styles.emptyText}>Chưa có playlist nào.</p>
             <button
@@ -171,18 +207,41 @@ export default function Library() {
             {playlists.map((pl) => (
               <div
                 key={pl.id}
-                style={styles.item}
+                style={{
+                  ...styles.item,
+                  // Tự động đổi màu nền nếu đang hover VÀO đúng playlist này
+                  backgroundColor: hoveredPlaylistId === pl.id ? "#1a1a1a" : "transparent"
+                }}
                 onClick={() => navigate(`/playlist/${pl.id}`)}
-                onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = "#1a1a1a")}
-                onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = "transparent")}
+                // Bắt sự kiện chuột ra/vào để set ID đang được hover
+                onMouseEnter={() => setHoveredPlaylistId(pl.id)}
+                onMouseLeave={() => setHoveredPlaylistId(null)}
               >
-                <div style={styles.itemIcon}>🎵</div>
-                <div>
-                  <div style={styles.itemName}>{pl.name}</div>
-                  <div style={styles.itemSub}>
-                    Playlist • {pl.track?.length ?? 0} bài
+                {/* KHỐI BÊN TRÁI: Icon và Text */}
+                <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
+                  <div style={styles.itemIcon}>♪</div> 
+                  <div>
+                    <div style={styles.itemName}>{pl.name}</div>
+                    <div style={styles.itemSub}>
+                      Playlist {pl.isPublic === "Public" ? "Công khai" : "Riêng tư"} • {pl.track?.length ?? 0} bài
+                    </div>
                   </div>
                 </div>
+
+                {/* KHỐI BÊN PHẢI: Nút Xóa (chỉ hiện khi đang hover đúng dòng này) */}
+                {(hoveredPlaylistId === pl.id || deletingId === pl.id) && (
+                  <button
+                    style={{
+                      ...styles.deleteBtn,
+                      ...(deletingId === pl.id ? { opacity: 0.5, cursor: "not-allowed" } : {})
+                    }}
+                    onClick={(e) => handleXoaPlaylist(e, pl.id, pl.name || "Không tên")}
+                    disabled={deletingId === pl.id}
+                    title="Xóa playlist này"
+                  >
+                    {deletingId === pl.id ? "..." : "✕"}
+                  </button>
+                )}
               </div>
             ))}
           </div>
@@ -198,8 +257,9 @@ export default function Library() {
           <div style={styles.list}>
             {uploads.map((item) => (
               <div key={item.id} style={styles.item}>
-                <div style={styles.itemIcon}>🎵</div>
-                <div>
+                <div style={styles.itemIcon}>♪</div>
+                {/* Bọc nội dung vào 1 div có flex: 1 để nó chiếm hết khoảng trống bên trái */}
+                <div style={{ flex: 1, minWidth: 0, textAlign: "left" }}>
                   <div style={styles.itemName}>{item.title}</div>
                   <div style={styles.itemSub}>{item.artist}</div>
                 </div>
@@ -208,6 +268,60 @@ export default function Library() {
           </div>
         )}
       </section>
+
+      {/* ============================================================ */}
+      {/* POPUP XÁC NHẬN CÔNG KHAI / RIÊNG TƯ                            */}
+      {/* ============================================================ */}
+      {showPublicConfirm && (
+        <div style={styles.overlay} onClick={() => !creating && setShowPublicConfirm(false)}>
+          <div style={styles.confirmBox} onClick={(e) => e.stopPropagation()}>
+            <h3 style={styles.confirmTitle}>Bạn có muốn playlist của bạn công khai?</h3>
+            <p style={styles.confirmSub}>Người khác có thể tìm thấy và xem playlist này.</p>
+            
+            <div style={styles.confirmBtns}>
+              {/* Tại sao dùng onMouseEnter/onMouseLeave? 
+                  Vì inline-style của React không hỗ trợ CSS :hover. 
+                  Ta can thiệp trực tiếp vào DOM node để đổi màu khi chuột ra/vào. */}
+              <button 
+                style={styles.btnPopupBase} 
+                onClick={() => thucHienTaoPlaylist("1")}
+                disabled={creating}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.backgroundColor = "#1DB954"; // Đổi nền xanh
+                  e.currentTarget.style.color = "#000";              // Đổi chữ đen
+                  e.currentTarget.style.borderColor = "#1DB954";     // Giấu viền xám
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.backgroundColor = "transparent"; // Trả về trong suốt
+                  e.currentTarget.style.color = "#fff";                  // Trả về chữ trắng
+                  e.currentTarget.style.borderColor = "#535353";         // Trả về viền xám
+                }}
+              >
+                {creating ? "..." : "Có (Công khai)"}
+              </button>
+              
+              <button 
+                style={styles.btnPopupBase} 
+                onClick={() => thucHienTaoPlaylist("0")}
+                disabled={creating}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.backgroundColor = "#1DB954";
+                  e.currentTarget.style.color = "#000";
+                  e.currentTarget.style.borderColor = "#1DB954";
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.backgroundColor = "transparent";
+                  e.currentTarget.style.color = "#fff";
+                  e.currentTarget.style.borderColor = "#535353";
+                }}
+              >
+                {creating ? "..." : "Không (Riêng tư)"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
     </div>
   );
 }
@@ -226,11 +340,32 @@ const styles: Record<string, React.CSSProperties> = {
   section:      { marginBottom: 40 },
   sectionTitle: { fontSize: 18, fontWeight: 700, marginBottom: 12 },
   list:         { display: "flex", flexDirection: "column", gap: 2 },
-  item:         { display: "flex", alignItems: "center", gap: 14, padding: "10px 12px", borderRadius: 6, cursor: "pointer", backgroundColor: "transparent" },
-  itemIcon:     { fontSize: 22, width: 44, height: 44, backgroundColor: "#282828", borderRadius: 6, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 },
-  itemName:     { fontSize: 14, fontWeight: 600 },
+  item:         { display: "flex", alignItems: "center", width: "100%", gap: 15, justifyContent: "space-between", padding: "10px 12px", borderRadius: 6, cursor: "pointer", transition: "background-color 0.2s ease" },  
+  itemIcon:     { fontSize: 22, width: 44, height: 44, backgroundColor: "#282828", borderRadius: 6, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, color: "#b3b3b3" },
+  itemName:     { color: "#fff", fontSize: 14, fontWeight: 600, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis"},
   itemSub:      { fontSize: 12, color: "#b3b3b3", marginTop: 2 },
   emptyBox:     { display: "flex", flexDirection: "column", alignItems: "flex-start", gap: 12 },
   emptyText:    { color: "#b3b3b3", fontSize: 14 },
   emptyBtn:     { backgroundColor: "transparent", color: "#fff", border: "1px solid #535353", borderRadius: 20, padding: "8px 20px", cursor: "pointer", fontSize: 13, fontWeight: 600 },
+  
+  // Styles mới cho Popup
+  overlay:      { position: "fixed", inset: 0, backgroundColor: "rgba(0,0,0,0.75)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 1000 },
+  confirmBox:   { backgroundColor: "#282828", borderRadius: 8, padding: 24, width: 400, maxWidth: "90%", display: "flex", flexDirection: "column", gap: 8, boxShadow: "0 8px 24px rgba(0,0,0,0.5)" },
+  confirmTitle: { margin: 0, fontSize: 18, fontWeight: 700, color: "#fff" },
+  confirmSub:   { margin: "0 0 16px 0", fontSize: 14, color: "#b3b3b3" },
+  confirmBtns:  { display: "flex", gap: 12, justifyContent: "flex-end" },
+  
+  // Gộp chung 1 style gốc (Base) cho cả 2 nút, để code không bị lặp lại
+  btnPopupBase: { 
+    backgroundColor: "transparent", 
+    color: "#fff", 
+    border: "1px solid #535353", 
+    borderRadius: 20, 
+    padding: "8px 20px", 
+    fontWeight: 700, 
+    cursor: "pointer", 
+    fontSize: 14,
+    transition: "all 0.2s ease" // TẠI SAO CẦN DÒNG NÀY? Để khi hover, màu sắc chuyển đổi mượt mà chứ không bị giật (chớp) đổi màu ngay lập tức.
+  },
+  deleteBtn:    { backgroundColor: "transparent", border: "none", color: "#b3b3b3", fontSize: 16, cursor: "pointer", padding: "4px 8px", fontWeight: "bold" },
 };

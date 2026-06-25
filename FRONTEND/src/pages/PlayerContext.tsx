@@ -1,5 +1,5 @@
 // src/pages/PlayerContext.tsx
-import { createContext, useContext, useState, useEffect } from 'react';
+import { createContext, useContext, useState, useEffect, useRef } from 'react';
 import type { ReactNode } from 'react';
 import type { AudioMediaDto } from '../types/Media.ts';
 
@@ -10,12 +10,14 @@ interface PlayerContextType {
   favIds: Set<string>;
   setFavIds: (ids: Set<string>) => void;
   toggleFavId: (id: string) => void;
+  mediaRef: React.MutableRefObject<HTMLMediaElement | null>;
 }
 
 const PlayerContext = createContext<PlayerContextType | undefined>(undefined);
 
 export function PlayerProvider({ children }: { children: ReactNode }) {
   const [currentTrack, setCurrentTrack] = useState<AudioMediaDto | null>(null);
+  const mediaRef = useRef<HTMLMediaElement | null>(null);
 
   // Khởi tạo favIds từ localStorage để không bị mất khi F5
   const [favIds, setFavIdsState] = useState<Set<string>>(() => {
@@ -60,7 +62,8 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
       updateCurrentTrack, 
       favIds, 
       setFavIds, 
-      toggleFavId 
+      toggleFavId,
+      mediaRef 
     }}>
       {children}
     </PlayerContext.Provider>

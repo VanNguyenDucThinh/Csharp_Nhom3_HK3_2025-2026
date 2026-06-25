@@ -53,7 +53,7 @@ namespace TuneVault.Infrastructure.Repositories
         {
             string sql = @"select [Id], [Name], [Owner], [IsPublic], [CreateDate], [UrlImage]
                            from PlayList
-                           where Id = @Id AND IsPublic = 1";
+                           where Id = @Id";
             using var connection = _connection.CreateConnection();
             var command = new CommandDefinition(sql, new { Id = playListId });
             return await connection.QueryFirstOrDefaultAsync<PlayListEntities>(command);
@@ -92,6 +92,16 @@ namespace TuneVault.Infrastructure.Repositories
             return result.ToList();
         }
 
+        public async Task<PlayListEntities> GetPlayListPublic(Guid playListId)
+        {
+            string sql = @"select [Id], [Name], [Owner], [IsPublic], [CreateDate], [UrlImage]
+                           from PlayList
+                           where Id = @Id AND IsPublic = 1";
+            using var connection = _connection.CreateConnection();
+            var command = new CommandDefinition(sql, new { Id = playListId });
+            return await connection.QueryFirstOrDefaultAsync<PlayListEntities>(command);
+        }
+
         public async Task<bool> UpdatePlayList(PlayListEntities playList)
         {
             string sql = @"update PlayList
@@ -110,5 +120,6 @@ namespace TuneVault.Infrastructure.Repositories
             int RowsAffected = await connection.ExecuteAsync(command);
             return RowsAffected > 0;
         }
+        
     }
 }

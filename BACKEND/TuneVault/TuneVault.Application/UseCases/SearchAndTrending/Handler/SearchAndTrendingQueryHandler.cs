@@ -41,14 +41,16 @@ public class SearchAndTrendingQueryHandler:IRequestHandler<SearchAndTrendingQuer
             Owner=x.Owner,
             Title=x.Title,
             Artist=x.Artist,
-            UrlImage=x.UrlImageMedia
+            UrlImage=x.UrlImageMedia,
+            mediaStyle=x.MediaStyle
         }).ToList();
         page.ListPlayList=listPlaylist.Select(x=>new PlayListDto
         {
             Id=x.Id,
             Name=x.Name,
             Owner=x.Owner,
-            UrlImage=x.UrlImage
+            UrlImage=x.UrlImage,
+            IsPublic=x.IsPublic,
         }).ToList();
 
         // var playlistDtos = new List<PlayListDto>();
@@ -81,7 +83,8 @@ public class SearchAndTrendingQueryHandler:IRequestHandler<SearchAndTrendingQuer
             Owner=x.Owner,
             Title=x.Title,
             Artist=x.Artist,
-            UrlImage=x.UrlImageMedia
+            UrlImage=x.UrlImageMedia,
+            mediaStyle=x.MediaStyle
         }).ToList();
         page.ListAlbum=listAlbum.Select(x=>new AlbumDto
         {

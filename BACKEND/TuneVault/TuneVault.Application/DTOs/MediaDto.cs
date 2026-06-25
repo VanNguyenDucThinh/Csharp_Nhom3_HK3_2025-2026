@@ -11,4 +11,5 @@ public class MediaDto
     public string? UrlImage{get; set;}
     public Category Category{get; set;}
     public Guid Owner { get; set; }
+    public MediaStyle mediaStyle {get; set;}
 }

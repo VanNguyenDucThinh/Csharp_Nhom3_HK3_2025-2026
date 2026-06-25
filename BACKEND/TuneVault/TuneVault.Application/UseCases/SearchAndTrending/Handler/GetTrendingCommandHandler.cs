@@ -25,16 +25,16 @@ public class GetTrendingCommandHandler:IRequestHandler<GetTrendingCommand, Searc
         var page = new SearchTrendingDto
         {
             CurrentPage=request.PageNumber,
-            trending=list.Select(x=> new MediaDto
+            ListTrending=list.Select(x=> new MediaDto
             {
                 Id=x.Id,
                 Artist=x.Artist,
                 Category=x.Category,
                 Owner=x.Owner,
                 Title=x.Title,
-                UrlImage=x.UrlImageMedia
+                UrlImage=x.UrlImageMedia,
+                mediaStyle=x.MediaStyle,
             }).ToList()
-            
         };
         return page;
     }

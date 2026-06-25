@@ -14,19 +14,6 @@ C:\Users\DUC KHAN\Documents\GitHub\Csharp_Nhom3_HK3_2025-2026\BACKEND\TuneVault\
 <<<<<<< Updated upstream
 =======
 >>>>>>> Stashed changes
-C:\Users\Van Nguyen Duc Thinh\Documents\GitHub\Csharp_Nhom3_HK3_2025-2026\BACKEND\TuneVault\TuneVault.Domain\bin\Debug\net10.0\TuneVault.Domain.deps.json
-C:\Users\Van Nguyen Duc Thinh\Documents\GitHub\Csharp_Nhom3_HK3_2025-2026\BACKEND\TuneVault\TuneVault.Domain\bin\Debug\net10.0\TuneVault.Domain.dll
-C:\Users\Van Nguyen Duc Thinh\Documents\GitHub\Csharp_Nhom3_HK3_2025-2026\BACKEND\TuneVault\TuneVault.Domain\bin\Debug\net10.0\TuneVault.Domain.pdb
-C:\Users\Van Nguyen Duc Thinh\Documents\GitHub\Csharp_Nhom3_HK3_2025-2026\BACKEND\TuneVault\TuneVault.Domain\obj\Debug\net10.0\TuneVault.Domain.csproj.AssemblyReference.cache
-C:\Users\Van Nguyen Duc Thinh\Documents\GitHub\Csharp_Nhom3_HK3_2025-2026\BACKEND\TuneVault\TuneVault.Domain\obj\Debug\net10.0\TuneVault.Domain.GeneratedMSBuildEditorConfig.editorconfig
-C:\Users\Van Nguyen Duc Thinh\Documents\GitHub\Csharp_Nhom3_HK3_2025-2026\BACKEND\TuneVault\TuneVault.Domain\obj\Debug\net10.0\TuneVault.Domain.AssemblyInfoInputs.cache
-C:\Users\Van Nguyen Duc Thinh\Documents\GitHub\Csharp_Nhom3_HK3_2025-2026\BACKEND\TuneVault\TuneVault.Domain\obj\Debug\net10.0\TuneVault.Domain.AssemblyInfo.cs
-C:\Users\Van Nguyen Duc Thinh\Documents\GitHub\Csharp_Nhom3_HK3_2025-2026\BACKEND\TuneVault\TuneVault.Domain\obj\Debug\net10.0\TuneVault.Domain.csproj.CoreCompileInputs.cache
-C:\Users\Van Nguyen Duc Thinh\Documents\GitHub\Csharp_Nhom3_HK3_2025-2026\BACKEND\TuneVault\TuneVault.Domain\obj\Debug\net10.0\TuneVault.Domain.sourcelink.json
-C:\Users\Van Nguyen Duc Thinh\Documents\GitHub\Csharp_Nhom3_HK3_2025-2026\BACKEND\TuneVault\TuneVault.Domain\obj\Debug\net10.0\TuneVault.Domain.dll
-C:\Users\Van Nguyen Duc Thinh\Documents\GitHub\Csharp_Nhom3_HK3_2025-2026\BACKEND\TuneVault\TuneVault.Domain\obj\Debug\net10.0\refint\TuneVault.Domain.dll
-C:\Users\Van Nguyen Duc Thinh\Documents\GitHub\Csharp_Nhom3_HK3_2025-2026\BACKEND\TuneVault\TuneVault.Domain\obj\Debug\net10.0\TuneVault.Domain.pdb
-C:\Users\Van Nguyen Duc Thinh\Documents\GitHub\Csharp_Nhom3_HK3_2025-2026\BACKEND\TuneVault\TuneVault.Domain\obj\Debug\net10.0\ref\TuneVault.Domain.dll
 C:\Users\ACER\Downloads\Csharp_Nhom3_HK3_2025-2026\BACKEND\TuneVault\TuneVault.Domain\bin\Debug\net10.0\TuneVault.Domain.deps.json
 C:\Users\ACER\Downloads\Csharp_Nhom3_HK3_2025-2026\BACKEND\TuneVault\TuneVault.Domain\bin\Debug\net10.0\TuneVault.Domain.dll
 C:\Users\ACER\Downloads\Csharp_Nhom3_HK3_2025-2026\BACKEND\TuneVault\TuneVault.Domain\bin\Debug\net10.0\TuneVault.Domain.pdb
@@ -40,3 +27,16 @@ C:\Users\ACER\Downloads\Csharp_Nhom3_HK3_2025-2026\BACKEND\TuneVault\TuneVault.D
 C:\Users\ACER\Downloads\Csharp_Nhom3_HK3_2025-2026\BACKEND\TuneVault\TuneVault.Domain\obj\Debug\net10.0\refint\TuneVault.Domain.dll
 C:\Users\ACER\Downloads\Csharp_Nhom3_HK3_2025-2026\BACKEND\TuneVault\TuneVault.Domain\obj\Debug\net10.0\TuneVault.Domain.pdb
 C:\Users\ACER\Downloads\Csharp_Nhom3_HK3_2025-2026\BACKEND\TuneVault\TuneVault.Domain\obj\Debug\net10.0\ref\TuneVault.Domain.dll
+C:\Users\Van Nguyen Duc Thinh\Documents\GitHub\Csharp_Nhom3_HK3_2025-2026\BACKEND\TuneVault\TuneVault.Domain\bin\Debug\net10.0\TuneVault.Domain.deps.json
+C:\Users\Van Nguyen Duc Thinh\Documents\GitHub\Csharp_Nhom3_HK3_2025-2026\BACKEND\TuneVault\TuneVault.Domain\bin\Debug\net10.0\TuneVault.Domain.dll
+C:\Users\Van Nguyen Duc Thinh\Documents\GitHub\Csharp_Nhom3_HK3_2025-2026\BACKEND\TuneVault\TuneVault.Domain\bin\Debug\net10.0\TuneVault.Domain.pdb
+C:\Users\Van Nguyen Duc Thinh\Documents\GitHub\Csharp_Nhom3_HK3_2025-2026\BACKEND\TuneVault\TuneVault.Domain\obj\Debug\net10.0\TuneVault.Domain.csproj.AssemblyReference.cache
+C:\Users\Van Nguyen Duc Thinh\Documents\GitHub\Csharp_Nhom3_HK3_2025-2026\BACKEND\TuneVault\TuneVault.Domain\obj\Debug\net10.0\TuneVault.Domain.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\Van Nguyen Duc Thinh\Documents\GitHub\Csharp_Nhom3_HK3_2025-2026\BACKEND\TuneVault\TuneVault.Domain\obj\Debug\net10.0\TuneVault.Domain.AssemblyInfoInputs.cache
+C:\Users\Van Nguyen Duc Thinh\Documents\GitHub\Csharp_Nhom3_HK3_2025-2026\BACKEND\TuneVault\TuneVault.Domain\obj\Debug\net10.0\TuneVault.Domain.AssemblyInfo.cs
+C:\Users\Van Nguyen Duc Thinh\Documents\GitHub\Csharp_Nhom3_HK3_2025-2026\BACKEND\TuneVault\TuneVault.Domain\obj\Debug\net10.0\TuneVault.Domain.csproj.CoreCompileInputs.cache
+C:\Users\Van Nguyen Duc Thinh\Documents\GitHub\Csharp_Nhom3_HK3_2025-2026\BACKEND\TuneVault\TuneVault.Domain\obj\Debug\net10.0\TuneVault.Domain.sourcelink.json
+C:\Users\Van Nguyen Duc Thinh\Documents\GitHub\Csharp_Nhom3_HK3_2025-2026\BACKEND\TuneVault\TuneVault.Domain\obj\Debug\net10.0\TuneVault.Domain.dll
+C:\Users\Van Nguyen Duc Thinh\Documents\GitHub\Csharp_Nhom3_HK3_2025-2026\BACKEND\TuneVault\TuneVault.Domain\obj\Debug\net10.0\refint\TuneVault.Domain.dll
+C:\Users\Van Nguyen Duc Thinh\Documents\GitHub\Csharp_Nhom3_HK3_2025-2026\BACKEND\TuneVault\TuneVault.Domain\obj\Debug\net10.0\TuneVault.Domain.pdb
+C:\Users\Van Nguyen Duc Thinh\Documents\GitHub\Csharp_Nhom3_HK3_2025-2026\BACKEND\TuneVault\TuneVault.Domain\obj\Debug\net10.0\ref\TuneVault.Domain.dll

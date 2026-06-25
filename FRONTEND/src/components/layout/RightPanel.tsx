@@ -1,7 +1,8 @@
-// src/components/layout/RightPanel.tsx
 import React, { useState, useEffect } from 'react';
 import { usePlayer } from '../../pages/PlayerContext.tsx'; 
 import apiClient, { showApiError } from '../../api/apiClient.ts'; 
+
+const BACKEND_DOMAIN = "http://localhost:5124";
 
 function CloseIcon() {
   return (
@@ -12,25 +13,35 @@ function CloseIcon() {
 }
 
 export default function RightPanel({ onClose }: { onClose: () => void }) {
-  const { currentTrack, updateCurrentTrack, favIds, toggleFavId } = usePlayer();
+  const { currentTrack, updateCurrentTrack, favIds, toggleFavId, mediaRef } = usePlayer();
   const [isFavorite, setIsFavorite] = useState(false);
 
-  // ĐỒNG BỘ TRẠNG THÁI: Mỗi khi bài hát đổi HOẶC danh sách yêu thích thay đổi
   useEffect(() => {
     if (currentTrack) {
-      // Ưu tiên kiểm tra trong favIds (độ chính xác cao nhất)
-      const isFav = favIds.has((currentTrack as any).id);
+      const isFav = favIds.has(currentTrack.id);
       setIsFavorite(isFav);
     }
   }, [currentTrack, favIds]);
+  useEffect(() => {
+    if (mediaRef.current && currentTrack) {
+      // Đợi một chút để React cập nhật DOM (src mới) xong
+      const playPromise = mediaRef.current.play();
+      
+      if (playPromise !== undefined) {
+        playPromise.catch((error: unknown) => {
+          console.warn("Trình duyệt chặn tự động phát:", error);
+          // Nếu bị chặn, bạn có thể tự thêm logic hiện nút "Nhấn để phát" ở đây nếu muốn
+        });
+      }
+    }
+  }, [currentTrack, mediaRef]);
 
   const handleToggleFavorite = async () => {
     if (!currentTrack) return;
     
-    const trackId = (currentTrack as any).id;
+    const trackId = currentTrack.id;
     const previousState = isFavorite;
 
-    // Optimistic UI: Đổi trạng thái ngay lập tức
     setIsFavorite(!previousState);
 
     try {
@@ -39,13 +50,8 @@ export default function RightPanel({ onClose }: { onClose: () => void }) {
       } else {
         await apiClient.media.favorite(trackId);
       }
-
-      // Cập nhật Context: Tự động thêm/xóa ID trong favIds và cập nhật track
       toggleFavId(trackId);
-      updateCurrentTrack({ ...(currentTrack as any), isFavorite: !previousState });
-      
     } catch (error) {
-      // Rollback nếu API lỗi
       setIsFavorite(previousState);
       showApiError(error);
     }
@@ -65,6 +71,11 @@ export default function RightPanel({ onClose }: { onClose: () => void }) {
     );
   }
 
+  // Xử lý URL media an toàn
+  const mediaSrc = currentTrack.urlMedia?.startsWith("http") 
+    ? currentTrack.urlMedia 
+    : `${BACKEND_DOMAIN}/${currentTrack.urlMedia}`;
+
   return (
     <div style={styles.container}>
       <div style={styles.header}>
@@ -75,12 +86,25 @@ export default function RightPanel({ onClose }: { onClose: () => void }) {
       </div>
 
       <div style={styles.body}>
-        {currentTrack.urlImage ? (
-          <img src={currentTrack.urlImage} alt={currentTrack.title} style={styles.imageCover} />
+        {/* Render Video hoặc Image tùy theo mediaStyle */}
+        {currentTrack.mediaStyle === 1 ? (
+          <video 
+            controls
+            src={mediaSrc}
+            style={{ ...styles.imageCover, objectFit: 'contain', backgroundColor: '#000' }}
+          />
         ) : (
-          <div style={{ ...styles.bigCover, background: 'linear-gradient(135deg, #1e3264, #121212)' }}>
-            <span style={styles.bigCoverIcon}>🎵</span>
-          </div>
+          currentTrack.urlImage ? (
+            <img 
+              src={currentTrack.urlImage.startsWith("http") ? currentTrack.urlImage : `${BACKEND_DOMAIN}/${currentTrack.urlImage}`} 
+              alt={currentTrack.title} 
+              style={styles.imageCover} 
+            />
+          ) : (
+            <div style={{ ...styles.bigCover, background: 'linear-gradient(135deg, #1e3264, #121212)' }}>
+              <span style={styles.bigCoverIcon}>🎵</span>
+            </div>
+          )
         )}
 
         <div style={styles.trackInfo}>

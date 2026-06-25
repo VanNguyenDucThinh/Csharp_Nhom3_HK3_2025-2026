@@ -31,6 +31,7 @@ export interface MediaDto {
   urlImage: string;  // Đường dẫn ảnh đại diện
   category: Category; // Thể loại nhạc (Pop, Rock, Remix...)
   owner: string;     // Guid của người upload -> string
+  mediaStyle:number;
 }
 
 /**
@@ -43,6 +44,7 @@ export interface AudioMediaDto {
   artist: string;
   urlImage?: string; // Dấu "?" tương ứng kiểu nullable (string?) trong C#
   urlMedia?: string; // Link stream âm thanh thật để trình phát nhạc hoạt động
+  mediaStyle:number;
 }
 
 /**
@@ -50,10 +52,12 @@ export interface AudioMediaDto {
  * Dùng cho: GET /api/media/Video/{id}
  */
 export interface VideoDto {
+  id:string;
   title: string;
   artist: string;
   urlImage?: string;
   urlMedia?: string;
+  mediaStyle:number;
 }
 
 /**

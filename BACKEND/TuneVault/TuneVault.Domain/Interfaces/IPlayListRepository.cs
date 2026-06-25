@@ -11,5 +11,6 @@ public interface IPlayListRepository
     Task<List<PlayListEntities>> GetPlayListForMe(Guid owner);
     Task<PlayListEntities> GetPlayListById(Guid playListId);//Lấy thông tin playlist
     Task<List<PlayListEntities>> GetPlayListByTitle(string title, int skip, int take);
+    Task<PlayListEntities> GetPlayListPublic(Guid playListId);
 
 }
