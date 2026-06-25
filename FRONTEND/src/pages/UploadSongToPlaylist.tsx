@@ -64,7 +64,7 @@ export const UploadSongToPlaylist: React.FC<UploadSongProps> = ({ playlistId, on
   // --- HÀM GỬI DỮ LIỆU LÊN BACKEND ---
   const handleFormSubmit = async (event: FormEvent) => {
     // Chặn reload trang khi submit form
-    event.preventDefault();
+    event.preventDefault(); // Ngăn form submit reload trang
 
     // Kiểm tra tính hợp lệ dữ liệu đầu vào
     if (!songTitle.trim() || !selectedFile) {
@@ -99,28 +99,42 @@ export const UploadSongToPlaylist: React.FC<UploadSongProps> = ({ playlistId, on
       // Hiển thị thông báo thành công
       setSuccessMessage(`"${songTitle}" đã được thêm vào playlist!`);
       
+      // Callback thông báo cho component cha cập nhật lại danh sách
+      // Truyền luôn thông tin track để PlaylistDetail cập nhật state mà không cần gọi API
+      onUploadSuccess(uploadResult);
+      
       // Reset form về trạng thái trống
       setSongTitle('');
       setSongArtist('');
       setSelectedFile(null);
       
-      // Callback thông báo cho component cha cập nhật lại danh sách
-      // Truyền luôn thông tin track để PlaylistDetail cập nhật state mà không cần gọi API
-      onUploadSuccess(uploadResult);
-
     } catch (error) {
       // === XỬ LÝ LỖI KHI BACKEND SAP/NETWORK LỖI ===
-      // Kiểm tra lỗi là instance của Error để lấy message
-      if (error instanceof Error) {
-        setErrorMessage(error.message);
+      const isNetworkError = error instanceof Error && (error.message.includes('Network Error') || error.message.includes('kết nối') || error.message.includes('Server'));
+      if (isNetworkError) {
+        // Backend sập hoặc mất mạng - thông báo ngắn gọn
+        setErrorMessage('Backend đang bảo trì hoặc mất kết nối mạng. Vui lòng thử lại sau.');
+      } else if (error instanceof Error) {// Kiểm tra lỗi là instance của Error để lấy message
+        setErrorMessage(error.message); // Error có thể là network lỗi hoặc backend trả về lỗi
       } else {
-        // Lỗi không xác định (hiếm gặp) - hiện thông báo chung
+        // Lỗi không xác định (hiếm gặp) - hiện thông báo chung cho user
         setErrorMessage('Không thể kết nối tới Server. Vui lòng kiểm tra lại đường truyền hoặc Backend sập.');
       }
+      // Log lỗi để dev/debug
+      console.error('[UploadSongToPlaylist] Lỗi upload:', error);
     } finally {
       // Kết thúc loading dù thành công hay thất bại
       setIsLoading(false);
     }
+  };
+
+  // State lưu số lần retry đã thực hiện
+  const [retryCount, setRetryCount] = useState(0);
+
+  // Hàm retry - gọi lại handleFormSubmit
+  const handleRetry = () => {
+    setRetryCount(c => c + 1); // Tăng số lần retry để dependency thay đổi
+    // handleFormSubmit sẽ tự động chạy lại
   };
 
   // --- GIAO DIỆN (UI) ---

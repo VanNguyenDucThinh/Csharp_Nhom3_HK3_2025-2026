@@ -335,16 +335,17 @@ export default function PlaylistDetail() {
             {soLuongBai === 0 && " — Playlist đang trống"}
           </p>
 
-          {/* Nút thêm bài hát từ thư viện */}
-          <button style={styles.addTrackBtn} onClick={() => setHienModal(true)}>
-            + Thêm bài hát
-          </button>
+          <div style={{display: "flex", gap: 8}}>
+            {/* Nút thêm bài hát từ thư viện */}
+            <button style={styles.addTrackBtn} onClick={() => setHienModal(true)}>
+              + Thêm bài hát
+            </button>
 
-          {/* Nút upload trực tiếp vào playlist - nằm cùng hàng với nút trên */}
-          <button style={{...styles.addTrackBtn, marginLeft: 8}} onClick={() => setHienModalUpload(true)}>
-            ⬆ Upload lên Playlist
-          </button>
-
+            {/* Nút upload trực tiếp vào playlist - nằm cùng hàng với nút trên */}
+            <button style={{...styles.addTrackBtn, marginLeft: 8}} onClick={() => setHienModalUpload(true)}>
+              ⬆ Upload lên Playlist
+            </button>
+          </div>
         </div>
       </div>
 
