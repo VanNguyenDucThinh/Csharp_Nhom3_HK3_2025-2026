@@ -12,6 +12,7 @@ import Notifications from "./pages/Notifications.tsx";
 import ShareInbox from "./pages/ShareInbox.tsx";
 import Upload from "./pages/Upload.tsx";
 
+
 function isAuthenticated(): boolean {
   return !!localStorage.getItem("token");
 }

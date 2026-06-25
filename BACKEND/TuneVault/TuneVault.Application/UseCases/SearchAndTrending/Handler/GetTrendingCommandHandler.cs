@@ -25,7 +25,7 @@ public class GetTrendingCommandHandler:IRequestHandler<GetTrendingCommand, Searc
         var page = new SearchTrendingDto
         {
             CurrentPage=request.PageNumber,
-            ListTrending=list.Select(x=> new MediaDto
+            trending=list.Select(x=> new MediaDto
             {
                 Id=x.Id,
                 Artist=x.Artist,

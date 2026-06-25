@@ -6,6 +6,7 @@ import { usePlayer } from "./PlayerContext.tsx";
 import type { PlayListDto as Playlist } from "../types/Playlist.ts";
 import type { MediaDto } from "../types/Media.ts";
 import { Category } from "../types/Media.ts";
+import { UploadSongToPlaylist } from "./UploadSongToPlaylist.tsx"
 
 const BACKEND_DOMAIN = "http://localhost:5124";
 
@@ -182,6 +183,9 @@ export default function PlaylistDetail() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [hienModal, setHienModal] = useState(false);
+  
+  const [hienModalUpload, setHienModalUpload] = useState(false); // State điều khiển modal upload trực tiếp vào playlist
+
   const [dangXoa, setDangXoa] = useState<string | null>(null); // id bài đang xóa
   const [thongBao, setThongBao] = useState(""); // Thông báo thành công tạm thời
   const [rowHover, setRowHover] = useState<string | null>(null);
@@ -331,10 +335,16 @@ export default function PlaylistDetail() {
             {soLuongBai === 0 && " — Playlist đang trống"}
           </p>
 
-          {/* Nút thêm bài hát */}
+          {/* Nút thêm bài hát từ thư viện */}
           <button style={styles.addTrackBtn} onClick={() => setHienModal(true)}>
             + Thêm bài hát
           </button>
+
+          {/* Nút upload trực tiếp vào playlist - nằm cùng hàng với nút trên */}
+          <button style={{...styles.addTrackBtn, marginLeft: 8}} onClick={() => setHienModalUpload(true)}>
+            ⬆ Upload lên Playlist
+          </button>
+
         </div>
       </div>
 
@@ -470,6 +480,50 @@ export default function PlaylistDetail() {
           }}
         />
       )}
+
+      {/* ── Modal upload trực tiếp vào playlist ───────────────────────────── */}
+      {hienModalUpload && (
+        <div 
+          style={modalStyles.overlay} 
+          onClick={() => setHienModalUpload(false)}
+        >
+          {/* Dùng overlay để click ra ngoài là đóng modal */}
+          <div 
+            style={{
+              ...modalStyles.box, 
+              width: 520,
+              maxHeight: "90vh",
+              padding: "24px",
+              boxSizing: "border-box"
+            }} 
+            onClick={(e) => e.stopPropagation()} // Ngăn click lan ra ngoài
+          >
+            <div style={modalStyles.header}>
+              <h2 style={modalStyles.title}>Upload nhạc vào playlist</h2>
+              <button 
+                style={modalStyles.closeBtn} 
+                onClick={() => setHienModalUpload(false)}
+              >
+                ✕
+              </button>
+            </div>
+            
+            {/* Component upload truyền playlistId và callback cập nhật */}
+            <div style={{paddingTop: 8}}>
+              <UploadSongToPlaylist
+                playlistId={id!}
+                onUploadSuccess={(track) => {
+                  // Cập nhật danh sách track trong playlist
+                  handleThemThanhCong(track);
+                  // Đóng modal sau khi upload thành công
+                  setHienModalUpload(false);
+                }}
+              />
+            </div>
+          </div>
+        </div>
+      )}
+
     </div>
   );
 }

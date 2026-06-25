@@ -155,9 +155,9 @@ const apiClient = {
   // --- MEDIA (api/media) ---
   media: {
     // POST api/media/upload (multipart/form-data)
-    upload: async (formData: FormData): Promise<unknown> => {
+    upload: async (formData: FormData): Promise<MediaDto> => {
       try {
-        const response = await axiosInstance.post<ApiResponse<unknown>>(
+        const response = await axiosInstance.post<ApiResponse<MediaDto>>(
           "/Media/upload",
           formData,
           { headers: { "Content-Type": "multipart/form-data" } },

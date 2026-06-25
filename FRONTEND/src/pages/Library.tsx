@@ -23,7 +23,7 @@ export default function Library() {
           apiClient.media.trend(1, 50),
         ]);
         setPlaylists(pls);
-        const mediaList: MediaItem[] = trendData.listTrending || [];
+        const mediaList: MediaItem[] = trendData.trending || [];
         setUploads(mediaList);
       } catch (err) {
         showApiError(err);
