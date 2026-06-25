@@ -6,7 +6,7 @@ import PlayerBar from './PlayerBar.tsx'
 import RightPanel from './RightPanel.tsx'
 import FriendActivity from './FriendActivity.tsx'
 import TopHeader from './TopHeader.tsx'
-import AudioPlayer from '../media/AudioPlayer.tsx'
+import AudioPlayer from '../media/AudioPlayer.tsx';
 
 // Icon thu gọn/mở rộng sidebar (mũi tên)
 function CollapseIcon({ direction }: { direction: 'left' | 'right' }) {

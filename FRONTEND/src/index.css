@@ -348,3 +348,80 @@ input[type="range"] {
   cursor: pointer;
   margin: 0;
 }
+/* ============================================================
+   THANH TIẾN TRÌNH MỚI — progress-input-seek
+   Dùng 1 input range duy nhất, fill bằng CSS background gradient.
+   --progress là custom property được set từ React (style={{ '--progress': '...' }})
+   Cách này đảm bảo chấm tròn và fill luôn đồng bộ vì cùng 1 element.
+   ============================================================ */
+.progress-input-seek {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  height: 4px;
+  border-radius: 2px;
+  outline: none;
+  cursor: pointer;
+  /* Fill từ 0 đến --progress bằng xanh lá, phần còn lại xám */
+  background: linear-gradient(
+    to right,
+    #1DB954 0%,
+    #1DB954 var(--progress, 0%),
+    #404040 var(--progress, 0%),
+    #404040 100%
+  );
+  transition: height 0.15s ease;
+}
+.progress-input-seek:hover {
+  height: 6px;
+}
+
+/* Chấm tròn — ẩn mặc định, hiện khi hover */
+.progress-input-seek::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: #ffffff;
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity 0.15s ease;
+}
+.progress-input-seek::-moz-range-thumb {
+  width: 12px;
+  height: 12px;
+  border: none;
+  border-radius: 50%;
+  background: #ffffff;
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity 0.15s ease;
+}
+.progress-input-seek:hover::-webkit-slider-thumb,
+.progress-input-seek:hover::-moz-range-thumb {
+  opacity: 1;
+}
+
+/* Volume slider — màu trắng mặc định, xanh lá khi hover */
+.volume-slider .progress-input-seek {
+  background: linear-gradient(
+    to right,
+    #ffffff 0%,
+    #ffffff var(--progress, 0%),
+    #535353 var(--progress, 0%),
+    #535353 100%
+  );
+}
+.volume-slider .progress-input-seek:hover {
+  background: linear-gradient(
+    to right,
+    #77dd77 0%,
+    #77dd77 var(--progress, 0%),
+    #535353 var(--progress, 0%),
+    #535353 100%
+  );
+}
+.volume-slider .progress-input-seek:hover::-webkit-slider-thumb,
+.volume-slider .progress-input-seek:hover::-moz-range-thumb {
+  opacity: 1;
+}

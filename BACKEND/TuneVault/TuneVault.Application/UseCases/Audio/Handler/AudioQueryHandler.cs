@@ -34,6 +34,7 @@ public class AudioQueryHandler:IRequestHandler<AudioQuery,AudioMediaDto>
         //Lấy ra cho react
         return new AudioMediaDto
         {
+            Id=audio.Id,
             Title=audio.Title,
             Artist=audio.Artist,
             UrlImage=audio.UrlImageMedia,

@@ -236,7 +236,7 @@ const apiClient = {
       try {
         const response = await axiosInstance.get<
           ApiResponse<SearchTrendingDto>
-        >("/trend", { params: { pageNumber, pageSize } });
+        >("/Trend", { params: { pageNumber, pageSize } });
         return unwrapApiResponse(response, "Không thể lấy danh sách trending");
       } catch (error) {
         throw new Error(getApiErrorMessage(error));

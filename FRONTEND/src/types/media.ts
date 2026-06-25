@@ -38,6 +38,7 @@ export interface MediaDto {
  * Dùng cho: GET /api/media/Audio/{id}
  */
 export interface AudioMediaDto {
+  id: string;
   title: string;
   artist: string;
   urlImage?: string; // Dấu "?" tương ứng kiểu nullable (string?) trong C#
@@ -64,7 +65,7 @@ export interface SearchTrendingDto {
   listPlayList?: PlayListDto[];
   listMediaByArtist?: MediaDto[];
   listAlbum?: AlbumDto[];
-  trending?: MediaDto[];
+  listTrending?: MediaDto[];
 
   // Phục vụ cho tính năng phân trang (Pagination) trên UI
   currentPage: number;
