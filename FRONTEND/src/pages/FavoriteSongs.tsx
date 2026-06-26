@@ -32,14 +32,30 @@ export default function FavoriteSongs() {
     loadFavorites();
   }, []);
 
-  // Hàm phát nhạc giống như trang Search
+
   const handlePlay = async (track: MediaDto) => {
     try {
-      const response = await apiClient.media.getById(track.id);
-      const data = (response as any).data?.data || (response as any).data || (response as any);
-      playTrack({ ...data, id: track.id, isFavorite: true });
+      let data;
+      // Kiểm tra mediaStyle: 1 là Video, khác 1 là Audio
+      if (track.mediaStyle === 1) {
+        data = await apiClient.media.getVideo(track.id);
+      } else {
+        data = await apiClient.media.getById(track.id);
+      }
+      
+      // Xử lý dữ liệu trả về (nếu backend bọc trong {data: ...})
+      const finalData = (data as any).data?.data || (data as any).data || data;
+      
+      // Đẩy vào context để phát
+      playTrack({ 
+        ...finalData, 
+        id: track.id, 
+        isFavorite: true,
+        mediaStyle: track.mediaStyle 
+      });
     } catch (err) {
       console.error("Không thể phát bài này:", err);
+      setErrorMessage("Không thể tải thông tin bài hát/video này.");
     }
   };
 

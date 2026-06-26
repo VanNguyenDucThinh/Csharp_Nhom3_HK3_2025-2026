@@ -33,7 +33,9 @@ public class GetSharedQueryHandler:IRequestHandler<GetSharedQuery, List<SharedIt
                 dto.Title=share.MediaItem.Title;
                 dto.IdItem=share.MediaItem.Id;
                 dto.UrlImage=share.MediaItem.UrlImageMedia;
-                dto.ShareStyle=ShareStyle.Media;
+                dto.ShareStyle = share.MediaItem.MediaStyle == MediaStyle.Video 
+                             ? ShareStyle.Video 
+                             : ShareStyle.Media;
             }
         else if(share.PlayList!=null)
             {

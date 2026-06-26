@@ -48,29 +48,30 @@ export default function Upload() {
       return;
     }
     setUploading(true);
-    setProgress(0);
+    setProgress(20); // Tạo cảm giác đang xử lý cho progress bar
     setError("");
-
-    if (USE_MOCK) {
-      // Giả lập tiến trình upload
-      for (let i = 0; i <= 100; i += 10) {
-        await new Promise((r) => setTimeout(r, 80));
-        setProgress(i);
-      }
-      setSuccess(true);
-      setUploading(false);
-      return;
-    }
 
     try {
       const formData = new FormData();
-      formData.append("mediaFile", file);
+      
+      // QUAN TRỌNG: Tên các key này phải KHỚP 100% với tham số của hàm UploadFile trong C#
+      formData.append("mediaFile", file); 
       formData.append("title", title);
       formData.append("artist", artist || "Unknown");
-      formData.append("type", mediaType);
+      
+      // Backend của bạn yêu cầu category (Enum) thay vì type. 
+      // Ta gán mặc định là "Pop" hoặc tùy chỉnh sau.
+      formData.append("category", "Pop"); 
+      formData.append("description", ""); // Thêm trường trống để backend không báo lỗi thiếu
+
+      setProgress(60); // Tiến trình đạt 60% khi bắt đầu gửi
+
+      // GỌI API THỰC TẾ (Đoạn code cũ của bạn bị thiếu dòng này)
+      await apiClient.media.upload(formData);
+
+      setProgress(100); // Xong 100%
       setSuccess(true);
     } catch (err) {
-      // Nếu backend upload lỗi, vẫn hiện alert để user biết nguyên nhân chung.
       showApiError(err);
       setError("Upload thất bại. Vui lòng thử lại.");
     } finally {

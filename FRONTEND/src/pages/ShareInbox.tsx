@@ -1,64 +1,62 @@
-// src/pages/ShareInbox.tsx
 import { useEffect, useState } from "react";
 import apiClient, { showApiError } from "../api/apiClient.ts";
 import type { SharedItemDto as MediaShare } from "../types/Share.ts";
 import { ShareStyle } from "../types/Share.ts";
+import { usePlayer } from "../pages/PlayerContext.tsx";
 
 export default function ShareInbox() {
   const [shared, setShared] = useState<MediaShare[]>([]);
   const [loading, setLoading] = useState(true);
-  const [tab, setTab] = useState<"inbox" | "sent">("inbox");
+  const { playTrack } = usePlayer();
 
   useEffect(() => {
     const load = async () => {
       setLoading(true);
       try {
-        // * apiClient currently exposes getReceived() (alias getSharedWithMe).
-        // * Backend does not provide "sent" list in client yet, so use same endpoint.
         const data = await apiClient.share.getReceived();
         setShared(data);
       } catch (err) {
-        // Nếu backend chia sẻ lỗi, hiển thị thông báo rõ cho user.
         showApiError(err);
       } finally {
         setLoading(false);
       }
     };
     load();
-  }, [tab]);
+  }, []);
+
+  // Logic phát nhạc: Lấy thông tin chi tiết qua ID rồi mới phát
+  const handlePlay = async (item: MediaShare) => {
+    try {
+      let mediaData;
+      // Gọi đúng endpoint dựa vào style
+      if (item.shareStyle === ShareStyle.Video) {
+        mediaData = await apiClient.media.getVideo(item.idItem);
+      } else {
+        mediaData = await apiClient.media.getById(item.idItem);
+      }
+
+      // Phát nhạc thông qua Context
+      playTrack({
+        id: mediaData.id,
+        title: mediaData.title,
+        artist: mediaData.artist || "Unknown",
+        urlMedia: mediaData.urlMedia,
+        urlImage: mediaData.urlImage,
+        mediaStyle: item.shareStyle === ShareStyle.Video ? 1 : 0
+      });
+    } catch (err) {
+      showApiError("Không thể phát media này: " + err);
+    }
+  };
 
   return (
     <div style={styles.page}>
       <h1 style={styles.title}>Chia sẻ Media</h1>
 
-      {/* Tabs */}
-      <div style={styles.tabs}>
-        <button
-          style={{
-            ...styles.tab,
-            ...(tab === "inbox" ? styles.activeTab : {}),
-          }}
-          onClick={() => setTab("inbox")}
-        >
-          📥 Nhận được
-        </button>
-        <button
-          style={{ ...styles.tab, ...(tab === "sent" ? styles.activeTab : {}) }}
-          onClick={() => setTab("sent")}
-        >
-          📤 Đã gửi
-        </button>
-      </div>
-
-      {/* Nội dung */}
       {loading && <p style={styles.info}>Đang tải...</p>}
 
       {!loading && shared.length === 0 && (
-        <p style={styles.empty}>
-          {tab === "inbox"
-            ? "Chưa có bài hát nào được chia sẻ với bạn."
-            : "Bạn chưa chia sẻ bài hát nào."}
-        </p>
+        <p style={styles.empty}>Chưa có bài hát nào được chia sẻ với bạn.</p>
       )}
 
       {!loading && shared.length > 0 && (
@@ -66,20 +64,17 @@ export default function ShareInbox() {
           {shared.map((item) => (
             <div key={`${item.idItem}-${item.idSender}`} style={styles.card}>
               <div style={styles.cardIcon}>
-                {item.shareStyle === ShareStyle.Media ? "🎵" : "📁"}
+                {item.shareStyle === ShareStyle.Video ? "🎬" : "🎵"}
               </div>
               <div style={styles.cardInfo}>
                 <p style={styles.trackTitle}>{item.title ?? "Bài hát"}</p>
-                <p style={styles.trackArtist}></p>
                 <p style={styles.meta}>
-                  {tab === "inbox"
-                    ? `Từ: ${item.idSender.slice(0, 8)}`
-                    : `Đã gửi`}
-                  {" · "}
-                  {new Date(item.shareAt).toLocaleDateString("vi-VN")}
+                  Từ: {item.idSender.slice(0, 8)} • {new Date(item.shareAt).toLocaleDateString("vi-VN")}
                 </p>
               </div>
-              <button style={styles.playBtn}>▶ Phát</button>
+              <button style={styles.playBtn} onClick={() => handlePlay(item)}>
+                ▶ Phát
+              </button>
             </div>
           ))}
         </div>
@@ -89,23 +84,8 @@ export default function ShareInbox() {
 }
 
 const styles: Record<string, React.CSSProperties> = {
-  page: { padding: "24px 32px", color: "#fff" },
+  page: { padding: "24px 32px", color: "#fff", backgroundColor: "#121212", minHeight: "100vh" },
   title: { fontSize: 28, fontWeight: 700, marginBottom: 24 },
-  tabs: { display: "flex", gap: 8, marginBottom: 24 },
-  tab: {
-    backgroundColor: "transparent",
-    color: "#b3b3b3",
-    border: "1px solid #383838",
-    borderRadius: 20,
-    padding: "8px 20px",
-    cursor: "pointer",
-    fontSize: 14,
-  },
-  activeTab: {
-    backgroundColor: "#282828",
-    color: "#fff",
-    borderColor: "#535353",
-  },
   list: { display: "flex", flexDirection: "column", gap: 8 },
   card: {
     display: "flex",
@@ -127,9 +107,8 @@ const styles: Record<string, React.CSSProperties> = {
     flexShrink: 0,
   },
   cardInfo: { flex: 1 },
-  trackTitle: { fontSize: 14, fontWeight: 600, marginBottom: 2 },
-  trackArtist: { fontSize: 12, color: "#b3b3b3", marginBottom: 4 },
-  meta: { fontSize: 11, color: "#535353" },
+  trackTitle: { fontSize: 14, fontWeight: 600, marginBottom: 4, color: "#fff" },
+  meta: { fontSize: 11, color: "#b3b3b3", margin: 0 },
   playBtn: {
     backgroundColor: "#1DB954",
     color: "#000",

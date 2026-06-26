@@ -5,10 +5,16 @@ using TuneVault.Application.DTOs;
 using TuneVault.Application.UseCases;
 using TuneVault.Application.UseCases.Share.Command;
 using TuneVault.Domain.Enums;
+using TuneVault.Domain.Interfaces;
 
 namespace TuneVault.API.Controllers;
 public class ShareController : BaseApiController
 {
+    private readonly IUserProfileRepository _user;
+    public ShareController(IUserProfileRepository user)
+    {
+        _user=user;
+    }
     [HttpPost]
     [Authorize]
     [ProducesResponseType(typeof(ApiResponse<ShareMediaDto>), StatusCodes.Status201Created)]
@@ -18,8 +24,7 @@ public class ShareController : BaseApiController
     {
         var command = new ShareMediaCommand(
             request.ReceiverUserId,
-            request.ItemId,
-            request.ShareStyle);
+            request.ItemId);
 
         var result = await Mediator.Send(command);
 
@@ -36,6 +41,16 @@ public class ShareController : BaseApiController
         var query = new GetSharedQuery();
         var result = await Mediator.Send(query);
         return Ok(ApiResponse<List<SharedItemDto>>.Ok(result));
+    }
+    [HttpGet("search-user")]
+    [Authorize]
+    [ProducesResponseType(typeof(ApiResponse<List<NameUserShareDto>>), StatusCodes.Status200OK)]
+    public async Task<IActionResult> SearchUser([FromQuery] string name)
+    { 
+        var query = new GetNameUserShareCommand(name);
+        var result = await Mediator.Send(query);
+    
+        return Ok(ApiResponse<List<NameUserShareDto>>.Ok(result));
     }
 }
 

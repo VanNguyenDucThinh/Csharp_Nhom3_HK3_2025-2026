@@ -72,14 +72,20 @@ export default function Search() {
     }
   };
 
-  const handlePlayTrack = async (id: string) => {
+  const handlePlayTrack = async (item: MediaItem) => {
     try {
-      const response = await apiClient.media.getById(id);
-      const data = (response as any).data?.data || (response as any).data || (response as any);
-      playTrack(data);
+      let data;
+      // Kiểm tra mediaStyle: giả sử 1 là Video, 0 là Audio
+      if (item.mediaStyle === 1) {
+        data = await apiClient.media.getVideo(item.id);
+      } else {
+        data = await apiClient.media.getById(item.id);
+      }
+    
+      // Đảm bảo data trả về có thêm mediaStyle để PlayerBar biết đường xử lý
+      playTrack({ ...data, mediaStyle: item.mediaStyle });
     } catch (error) {
       showApiError(error);
-      alert("Không thể tải bài nhạc này.");
     }
   };
 
@@ -117,7 +123,7 @@ export default function Search() {
             </thead>
             <tbody>
               {results.map((item, idx) => (
-                <tr key={item.id} style={styles.row} onClick={() => handlePlayTrack(item.id)}>
+                <tr key={item.id} style={styles.row} onClick={() => handlePlayTrack(item)}>
                   <td style={styles.td}>{idx + 1}</td>
                   <td style={styles.td}>
                     <div style={styles.trackName}>

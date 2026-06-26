@@ -121,5 +121,17 @@ namespace TuneVault.Infrastructure.Repositories
         {
             throw new NotImplementedException();
         }
+                public async Task<List<UserProfile>> GetUserProfileByName(string name)
+        {
+            string sql = @"Select Id, [Name], [Email], AvatarUrl, Bio
+                        from UserProfile
+                        where [Name] LIKE @Name"; 
+
+            using var connection = _connection.CreateConnection();
+            var parameters = new { Name = "%" + name + "%" };
+            var result = await connection.QueryAsync<UserProfile>(sql, parameters);
+    
+        return result.ToList();
+        }
     }
 }

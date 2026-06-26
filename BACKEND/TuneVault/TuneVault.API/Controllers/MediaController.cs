@@ -35,7 +35,7 @@ public class MediaController : BaseApiController
         IFormFile? coverImage,
         [FromForm] string title,
         [FromForm] string artist,
-        [FromForm] string description,
+        [FromForm] string? description,
         [FromForm] string category)
     {
         if (mediaFile == null || mediaFile.Length == 0)

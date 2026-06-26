@@ -38,3 +38,9 @@ export interface SharedItemDto {
   urlImage?: string; // Có thể null
   title: string;
 }
+export interface NameUserShareDto{
+  id: string;
+  name: string;
+  email: string;
+  urlImage?: string;
+}

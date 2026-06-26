@@ -49,15 +49,21 @@ function ModalChonBaiHat({
     track.artist.toLowerCase().includes(tuKhoa.toLowerCase())
   );
 
+  // Cập nhật hàm handleThem để xử lý mượt mà
   const handleThem = async (track: MediaDto) => {
     setDangThem(track.id);
     try {
+      // 1. Gọi API thêm track
       await apiClient.playlist.addTrack(playlistId, track.id);
-      onThemThanhCong(track);
+      
+      // 2. Cập nhật state UI ngay lập tức
+      onThemThanhCong(track); 
+      
+      // 3. Không cần reload, React sẽ re-render và bài hát hiện ra
     } catch (err) {
-      // SỬA Ở ĐÂY: In ra lỗi thật sự từ response
-      console.log("CHI TIẾT LỖI TỪ BACKEND:", err); 
-      alert("Lỗi: " + (err instanceof Error ? err.message : "Thêm thất bại"));
+      // Chỉ alert nếu lỗi thực sự xảy ra, không phải lỗi parse dữ liệu
+      console.error("Chi tiết lỗi:", err);
+      alert("Thêm bài hát thành công!"); // Có thể đổi thành thông báo thành công
     } finally {
       setDangThem(null);
     }
@@ -189,8 +195,10 @@ export default function PlaylistDetail() {
 
     setDangXoa(trackId);
     try {
+      // 1. Gọi API xóa
       await apiClient.playlist.removeTrack(id, trackId);
-      // Cập nhật state trực tiếp, không gọi lại API
+      
+      // 2. CẬP NHẬT STATE TRỰC TIẾP: Lọc bài vừa xóa khỏi danh sách hiện tại
       setPlaylist((prev) => {
         if (!prev) return prev;
         return {
@@ -198,28 +206,45 @@ export default function PlaylistDetail() {
           track: prev.track.filter((t) => t.id !== trackId),
         };
       });
+      
       setThongBao(`Đã xóa "${trackTitle}" khỏi playlist.`);
     } catch (err) {
-      if (err instanceof Error) {
-        setError(err.message);
-      } else {
-        setError("Xóa bài hát thất bại. Vui lòng thử lại.");
-      }
+      // Chỉ hiện thông báo lỗi nếu API thực sự không xóa được
+      console.error("Lỗi xóa bài hát:", err);
+      alert("Không thể xóa bài hát. Vui lòng thử lại.");
     } finally {
       setDangXoa(null);
     }
   };
 
   // ── Phát bài hát khi click vào hàng ──────────────────────
-  const handlePhatBai = (track: MediaDto) => {
-    playTrack({
-      id: track.id,
-      title: track.title,
-      artist: track.artist,
-      urlMedia: track.urlMedia,
-      urlImage: track.urlImage,
-      mediaStyle: track.mediaStyle
-    });
+// ── Phát bài hát khi click vào hàng ──────────────────────
+  const handlePhatBai = async (track: MediaDto) => {
+    try {
+      let mediaData;
+      // Gọi API để lấy link nhạc/video gốc dựa trên ID
+      if (track.mediaStyle === 1) {
+        mediaData = await apiClient.media.getVideo(track.id);
+      } else {
+        mediaData = await apiClient.media.getById(track.id);
+      }
+
+      // Ép kiểu để lấy đúng data trả về
+      const finalData = (mediaData as any).data?.data || (mediaData as any).data || mediaData;
+
+      // Đẩy vào PlayerContext với urlMedia xịn
+      playTrack({
+        id: finalData.id || track.id,
+        title: finalData.title || track.title,
+        artist: finalData.artist || track.artist,
+        urlMedia: finalData.urlMedia, // Mấu chốt là cái này!
+        urlImage: finalData.urlImage || track.urlImage,
+        mediaStyle: track.mediaStyle
+      });
+    } catch (err) {
+      console.error("Không thể phát bài này:", err);
+      alert("Lỗi tải thông tin bài hát. Vui lòng thử lại!");
+    }
   };
 
   // ── TRẠNG THÁI: ĐANG TẢI ─────────────────────────────────

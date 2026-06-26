@@ -9,13 +9,11 @@ public class ShareMediaCommand:IRequest<ShareMediaDto>
 {
     public Guid IdReceiver { get; set; }
     public Guid IdItem {get; set;}
-    public ShareStyle ShareStyle{get; set;}
 
-    public ShareMediaCommand(Guid idreceiver, Guid iditem, ShareStyle sharestyle)
+    public ShareMediaCommand(Guid idreceiver, Guid iditem)
     {
         IdReceiver=idreceiver;
         IdItem=iditem;
-        ShareStyle=sharestyle;
     }
 
 

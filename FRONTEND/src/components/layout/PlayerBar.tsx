@@ -1,4 +1,3 @@
-// src/components/layout/PlayerBar.tsx
 import { useState, useRef, useEffect } from 'react'
 import { usePlayer } from '../../pages/PlayerContext.tsx' // Đảm bảo đường dẫn này đúng với dự án của bạn
 

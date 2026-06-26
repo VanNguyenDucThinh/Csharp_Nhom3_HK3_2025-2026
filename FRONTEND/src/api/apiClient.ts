@@ -35,6 +35,7 @@ import type {
   ShareMediaDto,
   ShareStyle,
   SharedItemDto,
+  NameUserShareDto,
 } from "../types/Share.ts";
 
 import type { NotificationDto, Read } from "../types/Notification.ts";
@@ -155,9 +156,9 @@ const apiClient = {
   // --- MEDIA (api/media) ---
   media: {
     // POST api/media/upload (multipart/form-data)
-    upload: async (formData: FormData): Promise<MediaDto> => {
+    upload: async (formData: FormData): Promise<unknown> => {
       try {
-        const response = await axiosInstance.post<ApiResponse<MediaDto>>(
+        const response = await axiosInstance.post<ApiResponse<unknown>>(
           "/Media/upload",
           formData,
           { headers: { "Content-Type": "multipart/form-data" } },
@@ -286,7 +287,7 @@ const apiClient = {
     getMyPlaylists: async (): Promise<PlayListDto[]> => {
       try {
         const response =
-          await axiosInstance.get<ApiResponse<PlayListDto[]>>("/playlist");
+          await axiosInstance.get<ApiResponse<PlayListDto[]>>("/Playlist");
         return unwrapApiResponse(response, "Không thể lấy danh sách playlist");
       } catch (error) {
         throw new Error(getApiErrorMessage(error));
@@ -302,7 +303,7 @@ const apiClient = {
     getById: async (id: string): Promise<PlayListDto> => {
       try {
         const response = await axiosInstance.get<ApiResponse<PlayListDto>>(
-          `/playlist/${id}`,
+          `/Playlist/${id}`,
         );
         return unwrapApiResponse(response, "Không thể lấy chi tiết playlist");
       } catch (error) {
@@ -314,7 +315,7 @@ const apiClient = {
     create: async (formData: FormData): Promise<PlayListDto> => {
       try {
         const response = await axiosInstance.post<ApiResponse<PlayListDto>>(
-          "/playlist",
+          "/Playlist",
           formData,
           { headers: { "Content-Type": "multipart/form-data" } },
         );
@@ -328,7 +329,7 @@ const apiClient = {
     update: async (id: string, formData: FormData): Promise<PlayListDto> => {
       try {
         const response = await axiosInstance.put<ApiResponse<PlayListDto>>(
-          `/playlist/${id}`,
+          `/Playlist/${id}`,
           formData,
           { headers: { "Content-Type": "multipart/form-data" } },
         );
@@ -342,28 +343,23 @@ const apiClient = {
     delete: async (id: string): Promise<void> => {
       try {
         const response = await axiosInstance.delete<ApiResponseNoData>(
-          `/playlist/${id}`,
+          `/Playlist/${id}`,
         );
-        // Thay vì dùng unwrapApiResponse nghiêm ngặt, ta chỉ cần check status
-        if (response.status !== 200 && response.status !== 204) {
-             throw new Error("Xóa thất bại");
-        }
+        unwrapApiResponse(response, "Xóa playlist thất bại");
       } catch (error) {
         throw new Error(getApiErrorMessage(error));
       }
     },
 
     // POST api/playlist/{id}/tracks
-    // Sửa lại trong apiClient.ts
     addTrack: async (playlistId: string, mediaId: string): Promise<void> => {
       try {
         const response = await axiosInstance.post<ApiResponseNoData>(
           `/playlist/${playlistId}/tracks`,
-          { "MediaId": mediaId }, // PHẢI VIẾT HOA CHỮ M ĐỂ KHỚP VỚI C#
+          { mediaId },
         );
-        // Nếu API trả về success: true nhưng body rỗng, hàm này có thể bị lỗi,
-        // hãy thử tạm thời bỏ qua unwrapApiResponse nếu vẫn lỗi:
-        return; 
+        if (response.status >= 200 && response.status < 300) return;
+        unwrapApiResponse(response, "Thêm track vào playlist thất bại");
       } catch (error) {
         throw new Error(getApiErrorMessage(error));
       }
@@ -373,7 +369,7 @@ const apiClient = {
     removeTrack: async (playlistId: string, mediaId: string): Promise<void> => {
       try {
         const response = await axiosInstance.delete<ApiResponseNoData>(
-          `/playlist/${playlistId}/tracks/${mediaId}`,
+          `/Playlist/${playlistId}/tracks/${mediaId}`,
         );
         unwrapApiResponse(response, "Xóa track khỏi playlist thất bại");
       } catch (error) {
@@ -392,10 +388,21 @@ const apiClient = {
     ): Promise<ShareMediaDto> => {
       try {
         const response = await axiosInstance.post<ApiResponse<ShareMediaDto>>(
-          "/share",
+          "/Share",
           { receiverUserId, itemId, shareStyle },
         );
         return unwrapApiResponse(response, "Chia sẻ thất bại");
+      } catch (error) {
+        throw new Error(getApiErrorMessage(error));
+      }
+    },
+    searchUser: async (name: string): Promise<NameUserShareDto[]> => {
+      try {
+        const response = await axiosInstance.get<ApiResponse<NameUserShareDto[]>>(
+          "/Share/search-user",
+          { params: { name } } // Gửi query string ?name=...
+        );
+        return unwrapApiResponse(response, "Tìm kiếm người dùng thất bại");
       } catch (error) {
         throw new Error(getApiErrorMessage(error));
       }
@@ -406,7 +413,7 @@ const apiClient = {
       try {
         const response =
           await axiosInstance.get<ApiResponse<SharedItemDto[]>>(
-            "/share/received",
+            "/Share/received",
           );
         return unwrapApiResponse(response, "Không thể lấy danh sách chia sẻ");
       } catch (error) {
@@ -427,7 +434,7 @@ const apiClient = {
       try {
         const response =
           await axiosInstance.get<ApiResponse<NotificationDto[]>>(
-            "/notification",
+            "/Notification",
           );
         return unwrapApiResponse(response, "Không thể lấy danh sách thông báo");
       } catch (error) {
@@ -439,7 +446,7 @@ const apiClient = {
     markAsRead: async (id: string): Promise<void> => {
       try {
         const response = await axiosInstance.put<ApiResponseNoData>(
-          `/notification/${id}/read`,
+          `/Notification/${id}/read`,
         );
         unwrapApiResponse(response, "Đánh dấu đã đọc thất bại");
       } catch (error) {
@@ -454,7 +461,7 @@ const apiClient = {
     getRecent: async (): Promise<HistoryMediaDto[]> => {
       try {
         const response =
-          await axiosInstance.get<ApiResponse<HistoryMediaDto[]>>("/history");
+          await axiosInstance.get<ApiResponse<HistoryMediaDto[]>>("/History");
         return unwrapApiResponse(response, "Không thể lấy lịch sử phát");
       } catch (error) {
         throw new Error(getApiErrorMessage(error));
