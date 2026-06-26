@@ -1,3 +1,4 @@
+// src/components/layout/RightPanel.tsx
 import React, { useState, useEffect } from 'react';
 import { usePlayer } from '../../pages/PlayerContext.tsx'; 
 import apiClient, { showApiError } from '../../api/apiClient.ts'; 
@@ -147,8 +148,14 @@ export default function RightPanel({ onClose }: { onClose: () => void }) {
       </div>
     );
   }
+  const buildImageUrl = (url?: string) => {
+    if (!url) return "";
+    const normalizedUrl = url.replace(/\\/g, '/');
+    return normalizedUrl.startsWith("http") ? normalizedUrl : `${BACKEND_DOMAIN}/${normalizedUrl}`;
+  };
 
-  const mediaSrc = currentTrack.urlMedia?.startsWith("http") ? currentTrack.urlMedia : `${BACKEND_DOMAIN}/${currentTrack.urlMedia}`;
+  const coverSrc = buildImageUrl(currentTrack.urlImage);
+  const mediaSrc = buildImageUrl(currentTrack.urlMedia);
 
   return (
     <>
@@ -165,7 +172,7 @@ export default function RightPanel({ onClose }: { onClose: () => void }) {
             <>
               <audio ref={(el) => { mediaRef.current = el; }} src={mediaSrc} style={{ display: 'none' }} />
               {currentTrack.urlImage ? (
-                <img src={currentTrack.urlImage.startsWith("http") ? currentTrack.urlImage : `${BACKEND_DOMAIN}/${currentTrack.urlImage}`} alt={currentTrack.title} style={styles.imageCover} />
+                <img src={coverSrc} alt={currentTrack.title} style={styles.imageCover} />
               ) : (
                 <div style={{ ...styles.bigCover, background: 'linear-gradient(135deg, #1e3264, #121212)' }}><span style={styles.bigCoverIcon}>🎵</span></div>
               )}

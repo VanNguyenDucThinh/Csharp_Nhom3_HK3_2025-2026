@@ -45,6 +45,7 @@ function gopBaiHatTrung(historyItems: HistoryMediaDto[]): TrackVoiSoLan[] {
         urlImage:   item.urlImage,
         urlMedia:   "",
         category:   Category.Pop,
+        mediaStyle: 0,
         owner:      "",
         soLanNghe:  1,
         playAt:     item.playAt,
