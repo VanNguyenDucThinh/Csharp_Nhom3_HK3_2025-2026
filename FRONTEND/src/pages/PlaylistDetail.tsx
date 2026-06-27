@@ -6,7 +6,7 @@ import { usePlayer } from "./PlayerContext.tsx";
 import type { PlayListDto as Playlist } from "../types/Playlist.ts";
 import type { MediaDto } from "../types/Media.ts";
 import { Category } from "../types/Media.ts";
-import { UploadSongToPlaylist } from "./UploadSongToPlaylist.tsx"
+import { UploadSongToPlaylist } from "./UploadSongToPlaylist.tsx";
 
 const BACKEND_DOMAIN = "http://localhost:5124";
 
@@ -44,9 +44,10 @@ function ModalChonBaiHat({
   const [tuKhoa, setTuKhoa] = useState("");
   const [dangThem, setDangThem] = useState<string | null>(null);
 
-  const danhSachTimKiem = danhSachMedia.filter(track => 
-    track.title.toLowerCase().includes(tuKhoa.toLowerCase()) || 
-    track.artist.toLowerCase().includes(tuKhoa.toLowerCase())
+  const danhSachTimKiem = danhSachMedia.filter(
+    (track) =>
+      track.title.toLowerCase().includes(tuKhoa.toLowerCase()) ||
+      track.artist.toLowerCase().includes(tuKhoa.toLowerCase()),
   );
 
   // Cập nhật hàm handleThem để xử lý mượt mà
@@ -55,10 +56,10 @@ function ModalChonBaiHat({
     try {
       // 1. Gọi API thêm track
       await apiClient.playlist.addTrack(playlistId, track.id);
-      
+
       // 2. Cập nhật state UI ngay lập tức
-      onThemThanhCong(track); 
-      
+      onThemThanhCong(track);
+
       // 3. Không cần reload, React sẽ re-render và bài hát hiện ra
     } catch (err) {
       // Chỉ alert nếu lỗi thực sự xảy ra, không phải lỗi parse dữ liệu
@@ -74,7 +75,9 @@ function ModalChonBaiHat({
       <div style={modalStyles.box} onClick={(e) => e.stopPropagation()}>
         <div style={modalStyles.header}>
           <h2 style={modalStyles.title}>Thêm bài hát vào playlist</h2>
-          <button style={modalStyles.closeBtn} onClick={onClose}>✕</button>
+          <button style={modalStyles.closeBtn} onClick={onClose}>
+            ✕
+          </button>
         </div>
 
         <input
@@ -97,19 +100,35 @@ function ModalChonBaiHat({
                 <div key={track.id} style={modalStyles.item}>
                   <div style={modalStyles.itemCover}>
                     {track.urlImage ? (
-                      <img src={buildImageUrl(track.urlImage)} style={{width: "100%", height: "100%", objectFit: "cover"}} />
-                    ) : (<span>🎵</span>)}
+                      <img
+                        src={buildImageUrl(track.urlImage)}
+                        style={{
+                          width: "100%",
+                          height: "100%",
+                          objectFit: "cover",
+                        }}
+                      />
+                    ) : (
+                      <span>🎵</span>
+                    )}
                   </div>
                   <div style={{ flex: 1, minWidth: 0 }}>
                     <div style={modalStyles.itemTitle}>{track.title}</div>
                     <div style={modalStyles.itemSub}>{track.artist}</div>
                   </div>
                   <button
-                    style={{ ...modalStyles.addBtn, ...(daTonTai ? modalStyles.addBtnDisabled : {}) }}
+                    style={{
+                      ...modalStyles.addBtn,
+                      ...(daTonTai ? modalStyles.addBtnDisabled : {}),
+                    }}
                     onClick={() => !daTonTai && handleThem(track)}
                     disabled={daTonTai || dangThem === track.id}
                   >
-                    {dangThem === track.id ? "..." : daTonTai ? "✓ Đã có" : "+ Thêm"}
+                    {dangThem === track.id
+                      ? "..."
+                      : daTonTai
+                        ? "✓ Đã có"
+                        : "+ Thêm"}
                   </button>
                 </div>
               );
@@ -164,7 +183,9 @@ export default function PlaylistDetail() {
   };
 
   useEffect(() => {
-    apiClient.media.trend(1, 100).then(res => setAllMedia(res.listTrending || []));
+    apiClient.media
+      .trend(1, 100)
+      .then((res) => setAllMedia(res.listTrending || []));
     loadPlaylist();
   }, [id]);
 
@@ -197,7 +218,7 @@ export default function PlaylistDetail() {
     try {
       // 1. Gọi API xóa
       await apiClient.playlist.removeTrack(id, trackId);
-      
+
       // 2. CẬP NHẬT STATE TRỰC TIẾP: Lọc bài vừa xóa khỏi danh sách hiện tại
       setPlaylist((prev) => {
         if (!prev) return prev;
@@ -206,7 +227,7 @@ export default function PlaylistDetail() {
           track: prev.track.filter((t) => t.id !== trackId),
         };
       });
-      
+
       setThongBao(`Đã xóa "${trackTitle}" khỏi playlist.`);
     } catch (err) {
       // Chỉ hiện thông báo lỗi nếu API thực sự không xóa được
@@ -218,7 +239,7 @@ export default function PlaylistDetail() {
   };
 
   // ── Phát bài hát khi click vào hàng ──────────────────────
-// ── Phát bài hát khi click vào hàng ──────────────────────
+  // ── Phát bài hát khi click vào hàng ──────────────────────
   const handlePhatBai = async (track: MediaDto) => {
     try {
       let mediaData;
@@ -230,7 +251,8 @@ export default function PlaylistDetail() {
       }
 
       // Ép kiểu để lấy đúng data trả về
-      const finalData = (mediaData as any).data?.data || (mediaData as any).data || mediaData;
+      const finalData =
+        (mediaData as any).data?.data || (mediaData as any).data || mediaData;
 
       // Đẩy vào PlayerContext với urlMedia xịn
       playTrack({
@@ -239,7 +261,7 @@ export default function PlaylistDetail() {
         artist: finalData.artist || track.artist,
         urlMedia: finalData.urlMedia, // Mấu chốt là cái này!
         urlImage: finalData.urlImage || track.urlImage,
-        mediaStyle: track.mediaStyle
+        mediaStyle: track.mediaStyle,
       });
     } catch (err) {
       console.error("Không thể phát bài này:", err);
@@ -310,16 +332,19 @@ export default function PlaylistDetail() {
             {soLuongBai === 0 && " — Playlist đang trống"}
           </p>
 
-          <div style={{display: "flex", gap: 8}}>
+          <div style={{ display: "flex", gap: 8 }}>
             {/* Nút thêm bài hát từ thư viện */}
-            <button style={styles.addTrackBtn} onClick={() => setHienModal(true)}>
+            <button
+              style={styles.addTrackBtn}
+              onClick={() => setHienModal(true)}
+            >
               + Thêm bài hát
             </button>
 
-            {/* Nút upload trực tiếp vào playlist - nằm cùng hàng với nút trên */}
+            {/* Nút upload trực tiếp vào playlist - nằm cùng hàng với nút trên
             <button style={{...styles.addTrackBtn, marginLeft: 8}} onClick={() => setHienModalUpload(true)}>
               ⬆ Upload lên Playlist
-            </button>
+            </button> */}
           </div>
         </div>
       </div>
@@ -456,33 +481,33 @@ export default function PlaylistDetail() {
 
       {/* ── Modal upload trực tiếp vào playlist ───────────────────────────── */}
       {hienModalUpload && (
-        <div 
-          style={modalStyles.overlay} 
+        <div
+          style={modalStyles.overlay}
           onClick={() => setHienModalUpload(false)}
         >
           {/* Dùng overlay để click ra ngoài là đóng modal */}
-          <div 
+          <div
             style={{
-              ...modalStyles.box, 
+              ...modalStyles.box,
               width: 520,
               maxHeight: "90vh",
               padding: "24px",
-              boxSizing: "border-box"
-            }} 
+              boxSizing: "border-box",
+            }}
             onClick={(e) => e.stopPropagation()} // Ngăn click lan ra ngoài
           >
             <div style={modalStyles.header}>
               <h2 style={modalStyles.title}>Upload nhạc vào playlist</h2>
-              <button 
-                style={modalStyles.closeBtn} 
+              <button
+                style={modalStyles.closeBtn}
                 onClick={() => setHienModalUpload(false)}
               >
                 ✕
               </button>
             </div>
-            
+
             {/* Component upload truyền playlistId và callback cập nhật */}
-            <div style={{paddingTop: 8}}>
+            <div style={{ paddingTop: 8 }}>
               <UploadSongToPlaylist
                 playlistId={id!}
                 onUploadSuccess={(track) => {
@@ -496,7 +521,6 @@ export default function PlaylistDetail() {
           </div>
         </div>
       )}
-
     </div>
   );
 }

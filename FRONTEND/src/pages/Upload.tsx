@@ -15,12 +15,12 @@ export default function Upload() {
   const [file, setFile] = useState<File | null>(null);
   const [coverImage, setCoverImage] = useState<File | null>(null);
   const [coverPreview, setCoverPreview] = useState<string | null>(null); // State để lưu URL preview ảnh
-  
+
   const [title, setTitle] = useState("");
   const [artist, setArtist] = useState("");
   const [category, setCategory] = useState("Pop");
   const [mediaType, setMediaType] = useState<"audio" | "video">("audio");
-  
+
   const [uploading, setUploading] = useState(false);
   const [progress, setProgress] = useState(0);
   const [success, setSuccess] = useState(false);
@@ -79,8 +79,8 @@ export default function Upload() {
       formData.append("title", title);
       formData.append("artist", artist || "Unknown");
       formData.append("category", category);
-      formData.append("description", ""); 
-      
+      formData.append("description", "");
+
       // Nếu user có chọn ảnh bìa thì mới append vào
       if (coverImage) {
         formData.append("coverImage", coverImage);
@@ -174,10 +174,13 @@ export default function Upload() {
           />
           {file ? (
             <div style={styles.fileInfo}>
-              
               {/* NẾU CÓ ẢNH BÌA THÌ HIỆN ẢNH, KHÔNG THÌ HIỆN ICON */}
               {coverPreview ? (
-                <img src={coverPreview} alt="Cover" style={styles.coverPreviewImg} />
+                <img
+                  src={coverPreview}
+                  alt="Cover"
+                  style={styles.coverPreviewImg}
+                />
               ) : (
                 <div style={styles.fileIcon}>
                   {mediaType === "video" ? "🎬" : "🎵"}
@@ -210,7 +213,6 @@ export default function Upload() {
 
         {/* KHU VỰC BÊN PHẢI: METADATA FORM */}
         <div style={styles.form}>
-          
           {/* Tiêu đề */}
           <div style={styles.field}>
             <label style={styles.label}>Tiêu đề *</label>
@@ -226,15 +228,17 @@ export default function Upload() {
           {/* Ảnh bìa - Đã sửa thành nút dài cân đối */}
           <div style={styles.field}>
             <label style={styles.label}>Ảnh bìa (Tùy chọn)</label>
-            <button 
+            <button
               style={{
                 ...styles.coverUploadBtnFull,
-                ...(coverImage ? styles.coverUploadBtnActive : {})
+                ...(coverImage ? styles.coverUploadBtnActive : {}),
               }}
               onClick={() => coverInputRef.current?.click()}
               disabled={uploading}
             >
-              {coverImage ? `Đã chọn: ${coverImage.name}` : "Click để chọn ảnh bìa"}
+              {coverImage
+                ? `Đã chọn: ${coverImage.name}`
+                : "Click để chọn ảnh bìa"}
             </button>
             <input
               ref={coverInputRef}
@@ -260,9 +264,9 @@ export default function Upload() {
 
             <div style={{ ...styles.field, flex: 1 }}>
               <label style={styles.label}>Thể loại</label>
-              <select 
-                style={styles.select} 
-                value={category} 
+              <select
+                style={styles.select}
+                value={category}
                 onChange={(e) => setCategory(e.target.value)}
                 disabled={uploading}
               >
@@ -286,7 +290,7 @@ export default function Upload() {
                   ...(mediaType === "audio" ? styles.typeBtnActive : {}),
                 }}
                 onClick={() => setMediaType("audio")}
-                disabled={uploading || !!file} 
+                disabled={uploading || !!file}
               >
                 🎵 Audio
               </button>
@@ -364,7 +368,7 @@ const styles: Record<string, React.CSSProperties> = {
 
   fileInfo: { textAlign: "center", padding: 24, width: "100%" },
   fileIcon: { fontSize: 52, marginBottom: 16 },
-  
+
   // Style cho ảnh preview
   coverPreviewImg: {
     width: 140,
@@ -375,7 +379,7 @@ const styles: Record<string, React.CSSProperties> = {
     boxShadow: "0 4px 16px rgba(0,0,0,0.5)",
     display: "block",
     marginLeft: "auto",
-    marginRight: "auto"
+    marginRight: "auto",
   },
 
   fileName: {
@@ -419,7 +423,7 @@ const styles: Record<string, React.CSSProperties> = {
     outline: "none",
     cursor: "pointer",
   },
-  
+
   // Style cho nút chọn ảnh bìa dài full width
   coverUploadBtnFull: {
     backgroundColor: "#2a2a2a",
@@ -435,13 +439,13 @@ const styles: Record<string, React.CSSProperties> = {
     transition: "all 0.2s",
     overflow: "hidden",
     textOverflow: "ellipsis",
-    whiteSpace: "nowrap"
+    whiteSpace: "nowrap",
   },
   coverUploadBtnActive: {
     borderColor: "#1DB954",
     color: "#1DB954",
     backgroundColor: "rgba(29, 185, 84, 0.05)",
-    borderStyle: "solid"
+    borderStyle: "solid",
   },
 
   typeToggle: { display: "flex", gap: 8 },
@@ -463,7 +467,14 @@ const styles: Record<string, React.CSSProperties> = {
     backgroundColor: "rgba(29, 185, 84, 0.1)",
   },
 
-  error: { color: "#f15e6c", fontSize: 13, textAlign: "center", backgroundColor: "rgba(241, 94, 108, 0.1)", padding: 10, borderRadius: 6 },
+  error: {
+    color: "#f15e6c",
+    fontSize: 13,
+    textAlign: "center",
+    backgroundColor: "rgba(241, 94, 108, 0.1)",
+    padding: 10,
+    borderRadius: 6,
+  },
 
   progressBox: { display: "flex", alignItems: "center", gap: 12 },
   progressTrack: {
