@@ -45,7 +45,7 @@ export default function Search() {
     const fetchResults = async () => {
       setLoading(true);
       try {
-        const response = await apiClient.media.search(q);
+        const response = await apiClient.media.search(q, 1, 10);
         const searchData =
           (response as any).data?.listMedia ||
           (response as any).listMedia ||

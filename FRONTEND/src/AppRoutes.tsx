@@ -13,9 +13,7 @@ import ShareInbox from "./pages/ShareInbox.tsx";
 import Upload from "./pages/Upload.tsx";
 
 
-function isAuthenticated(): boolean {
-  return !!localStorage.getItem("token");
-}
+function isAuthenticated(): boolean {return !!localStorage.getItem("token");}
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
   if (!isAuthenticated()) return <Navigate to="/login" replace />;

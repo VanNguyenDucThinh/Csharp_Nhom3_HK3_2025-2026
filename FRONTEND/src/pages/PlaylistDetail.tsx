@@ -10,23 +10,12 @@ import { UploadSongToPlaylist } from "./UploadSongToPlaylist.tsx";
 
 const BACKEND_DOMAIN = "http://localhost:5124";
 
-// ============================================================
-// HELPER: Xây dựng URL đầy đủ cho ảnh từ backend
-// ============================================================
+
 function buildImageUrl(url?: string): string {
   if (!url) return "";
   return url.startsWith("http") ? url : `${BACKEND_DOMAIN}/${url}`;
 }
 
-// ============================================================
-// SUB-COMPONENT: Modal chọn bài hát từ thư viện để thêm vào playlist
-//
-// Hiển thị danh sách tất cả media đang trending (= tất cả bài đã upload),
-// cho phép người dùng chọn 1 bài để thêm vào playlist hiện tại.
-// ============================================================
-// ============================================================
-// SUB-COMPONENT: Modal chọn bài hát (Bảng tìm kiếm)
-// ============================================================
 function ModalChonBaiHat({
   playlistId,
   danhSachDaThem,
@@ -50,21 +39,16 @@ function ModalChonBaiHat({
       track.artist.toLowerCase().includes(tuKhoa.toLowerCase()),
   );
 
-  // Cập nhật hàm handleThem để xử lý mượt mà
   const handleThem = async (track: MediaDto) => {
     setDangThem(track.id);
     try {
-      // 1. Gọi API thêm track
       await apiClient.playlist.addTrack(playlistId, track.id);
 
-      // 2. Cập nhật state UI ngay lập tức
       onThemThanhCong(track);
 
-      // 3. Không cần reload, React sẽ re-render và bài hát hiện ra
     } catch (err) {
-      // Chỉ alert nếu lỗi thực sự xảy ra, không phải lỗi parse dữ liệu
       console.error("Chi tiết lỗi:", err);
-      alert("Thêm bài hát thành công!"); // Có thể đổi thành thông báo thành công
+      alert("Thêm bài hát thành công!");
     } finally {
       setDangThem(null);
     }
@@ -140,14 +124,7 @@ function ModalChonBaiHat({
   );
 }
 
-// ============================================================
-// COMPONENT CHÍNH: PlaylistDetail
-// Hiển thị chi tiết playlist + các chức năng:
-//   1. Xem danh sách bài hát trong playlist
-//   2. Phát bài hát khi click
-//   3. Thêm bài hát từ thư viện (modal)
-//   4. Xóa bài hát khỏi playlist
-// ============================================================
+
 export default function PlaylistDetail() {
   const { id } = useParams<{ id: string }>();
   const { playTrack } = usePlayer();
@@ -471,7 +448,7 @@ export default function PlaylistDetail() {
       {/* ── Modal chọn bài hát ───────────────────────────── */}
       {hienModal && (
         <ModalChonBaiHat
-          danhSachMedia={allMedia} // Bạn cần có state chứa list bài hát này
+          danhSachMedia={allMedia}
           playlistId={id!}
           danhSachDaThem={playlist.track.map((t) => t.id)}
           onClose={() => setHienModal(false)}

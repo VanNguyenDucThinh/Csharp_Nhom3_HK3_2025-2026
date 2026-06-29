@@ -2,7 +2,7 @@
 import * as signalR from '@microsoft/signalr'
 
 // Đọc URL từ .env
-const HUB_URL = import.meta.env.VITE_SIGNALR_HUB_URL || 'http://localhost:5000/hubs/notifications'
+const HUB_URL = import.meta.env.VITE_SIGNALR_HUB_URL
 
 let connection: signalR.HubConnection | null = null
 

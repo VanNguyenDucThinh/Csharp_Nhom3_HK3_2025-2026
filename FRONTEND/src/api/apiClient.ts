@@ -2,7 +2,6 @@
 import axiosInstance from "./axiosInstance.ts";
 import { getApiErrorMessage, unwrapApiResponse } from "../types/ApiHelper.ts";
 
-// Import types khớp với backend DTOs
 import type {
   LoginRequest,
   RegisterRequest,
@@ -11,7 +10,6 @@ import type {
 
 import type {
   ProfileUserDto,
-  UpdateProfileRequest,
   FollowDto,
 } from "../types/User.ts";
 
@@ -21,15 +19,9 @@ import type {
   VideoDto,
   SearchTrendingDto,
   FavoriteDto,
-  Category,
 } from "../types/Media.ts";
 
-import type {
-  PlayListDto,
-  PlayListStatus,
-  CreateOrUpdatePlaylistRequest,
-  AddTrackToPlaylistRequest,
-} from "../types/Playlist.ts";
+import type {PlayListDto} from "../types/Playlist.ts";
 
 import type {
   ShareMediaDto,
@@ -38,7 +30,7 @@ import type {
   NameUserShareDto,
 } from "../types/Share.ts";
 
-import type { NotificationDto, Read } from "../types/Notification.ts";
+import type { NotificationDto } from "../types/Notification.ts";
 
 import type { HistoryMediaDto } from "../types/History.ts";
 
@@ -115,8 +107,7 @@ const apiClient = {
     // GET api/user/profile
     getMe: async (): Promise<ProfileUserDto> => {
       try {
-        const response =
-          await axiosInstance.get<ApiResponse<ProfileUserDto>>("/user/profile");
+        const response = await axiosInstance.get<ApiResponse<ProfileUserDto>>("/User/profile");
         return unwrapApiResponse(response, "Không thể lấy thông tin profile");
       } catch (error) {
         throw new Error(getApiErrorMessage(error));
@@ -127,7 +118,7 @@ const apiClient = {
     getById: async (id: string): Promise<ProfileUserDto> => {
       try {
         const response = await axiosInstance.get<ApiResponse<ProfileUserDto>>(
-          `/user/${id}`,
+          `/User/${id}`,
         );
         return unwrapApiResponse(
           response,
@@ -151,19 +142,39 @@ const apiClient = {
         throw new Error(getApiErrorMessage(error));
       }
     },
+
+    // POST /api/User/{id}/follow
+    follow: async (id: string): Promise<FollowDto> => {
+      try {
+        const response = await axiosInstance.post<ApiResponse<FollowDto>>(`/User/${id}/follow`,);
+        return unwrapApiResponse(response, "Không thể theo dõi người dùng",);
+      } catch (error) {
+        throw new Error(getApiErrorMessage(error));
+      }
+    },
+
+    // DELETE /api/User/{id}/follow
+    delete: async (id: string): Promise<void> => {
+      try {
+        const response = await axiosInstance.delete<ApiResponseNoData>(`/User/${id}/follow`,);
+        unwrapApiResponse(response, "Bỏ theo dõi người dùng thất bại");
+      } catch (error) {
+        throw new Error(getApiErrorMessage(error));
+      }
+    },
   },
 
   // --- MEDIA (api/media) ---
   media: {
     // POST api/media/upload (multipart/form-data)
-    upload: async (formData: FormData): Promise<unknown> => {
+    upload: async (formData: FormData): Promise<MediaDto> => {
       try {
-        const response = await axiosInstance.post<ApiResponse<unknown>>(
+        const response = await axiosInstance.post<ApiResponse<MediaDto>>(
           "/Media/upload",
           formData,
           { headers: { "Content-Type": "multipart/form-data" } },
         );
-        return unwrapApiResponse(response, "Upload file thất bại");
+        return unwrapApiResponse(response, "Tải tệp nhạc lên thất bại");
       } catch (error) {
         throw new Error(getApiErrorMessage(error));
       }
@@ -220,9 +231,10 @@ const apiClient = {
       pageSize: number = 10,
     ): Promise<SearchTrendingDto> => {
       try {
-        const response = await axiosInstance.get<
-          ApiResponse<SearchTrendingDto>
-        >("/search", { params: { search: query, pageNumber, pageSize } });
+        const response = await axiosInstance.get<ApiResponse<SearchTrendingDto>>(
+          "/Search",
+          { params: { search: query, pageNumber, pageSize } }
+        );
         return unwrapApiResponse(response, "Tìm kiếm thất bại");
       } catch (error) {
         throw new Error(getApiErrorMessage(error));
@@ -235,10 +247,11 @@ const apiClient = {
       pageSize: number = 10,
     ): Promise<SearchTrendingDto> => {
       try {
-        const response = await axiosInstance.get<
-          ApiResponse<SearchTrendingDto>
-        >("/Trend", { params: { pageNumber, pageSize } });
-        return unwrapApiResponse(response, "Không thể lấy danh sách trending");
+        const response = await axiosInstance.get<ApiResponse<SearchTrendingDto>>(
+          "/Trend",
+          { params: { pageNumber, pageSize } }
+        );
+        return unwrapApiResponse(response, "Không thể lấy danh sách Thịnh Hành");
       } catch (error) {
         throw new Error(getApiErrorMessage(error));
       }
@@ -247,9 +260,7 @@ const apiClient = {
     // POST api/media/favorite/{id}
     favorite: async (id: string): Promise<FavoriteDto> => {
       try {
-        const response = await axiosInstance.post<ApiResponse<FavoriteDto>>(
-          `/media/favorite/${id}`,
-        );
+        const response = await axiosInstance.post<ApiResponse<FavoriteDto>>(`/Media/favorite/${id}`,);
         return unwrapApiResponse(response, "Thao tác yêu thích thất bại");
       } catch (error) {
         throw new Error(getApiErrorMessage(error));
@@ -259,9 +270,7 @@ const apiClient = {
     // PUT api/media/unfavorite/{id}
     unfavorite: async (id: string): Promise<FavoriteDto> => {
       try {
-        const response = await axiosInstance.put<ApiResponse<FavoriteDto>>(
-          `/media/unfavorite/${id}`,
-        );
+        const response = await axiosInstance.put<ApiResponse<FavoriteDto>>(`/Media/unfavorite/${id}`,);
         return unwrapApiResponse(response, "Bỏ yêu thích thất bại");
       } catch (error) {
         throw new Error(getApiErrorMessage(error));
@@ -271,9 +280,7 @@ const apiClient = {
     // GET api/media/ListFavorite
     getFavorites: async (): Promise<MediaDto[]> => {
       try {
-        const response = await axiosInstance.get<ApiResponse<MediaDto[]>>(
-          "/media/ListFavorite",
-        );
+        const response = await axiosInstance.get<ApiResponse<MediaDto[]>>("/Media/ListFavorite",);
         return unwrapApiResponse(response, "Không thể lấy danh sách yêu thích");
       } catch (error) {
         throw new Error(getApiErrorMessage(error));
@@ -302,9 +309,7 @@ const apiClient = {
     // GET api/playlist/{id}
     getById: async (id: string): Promise<PlayListDto> => {
       try {
-        const response = await axiosInstance.get<ApiResponse<PlayListDto>>(
-          `/Playlist/${id}`,
-        );
+        const response = await axiosInstance.get<ApiResponse<PlayListDto>>(`/Playlist/${id}`,);
         return unwrapApiResponse(response, "Không thể lấy chi tiết playlist");
       } catch (error) {
         throw new Error(getApiErrorMessage(error));
@@ -342,9 +347,7 @@ const apiClient = {
     // DELETE api/playlist/{id}
     delete: async (id: string): Promise<void> => {
       try {
-        const response = await axiosInstance.delete<ApiResponseNoData>(
-          `/Playlist/${id}`,
-        );
+        const response = await axiosInstance.delete<ApiResponseNoData>(`/Playlist/${id}`,);
         unwrapApiResponse(response, "Xóa playlist thất bại");
       } catch (error) {
         throw new Error(getApiErrorMessage(error));
@@ -355,7 +358,7 @@ const apiClient = {
     addTrack: async (playlistId: string, mediaId: string): Promise<void> => {
       try {
         const response = await axiosInstance.post<ApiResponseNoData>(
-          `/playlist/${playlistId}/tracks`,
+          `/Playlist/${playlistId}/tracks`,
           { mediaId },
         );
         if (response.status >= 200 && response.status < 300) return;
@@ -411,10 +414,7 @@ const apiClient = {
     // GET api/share/received
     getReceived: async (): Promise<SharedItemDto[]> => {
       try {
-        const response =
-          await axiosInstance.get<ApiResponse<SharedItemDto[]>>(
-            "/Share/received",
-          );
+        const response = await axiosInstance.get<ApiResponse<SharedItemDto[]>>("/Share/received",);
         return unwrapApiResponse(response, "Không thể lấy danh sách chia sẻ");
       } catch (error) {
         throw new Error(getApiErrorMessage(error));
@@ -432,10 +432,7 @@ const apiClient = {
     // GET api/notification
     getAll: async (): Promise<NotificationDto[]> => {
       try {
-        const response =
-          await axiosInstance.get<ApiResponse<NotificationDto[]>>(
-            "/Notification",
-          );
+        const response = await axiosInstance.get<ApiResponse<NotificationDto[]>>("/Notification",);
         return unwrapApiResponse(response, "Không thể lấy danh sách thông báo");
       } catch (error) {
         throw new Error(getApiErrorMessage(error));
@@ -445,9 +442,7 @@ const apiClient = {
     // PUT api/notification/{id}/read
     markAsRead: async (id: string): Promise<void> => {
       try {
-        const response = await axiosInstance.put<ApiResponseNoData>(
-          `/Notification/${id}/read`,
-        );
+        const response = await axiosInstance.put<ApiResponseNoData>(`/Notification/${id}/read`,);
         unwrapApiResponse(response, "Đánh dấu đã đọc thất bại");
       } catch (error) {
         throw new Error(getApiErrorMessage(error));
@@ -460,8 +455,7 @@ const apiClient = {
     // GET api/history
     getRecent: async (): Promise<HistoryMediaDto[]> => {
       try {
-        const response =
-          await axiosInstance.get<ApiResponse<HistoryMediaDto[]>>("/History");
+        const response = await axiosInstance.get<ApiResponse<HistoryMediaDto[]>>("/History");
         return unwrapApiResponse(response, "Không thể lấy lịch sử phát");
       } catch (error) {
         throw new Error(getApiErrorMessage(error));

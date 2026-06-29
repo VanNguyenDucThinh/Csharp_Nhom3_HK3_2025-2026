@@ -14,7 +14,7 @@ export default function Upload() {
 
   const [file, setFile] = useState<File | null>(null);
   const [coverImage, setCoverImage] = useState<File | null>(null);
-  const [coverPreview, setCoverPreview] = useState<string | null>(null); // State để lưu URL preview ảnh
+  const [coverPreview, setCoverPreview] = useState<string | null>(null);
 
   const [title, setTitle] = useState("");
   const [artist, setArtist] = useState("");
@@ -52,7 +52,7 @@ export default function Upload() {
         return;
       }
       setCoverImage(selected);
-      setCoverPreview(URL.createObjectURL(selected)); // Tạo URL ảo để preview
+      setCoverPreview(URL.createObjectURL(selected));
       setError("");
     }
   };

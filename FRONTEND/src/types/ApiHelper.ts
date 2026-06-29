@@ -42,9 +42,7 @@ export function getApiErrorMessage(error: unknown): string {
 
     // TRƯỜNG HỢP 2: Request đã được GỬI ĐI nhưng KHÔNG nhận được phản hồi nào.
     // Đây chính là tình huống "Backend sập hoặc mất mạng" mà bạn lo lắng ban đầu.
-    if (error.request) {
-      return "Không thể kết nối tới server. Vui lòng kiểm tra mạng hoặc thử lại sau.";
-    }
+    if (error.request) return "Không thể kết nối tới server. Vui lòng kiểm tra mạng hoặc thử lại sau.";
   }
 
   // TRƯỜNG HỢP 3: Lỗi không liên quan tới việc gọi API (hiếm gặp, ví dụ lỗi

@@ -174,10 +174,10 @@ export default function PlayerBar() {
 
       {/* Phần 1: Thông tin bài hát (Load từ currentTrack) */}
       <div style={styles.trackSection}>
-        <img 
+        <img
           src={currentTrack?.urlImage ? `${BACKEND_DOMAIN}/${currentTrack.urlImage}` : "https://picsum.photos/seed/tune/48/48"} 
-          alt="cover" 
-          style={styles.cover} 
+          alt="cover"
+          style={styles.cover}
         />
         <div style={styles.trackText}>
           <div style={styles.trackTitle}>{currentTrack?.title || "Chưa có bài hát"}</div>

@@ -125,11 +125,7 @@ function ShareModal({ track, onClose }: { track: any; onClose: () => void }) {
               <div key={user.id} style={styles.userRow}>
                 <div style={styles.userInfo}>
                   <img
-                    src={
-                      user.avatarUrl
-                        ? `${BACKEND_DOMAIN}/${user.avatarUrl}`
-                        : `https://ui-avatars.com/api/?name=${encodeURIComponent(user.name)}`
-                    }
+                    src={user.avatarUrl? `${BACKEND_DOMAIN}/${user.avatarUrl}`: `https://ui-avatars.com/api/?name=${encodeURIComponent(user.name)}`}
                     alt={user.name}
                     style={styles.userAvatarImage}
                   />
@@ -203,9 +199,7 @@ export default function RightPanel({ onClose }: { onClose: () => void }) {
   const buildImageUrl = (url?: string) => {
     if (!url) return "";
     const normalizedUrl = url.replace(/\\/g, "/");
-    return normalizedUrl.startsWith("http")
-      ? normalizedUrl
-      : `${BACKEND_DOMAIN}/${normalizedUrl}`;
+    return normalizedUrl.startsWith("http")? normalizedUrl : `${BACKEND_DOMAIN}/${normalizedUrl}`;
   };
 
   const coverSrc = buildImageUrl(currentTrack.urlImage);

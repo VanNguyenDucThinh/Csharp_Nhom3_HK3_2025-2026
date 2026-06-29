@@ -26,22 +26,22 @@ export interface ApiResponse<T> {
 
   // message: chuỗi thông báo dùng để hiển thị cho người dùng
   // (ví dụ: "Đăng nhập thành công" hoặc "Sai email hoặc mật khẩu").
-  message:   string | null;                                     // Cách 2: message?: string
+  message: string | null;                    // Cách 2: message?: string
 
-    // data: dữ liệu thật mà ta cần dùng.
-    // Đánh dấu "?" (optional) vì khi success = false, có thể backend không trả data.
-     data:        T | null;                                     // Cách 2:    data?: T
+  // data: dữ liệu thật mà ta cần dùng.
+  // Đánh dấu "?" (optional) vì khi success = false, có thể backend không trả data.
+  data: T | null;                            // Cách 2:    data?: T
 
-    // errors: danh sách lỗi chi tiết (ví dụ lỗi validate từng field khi đăng ký).
-    // Đánh dấu "?" vì không phải lúc nào backend cũng trả mảng này
-    // (thường chỉ có khi success = false).
-   errors: string[] | null;                                     // Cách 2:  errors?: string[];
+  // errors: danh sách lỗi chi tiết (ví dụ lỗi validate từng field khi đăng ký).
+  // Đánh dấu "?" vì không phải lúc nào backend cũng trả mảng này
+  // (thường chỉ có khi success = false).
+  errors: string[] | null;                  // Cách 2:  errors?: string[];
 }
 
 // Dùng cho các endpoint không trả data (logout, xóa...)
 export interface ApiResponseNoData {
   success: boolean;
-  message: string | null;
+  message: string | null; // messages?: string
   data: null;
-  errors: string[] | null;
+  errors: string[] | null;// errors?: string[]
 }

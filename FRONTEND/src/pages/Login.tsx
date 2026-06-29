@@ -12,24 +12,17 @@ export default function Login() {
   const navigate = useNavigate();
   const [tab, setTab] = useState<"login" | "register">("login");
 
-  // --- STATE ---
-  // email: dùng cho CẢ login và register (backend đều cần field "email")
   const [email, setEmail] = useState("");
-  // username: CHỈ dùng cho register (backend cần "name")
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   
-  // ====================================================================
-  // HANDLER: Đăng nhập
-  // ✅ SỬA: Validate email (không phải username) + gửi { email, password }
-  // ====================================================================
   const handleLogin = async (e: FormEvent) => {
-    e.preventDefault(); // Ngăn trình duyệt reload page
+    e.preventDefault(); 
 
-    // ✅ SỬA: Validate email + password (backend LoginRequest cần cả 2)
+  
     if (!email || !password) {
       setError("Vui lòng nhập đầy đủ email và mật khẩu.");
       return;
@@ -38,28 +31,18 @@ export default function Login() {
     setLoading(true);
     setError("");
     try {
-      // ✅ Gửi { email, password } khớp LoginRequest C#
       const response = await apiClient.auth.login({ email, password });
 
-      // ✅ FIX QUAN TRỌNG: Lưu token vào localStorage
-      // Tại sao? Vì Home page gọi API cần token trong header Authorization.
-      // Nếu không lưu ở đây, Home page sẽ bị 401 → redirect về login → vòng lặp.
       localStorage.setItem("token", response.token);
       localStorage.setItem("user", JSON.stringify(response));
-      // Sau khi lưu token xong mới navigate
       navigate("/");
     } catch (err) {
-      // Lỗi từ getApiErrorMessage đã là tiếng Việt rõ ràng
       setError(err instanceof Error ? err.message : "Đăng nhập thất bại.");
     } finally {
       setLoading(false);
     }
   };
 
-  // ====================================================================
-  // HANDLER: Đăng ký
-  // Gửi { name, email, password } khớp RegisterRequest C#
-  // ====================================================================
   const handleRegister = async (e: FormEvent) => {
     e.preventDefault();
 
@@ -125,11 +108,6 @@ export default function Login() {
           {/* Form */}
           <form onSubmit={tab === "login" ? handleLogin : handleRegister}>
             <div style={styles.form}>
-              {/* ✅ SỬA QUAN TRỌNG: 
-                  - Tab LOGIN: hiện input EMAIL (gắn state email)
-                  - Tab REGISTER: hiện input TÊN (gắn state username)
-                  Trước đây: login hiện "Tên đăng nhập" → gửi nhầm field lên backend
-              */}
               {tab === "login" ? (
                 // --- LOGIN: chỉ cần Email + Password ---
                 <>
@@ -146,7 +124,7 @@ export default function Login() {
                   {/* Bọc input password vào container tương đối */}
                   <div style={styles.passwordWrapper}>
                     <input
-                      style={{...styles.input, width: "100%", paddingRight: 44 }} // Thêm padding bên phải để chừa khoảng trống cho icon
+                      style={{...styles.input, width: "100%", paddingRight: 44 }}
                       type={showPassword ? "text" : "password"}
                       placeholder="Mật khẩu"
                       value={password}
@@ -158,10 +136,10 @@ export default function Login() {
 
                     {/* Nút bấm ẩn/hiện dùng icon SVG */}
                     <button
-                      type="button" // Bắt buộc phải là type="button" để tránh trigger submit form ngầm định
+                      type="button" 
                       onClick={() => setShowPassword(!showPassword)}
                       style={styles.eyeButton}
-                      tabIndex={-1} // Bỏ qua khi người dùng nhấn phím Tab để trải nghiệm mượt mà hơn
+                      tabIndex={-1}
                     >
                       {showPassword ? (
                         // Icon Mắt Mở (Show)
@@ -296,7 +274,7 @@ const styles: Record<string, React.CSSProperties> = {
     display: "flex", alignItems: "center", justifyContent: "center",
     width: "100%", height: '100vh', padding: 24,
     backgroundColor: "transparent",
-    backdropFilter: "blur(2px)",
+    backdropFilter: "blur(1px)",
   },
   card: {
     backgroundColor: "#ffffff", color: "#121212",

@@ -28,12 +28,6 @@ export default function EditProfileModal({
   const [loading, setLoading] = useState(false);
   const [error, setError]     = useState("");
 
-  // ── FIX: Reset toàn bộ form mỗi khi modal được MỞ ───────────
-  // Tại sao cần useEffect thay vì useState khởi tạo 1 lần?
-  // Vì useState chỉ chạy lần đầu component mount. Sau đó dù đóng/mở
-  // modal nhiều lần, các giá trị cũ vẫn còn nguyên trong state.
-  // useEffect với dependency [isOpen] sẽ chạy lại mỗi khi isOpen đổi
-  // từ false → true, đảm bảo form luôn hiện đúng dữ liệu hiện tại.
   useEffect(() => {
     if (isOpen) {
       setName(user?.name ?? "");
@@ -45,10 +39,30 @@ export default function EditProfileModal({
       setHienMatKhauCu(false);
       setError("");
     }
-  }, [isOpen]);  // Chỉ chạy khi isOpen thay đổi, không chạy liên tục
+  }, [isOpen]); 
 
   if (!isOpen) return null;
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
   // ── Validate mật khẩu mới ────────────────────────────────────
   const kiemTraMatKhauMoi = (matKhau: string): boolean => {
     if (!matKhau) return false;

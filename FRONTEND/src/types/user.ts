@@ -25,9 +25,9 @@ export interface ProfileUserDto {
  * mô tả "có những field nào", phần đóng gói thực tế sẽ làm ở bước sau.
  */
 export interface UpdateProfileRequest {
-  name?: string;
+  name?: string;      // name: string | null;
   avatarUrl?: string; // có thể là file ảnh, sẽ xử lý cụ thể ở Bước 3
-  bio?: string;
+  bio?: string;       // name: string | null
 }
 
 /**

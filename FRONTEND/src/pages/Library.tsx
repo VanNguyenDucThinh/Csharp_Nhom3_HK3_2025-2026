@@ -53,11 +53,7 @@ export default function Library() {
     return `${tenGoc.trim()} (${soThuTu})`;
   };
 
-  // ============================================================
-  // HÀM 1: Xử lý khi user bấm nút "Tạo" ở form nhập tên
-  // Tại sao tách hàm? Vì ta chưa gọi API vội, ta cần giữ user lại
-  // để hỏi xem họ muốn Public hay Private thông qua Popup.
-  // ============================================================
+
   const handleBamTao = () => {
     if (!newName.trim()) {
       setCreateError("Vui lòng nhập tên playlist.");
@@ -68,10 +64,7 @@ export default function Library() {
     setShowPublicConfirm(true); 
   };
 
-  // ============================================================
-  // HÀM 2: Thực sự gọi API sau khi user đã chọn Có/Không trong popup
-  // Tham số isPublicStatus: "1" (Có - Public) hoặc "0" (Không - Private)
-  // ============================================================
+
   const thucHienTaoPlaylist = async (isPublicStatus: string) => {
     setCreating(true);
     setCreateError("");
@@ -106,12 +99,7 @@ export default function Library() {
     }
   };
 
-  // ============================================================
-  // HÀM 3: Xử lý Xóa Playlist
-  // Tại sao cần tham số e: React.MouseEvent?
-  // Vì cái dòng Playlist đang có sự kiện onClick chuyển trang. 
-  // Nếu bấm nút Xóa mà không chặn lại, trình duyệt sẽ vừa xóa vừa chuyển trang gây lỗi.
-  // ============================================================
+  
   const handleXoaPlaylist = async (e: React.MouseEvent, id: string, name: string) => {
     e.stopPropagation();
 

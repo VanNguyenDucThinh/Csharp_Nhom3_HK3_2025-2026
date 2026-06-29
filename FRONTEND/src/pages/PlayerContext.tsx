@@ -10,7 +10,7 @@ interface PlayerContextType {
   favIds: Set<string>;
   setFavIds: (ids: Set<string>) => void;
   toggleFavId: (id: string) => void;
-  mediaRef: React.MutableRefObject<HTMLMediaElement | null>;
+  mediaRef: React.RefObject<HTMLMediaElement | null>;
 }
 
 const PlayerContext = createContext<PlayerContextType | undefined>(undefined);

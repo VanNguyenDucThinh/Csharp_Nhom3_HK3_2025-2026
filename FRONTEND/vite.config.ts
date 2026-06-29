@@ -20,9 +20,9 @@ export default defineConfig({
   // 2. CẤU HÌNH KIỂM THỬ (Giữ nguyên của bạn)
   test: {
     exclude: [
-      '**/node_modules/**', 
-      '**/dist/**',         
-      '**/.cypress/**'      
+      '**/node_modules/**',
+      '**/dist/**',
+      '**/.cypress/**'
     ]
   }
 })

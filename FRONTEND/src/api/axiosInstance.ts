@@ -1,30 +1,21 @@
 import axios from 'axios'
 
-// SỬA CHÍNH TẠI ĐÂY: Xóa đoạn http://localhost... đi. 
-// Chỉ để lại "/api" để bắt buộc Axios phải chạy qua cánh cửa Proxy ở trên.
-const BASE_URL = '/api' 
+const BASE_URL = '/api'
 
 const axiosInstance = axios.create({
   baseURL: BASE_URL,
-  headers: {
-    'Content-Type': 'application/json',
-  },
-  timeout: 15000, 
-})
+  headers: {'Content-Type': 'application/json',},
+  timeout: 120000,
+});
 
-// Interceptor: tự động gắn JWT token vào mọi request
 axiosInstance.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem('token')
-    if (token && config.headers) {
-      config.headers.Authorization = `Bearer ${token}`
-    }
+    if (token && config.headers) config.headers.Authorization = `Bearer ${token}`
     return config
-  },
-  (error) => Promise.reject(error)
+  }, (error) => Promise.reject(error)
 )
 
-// Interceptor: tự động logout nếu token hết hạn (lỗi 401)
 axiosInstance.interceptors.response.use(
   (response) => response,
   (error) => {
@@ -36,5 +27,7 @@ axiosInstance.interceptors.response.use(
     return Promise.reject(error)
   }
 )
+
+// const buildUrl = (path?: string) => path?.startsWith("http") ? path : `${domain}/${path}`;
 
 export default axiosInstance
