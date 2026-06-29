@@ -1,3 +1,4 @@
+<<<<<<< Updated upstream
 {
   "version": 2,
   "dgSpecHash": "R7bgFYF3QpI=",
@@ -38,4 +39,16 @@
     "C:\\Users\\ACER\\.nuget\\packages\\system.security.cryptography.protecteddata\\9.0.13\\system.security.cryptography.protecteddata.9.0.13.nupkg.sha512"
   ],
   "logs": []
+=======
+{
+  "version": 2,
+  "dgSpecHash": "y2LTtjwk4E0=",
+  "success": true,
+  "projectFilePath": "C:\\Users\\ACER\\Downloads\\Csharp_Nhom3_HK3_2025-2026\\BACKEND\\TuneVault\\TuneVault.API\\TuneVault.API.csproj",
+  "expectedPackageFiles": [
+    "C:\\Users\\ACER\\.nuget\\packages\\microsoft.aspnetcore.openapi\\10.0.7\\microsoft.aspnetcore.openapi.10.0.7.nupkg.sha512",
+    "C:\\Users\\ACER\\.nuget\\packages\\microsoft.openapi\\2.0.0\\microsoft.openapi.2.0.0.nupkg.sha512"
+  ],
+  "logs": []
+>>>>>>> Stashed changes
 }

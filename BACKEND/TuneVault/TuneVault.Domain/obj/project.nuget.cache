@@ -1,3 +1,4 @@
+<<<<<<< Updated upstream
 {
   "version": 2,
   "dgSpecHash": "7VTTPL5cU0Y=",
@@ -14,4 +15,13 @@
     "C:\\Users\\ACER\\.nuget\\packages\\microsoft.identitymodel.tokens\\8.14.0\\microsoft.identitymodel.tokens.8.14.0.nupkg.sha512"
   ],
   "logs": []
+=======
+{
+  "version": 2,
+  "dgSpecHash": "39Qko6213RY=",
+  "success": true,
+  "projectFilePath": "C:\\Users\\ACER\\Downloads\\Csharp_Nhom3_HK3_2025-2026\\BACKEND\\TuneVault\\TuneVault.Domain\\TuneVault.Domain.csproj",
+  "expectedPackageFiles": [],
+  "logs": []
+>>>>>>> Stashed changes
 }
